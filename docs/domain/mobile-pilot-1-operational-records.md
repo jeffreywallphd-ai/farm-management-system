@@ -5,7 +5,7 @@
 - Canonical for: operational-record meanings implemented in Mobile Pilot 1
 - Related ADRs: [ADR-0001](../adr/ADR-0001-offline-first-field-operation.md), [ADR-0002](../adr/ADR-0002-history-preserving-idempotent-synchronization.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](../adr/ADR-0005-data-portability-and-recoverability.md), [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md), [ADR-0009](../adr/ADR-0009-mobile-pilot-1-local-persistence.md), [ADR-0010](../adr/ADR-0010-mobile-pilot-1-export-and-recovery-copy.md), [ADR-0011](../adr/ADR-0011-mobile-pilot-1-runtime-boundary-validation.md)
 - Related docs: [Glossary](glossary.md), [Inventory and Reconciliation Rules](inventory-and-reconciliation-rules.md), [Initial Vertical Slice](../product/initial-vertical-slice.md), [Mobile Pilot 1 Implementation Scope](../product/mobile-pilot-1-implementation-scope.md), [Offline-First Mobile Architecture](../architecture/offline-first-mobile-architecture.md), [Mobile Pilot Data-Safety Requirements](../operations/mobile-pilot-data-safety-requirements.md), [Mobile App README](../../apps/mobile/README.md)
-- Related tests: not yet implemented
+- Related tests: [Harvest validation tests](../../apps/mobile/src/domain/validation/harvestValidation.test.ts), [Harvest use-case tests](../../apps/mobile/src/application/use-cases/harvestUseCases.test.ts)
 - Supersedes: none
 
 ## Purpose
@@ -48,10 +48,11 @@ Minimum required fields:
 Mobile Pilot 1 behavior:
 
 - Private and device-local.
-- Appears in local activity history.
-- Included in Mobile Pilot 1 export/backup.
+- Appears in harvest-specific local history.
+- Included in the implemented Mobile Pilot 1 recovery-copy export.
 - Export/recovery copies must include the tracked crop reference data needed to interpret exported harvest records.
 - Does not imply saleable inventory, customer fulfillment, marketplace availability, listing publication, or server synchronization.
+- Phase 2 implements read-only saved harvest records; editing, deletion, correction lineage, and supersession are deferred.
 
 Crop rename, deletion, and historical name-snapshot behavior are deferred because reference-editing behavior is not yet implemented in Mobile Pilot 1. Until that behavior is deliberately scoped, harvest records should preserve stable crop identity without silently losing the crop meaning needed for local history or export.
 

@@ -29,6 +29,7 @@ Helps agents work on offline mobile behavior, local retention, future-sync-compa
 
 - Supported private field recording must work without server connectivity.
 - In the standalone pilot, confirmed work is retained locally and shown in local history without server synchronization.
+- The current implemented operational workflow is manual harvest only; material use and inventory count remain unimplemented.
 - Mobile Pilot 1 work concerns local retention, local history, export/backup, record identity/history, and future-sync-compatible boundaries.
 - Future server-connected synchronization becomes applicable only after later authorized scope.
 - Server acceptance must be idempotent.

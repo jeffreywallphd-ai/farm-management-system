@@ -37,6 +37,7 @@ The current pilot is standalone mobile. This document does not define database s
 - Problem or trigger: produce is harvested and the worker wants to record crop, quantity, unit, and location before details are forgotten.
 - Desired user action: quickly record the harvest at or near the harvest location.
 - Expected pilot outcome: the harvest activity is saved locally, visible in local history, and clearly identified as stored on the device.
+- Implementation note: Phase 2 implements manual harvest entry, harvest-specific history/detail, and recovery-copy export for saved harvest records.
 - Why it matters: harvest records are high-value operational records and are easy to lose when entry is delayed.
 - Online/offline relevance: included workflow must remain usable without live connectivity or server availability.
 - Future server note: a later server-connected version may synchronize the retained record, but synchronization state is not part of the standalone pilot.

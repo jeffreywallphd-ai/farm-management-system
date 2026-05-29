@@ -42,7 +42,9 @@ Local and server environments may eventually have different storage implementati
 - Private and shared record categories must remain distinguishable.
 - Local storage, server storage, caching, exports, and later backups must preserve access classification.
 
-Phase 1 implements the first SQLite-backed local tables for Mobile Pilot 1 setup/reference information only: farms, farm locations, and tracked items. Operational-record tables, export generation, sync state, AI drafts, captures, publications, and authentication remain unimplemented.
+Phase 1 implements the first SQLite-backed local tables for Mobile Pilot 1 setup/reference information: farms, farm locations, and tracked items.
+
+Phase 2 adds SQLite-backed local persistence for `HarvestRecorded` only, plus a one-way versioned JSON recovery-copy export for farm setup/reference data and saved harvest records. `MaterialUseRecorded`, `InventoryCountRecorded`, unified multi-record history, import/restore, sync state, AI drafts, captures, publications, and authentication remain unimplemented.
 
 Beyond the Mobile Pilot 1 `expo-sqlite` decision in ADR-0009, this document does not choose server-side relational tables, document stores, event stores, server storage libraries, or server database products.
 

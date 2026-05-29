@@ -29,6 +29,7 @@ Helps agents handle product scope, farmer workflows, farm terminology, tracked i
 - First-slice scope is a narrow standalone mobile pilot.
 - Mobile Pilot 1 implements only `HarvestRecorded`, `MaterialUseRecorded`, and `InventoryCountRecorded`.
 - Phase 1 implements only the setup/reference data needed before those records: one local farm, locations, crops, materials, and countable items.
+- Phase 2 implements only the `HarvestRecorded` workflow; material use and inventory count remain accepted Pilot 1 scope but unimplemented.
 - TypeScript domain skeletons under `apps/mobile/src/domain` derive from the accepted Mobile Pilot 1 record document and must not become a competing source of domain truth.
 - Planting/transplanting, movement, equipment issue, and private supply-need records require later pilot scope authorization.
 - Use farmer-understandable terms from the glossary.
@@ -81,7 +82,7 @@ Review product and domain docs when workflows, terminology, record meaning, inve
 
 ## Required Verification Impact Review
 
-Future implementation must include domain behavior tests, sync/discrepancy tests for quantity-affecting records, privacy tests for supply/listing separation, and usability review for farmer-facing workflows.
+Future implementation must include domain behavior tests, local retention/history/export tests, discrepancy tests for inventory-affecting records, privacy tests for supply/listing separation, and usability review for farmer-facing workflows.
 
 ## Prompt Assembly Notes
 
