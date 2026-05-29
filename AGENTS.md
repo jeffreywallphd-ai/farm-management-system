@@ -19,7 +19,7 @@ For any non-trivial repository work, automated development agents must:
 7. Update canonical documentation and affected context packs when durable behavior changes.
 8. Report deferred decisions rather than silently selecting or implementing them.
 
-The current accepted implementation target is a standalone offline-first mobile pilot. Use the decision-readiness register and relevant ADRs before introducing server-connected, multi-device, hosted/local server, or external-publication scope.
+The current accepted implementation target is Mobile Pilot 1, defined in `docs/product/mobile-pilot-1-implementation-scope.md`. Use the decision-readiness register and relevant ADRs before introducing server-connected, multi-device, hosted/local server, external-publication, AI-assisted, or additional-record scope.
 
 ## Authority Rule
 

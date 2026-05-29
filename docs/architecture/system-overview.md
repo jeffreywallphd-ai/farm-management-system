@@ -2,9 +2,9 @@
 
 - Status: proposed
 - Last reviewed: 2026-05-28
-- Canonical for: immediate standalone mobile pilot topology, future server-connected expansion boundaries, information categories, and architecture invariants
+- Canonical for: standalone mobile pilot topology, Mobile Pilot 1 boundaries, future server-connected expansion boundaries, information categories, and architecture invariants
 - Related ADRs: [ADR-0001](../adr/ADR-0001-offline-first-field-operation.md), [ADR-0002](../adr/ADR-0002-history-preserving-idempotent-synchronization.md), [ADR-0003](../adr/ADR-0003-ai-interpretations-require-confirmation.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](../adr/ADR-0005-data-portability-and-recoverability.md), [ADR-0006](../adr/ADR-0006-deployment-mode-compatibility.md), [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md)
-- Related docs: [Architecture README](README.md), [Offline-First Mobile Architecture](offline-first-mobile-architecture.md), [Synchronization Architecture](synchronization-architecture.md), [Persistence and Attachment Storage](persistence-and-attachment-storage.md), [Identity, Privacy, and Sharing](identity-privacy-and-sharing.md), [Server and Deployment Operating Model](server-and-deployment-operating-model.md), [Initial Vertical Slice](../product/initial-vertical-slice.md), [Operational Event Catalog](../domain/operational-event-catalog.md)
+- Related docs: [Architecture README](README.md), [Offline-First Mobile Architecture](offline-first-mobile-architecture.md), [Synchronization Architecture](synchronization-architecture.md), [Persistence and Attachment Storage](persistence-and-attachment-storage.md), [Identity, Privacy, and Sharing](identity-privacy-and-sharing.md), [Server and Deployment Operating Model](server-and-deployment-operating-model.md), [Initial Vertical Slice](../product/initial-vertical-slice.md), [Mobile Pilot 1 Implementation Scope](../product/mobile-pilot-1-implementation-scope.md), [Mobile Pilot 1 Operational Records](../domain/mobile-pilot-1-operational-records.md), [Operational Event Catalog](../domain/operational-event-catalog.md), [Mobile Pilot Data-Safety Requirements](../operations/mobile-pilot-data-safety-requirements.md)
 - Related tests: not yet implemented
 - Supersedes: none
 
@@ -12,21 +12,21 @@
 
 The platform is intended to support small farms by making operational recording practical under real field conditions, including poor or unavailable connectivity.
 
-The accepted first implementation target is a standalone offline-first mobile pilot. Server synchronization, hosted/local/cooperative server operation, in-product listing publication, responses, and broader coordination remain future expansion areas.
+The accepted first implementation target is Mobile Pilot 1, a narrow standalone offline-first mobile increment. Server synchronization, hosted/local/cooperative server operation, in-product listing publication, responses, AI-assisted capture, additional record types, and broader coordination remain future expansion areas.
 
-## Immediate Topology: Standalone Mobile Pilot
+## Immediate Topology: Mobile Pilot 1
 
 ```text
-Standalone Mobile Pilot
+Mobile Pilot 1
 |-- Local farm setup/reference information
-|-- Local confirmed operational records
+|-- Local confirmed harvest, material-use, and inventory-count records
 |-- Local activity history
-|-- Constrained AI-assisted drafts and confirmation
-|-- Local retained captures/provenance according to pilot policy
 `-- Local export/backup pathway
 ```
 
-The pilot must not require server availability. Local records and captures remain private by default. Practical export/backup is required before farmers rely on the pilot for meaningful operational records.
+Mobile Pilot 1 must not require server availability. Local records remain private by default. Practical export/backup is required before farmers rely on the pilot for meaningful operational records.
+
+Later standalone mobile increments may add constrained AI-assisted drafts, retained captures/provenance, private supply-need notes, or additional manual records only after accepted scope updates.
 
 ## Future Topology: Server-Connected Expansion
 
@@ -59,10 +59,10 @@ This future topology is not authorized by the standalone pilot. It requires late
 | Information category | Meaning | Pilot posture |
 | --- | --- | --- |
 | Reference information | Local farm, locations, tracked items, and supported entry context | Created/available locally as needed for pilot workflows |
-| Confirmed operational records | Saved activities/observations accepted by the worker as farm records | Created and retained locally |
-| Draft interpretations | Unconfirmed voice/photo-assisted proposed records | Local drafts only; not farm history until confirmed |
-| Attachments/source captures | Photos/audio/files associated with drafts or records | Sensitive local content according to pilot policy |
-| Private supply needs | Internal recognition of a material/resource need | Optional local/private discovery workflow |
+| Confirmed operational records | Saved harvest, material-use, and inventory-count records accepted by the worker as farm records | Created and retained locally in Mobile Pilot 1 |
+| Draft interpretations | Unconfirmed voice/photo-assisted proposed records | Mobile Pilot 2 or later only; not farm history until confirmed |
+| Attachments/source captures | Photos/audio/files associated with drafts or records | Not required for Mobile Pilot 1; sensitive local content if later accepted |
+| Private supply needs | Internal recognition of a material/resource need | Candidate later discovery workflow |
 | Shared publication actions | Intentional need listings or later offers | Deferred from pilot |
 | Sync metadata | Server submission/acceptance/retry state | Deferred from pilot; local identity/history should support later sync |
 | Export/backup artifacts | User-controlled retrieval or backup of pilot data | Active pilot data-safety concern |

@@ -27,6 +27,8 @@ Helps agents handle product scope, farmer workflows, farm terminology, tracked i
 ## Core Guidance
 
 - First-slice scope is a narrow standalone mobile pilot.
+- Mobile Pilot 1 implements only `HarvestRecorded`, `MaterialUseRecorded`, and `InventoryCountRecorded`.
+- Planting/transplanting, movement, equipment issue, and private supply-need records require later pilot scope authorization.
 - Use farmer-understandable terms from the glossary.
 - Operational records represent confirmed activities or observations.
 - Inventory observations preserve discrepancy/history meaning.
@@ -54,10 +56,12 @@ Do not add accounting, payments, ecommerce, public marketplace, broad compliance
 
 - `docs/product/product-vision-and-scope.md`: product direction and non-goals.
 - `docs/product/initial-vertical-slice.md`: first-slice scope.
+- `docs/product/mobile-pilot-1-implementation-scope.md`: exact current Pilot 1 implementation scope.
 - `docs/product/field-workflows.md`: representative farmer workflows.
 - `docs/product/roadmap.md`: sequencing and scope-change rules.
 - `docs/domain/glossary.md`: authoritative terminology.
 - `docs/domain/farm-structure-and-tracked-items.md`: farm locations and tracked item categories.
+- `docs/domain/mobile-pilot-1-operational-records.md`: accepted Pilot 1 record semantics.
 - `docs/domain/operational-event-catalog.md`: activity/observation record meanings.
 - `docs/domain/inventory-and-reconciliation-rules.md`: inventory and discrepancy semantics.
 - `docs/domain/sourcing-and-local-network-model.md`: supply needs and listings.

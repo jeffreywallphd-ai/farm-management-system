@@ -22,9 +22,14 @@ For all non-trivial work:
 
 | Task category | Required specialized pack(s) | Primary canonical docs/ADRs/standards to read | Typical documentation impact |
 | --- | --- | --- | --- |
+| Implement Mobile Pilot 1 manual record core | `product-and-domain`, `mobile-field-capture`, `offline-sync`, `testing-and-diagnostics` | ADR-0007, `docs/product/mobile-pilot-1-implementation-scope.md`, `docs/domain/mobile-pilot-1-operational-records.md`, offline architecture, testing/usability standards | Authorized for the three accepted Pilot 1 records |
+| Implement Mobile Pilot 1 local export/backup | `server-deployment-and-operations`, `offline-sync`, `mobile-field-capture`, `testing-and-diagnostics`, `privacy-and-sharing` | ADR-0005, ADR-0007, `docs/operations/mobile-pilot-data-safety-requirements.md`, offline architecture, privacy docs | Authorized pilot data-safety work |
+| Implement planting/movement/equipment/supply-need record | `product-and-domain`, `documentation-and-adr-governance` | ADR-0007, roadmap, initial vertical slice, proposed event catalog | Not Mobile Pilot 1; requires scoped product update or later increment authorization |
+| Implement voice/photo draft feature | `ai-assisted-recording`, `mobile-field-capture`, `product-and-domain`, `privacy-and-sharing` as needed | ADR-0003, ADR-0007, AI domain/architecture docs, validation plan | Mobile Pilot 2 only; separate later prompt |
+| Implement server sync/publication/deployment | `documentation-and-adr-governance`, `dependency-and-technology-selection`, affected feature packs | ADR-0007, readiness register, sync/server/deployment docs | Deferred; requires later ADR/product authorization |
 | Standalone mobile pilot implementation | `product-and-domain`, `mobile-field-capture`, `offline-sync`, `testing-and-diagnostics` | ADR-0007, initial vertical slice, field workflows, offline architecture, export/backup operations docs | Product/architecture/operations/test impact |
-| Mobile local history/persistence/export/backup | `offline-sync`, `mobile-field-capture`, `server-deployment-and-operations`, `testing-and-diagnostics`, `privacy-and-sharing` as needed | ADR-0007, ADR-0005, offline architecture, backup/export docs, upgrade/recovery docs | Operations/privacy/verification impact |
-| Mobile voice/photo draft experiment | `ai-assisted-recording`, `mobile-field-capture`, `product-and-domain`, `privacy-and-sharing` as needed | ADR-0003, ADR-0007, AI domain/architecture docs, validation plan | Active only within constrained confirmed-draft boundaries |
+| Mobile local history/persistence/export/backup | `offline-sync`, `mobile-field-capture`, `server-deployment-and-operations`, `testing-and-diagnostics`, `privacy-and-sharing` as needed | ADR-0007, ADR-0005, offline architecture, mobile pilot data-safety doc, backup/export docs, upgrade/recovery docs | Operations/privacy/verification impact |
+| Mobile voice/photo draft experiment | `ai-assisted-recording`, `mobile-field-capture`, `product-and-domain`, `privacy-and-sharing` as needed | ADR-0003, ADR-0007, AI domain/architecture docs, validation plan | Mobile Pilot 2 only; active only within constrained confirmed-draft boundaries |
 | New or changed farm workflow | `product-and-domain`, possibly `mobile-field-capture` | Product scope/workflows, glossary, event catalog, relevant ADRs, naming/usability/testing standards | Product/domain updates likely |
 | New or changed operational record | `product-and-domain`, `offline-sync`, `testing-and-diagnostics` | Event catalog, inventory rules, sync docs/ADR, testing standards | Domain/architecture/ADR review likely |
 | Offline mobile persistence/status | `offline-sync`, `mobile-field-capture`, `testing-and-diagnostics` | Offline architecture, sync ADR/docs, usability/logging standards | Architecture/verification impact |
@@ -49,6 +54,7 @@ For all non-trivial work:
 
 - Use `index` plus only packs required by the task.
 - Do not include a pack merely because the affected subsystem could theoretically interact with it.
+- Use `docs/product/mobile-pilot-1-implementation-scope.md`, `docs/domain/mobile-pilot-1-operational-records.md`, and `docs/operations/mobile-pilot-data-safety-requirements.md` for first implementation prompts.
 - Include `privacy-and-sharing` whenever work may change external visibility, sensitive attachments, captures, exports, or access.
 - Include `offline-sync` whenever work may change retained field work, status, retry, conflicts, or publication timing.
 - Include `documentation-and-adr-governance` when making architecture/decision changes or selecting previously deferred technology.
@@ -98,6 +104,12 @@ Add:
 - testing-and-diagnostics.pack.md
 
 Then read named canonical sources and affected implementation/tests.
+
+For Mobile Pilot 1, also read:
+
+- docs/product/mobile-pilot-1-implementation-scope.md
+- docs/domain/mobile-pilot-1-operational-records.md
+- docs/operations/mobile-pilot-data-safety-requirements.md
 ```
 
 ### Example B: Implement or Review Local Mobile Retention or Export/Backup
@@ -122,6 +134,8 @@ Baseline plus:
 - privacy-and-sharing.pack.md, if audio retention/transfer/access is involved
 - offline-sync.pack.md, if local capture/confirmation/history/export behavior is involved
 - testing-and-diagnostics.pack.md
+
+This is Mobile Pilot 2 or later, not a Mobile Pilot 1 implementation task.
 ```
 
 ### Example D: Evaluate Future Need-Listing Publication

@@ -19,7 +19,7 @@ Do not use as the only context for behavior-changing work; add relevant speciali
 
 ## Project Identity
 
-This is an open-source small-farm support platform. The active implementation target is a standalone offline-first mobile pilot for practical farm activity recording, local history, trustworthy AI-assisted draft experiments, and data control/recovery. The first slice remains intentionally narrow.
+This is an open-source small-farm support platform. The active implementation target is Mobile Pilot 1: a standalone offline-first mobile increment for manual harvest, material-use, and inventory-count records, local history, and data control/recovery. The first slice remains intentionally narrow.
 
 ## Core Guidance
 
@@ -34,7 +34,7 @@ This is an open-source small-farm support platform. The active implementation ta
 ## Non-Negotiable Constraints
 
 - [ADR-0001](../../adr/ADR-0001-offline-first-field-operation.md): supported field recording must remain usable offline.
-- [ADR-0002](../../adr/ADR-0002-history-preserving-idempotent-synchronization.md): confirmed records must be retained and synchronized without silent loss, duplicate effects, or destructive history replacement.
+- [ADR-0002](../../adr/ADR-0002-history-preserving-idempotent-synchronization.md): confirmed pilot records must be safely retained locally; when server synchronization is later authorized, synchronization must not cause silent loss, duplicate effects, or destructive history replacement.
 - [ADR-0003](../../adr/ADR-0003-ai-interpretations-require-confirmation.md): AI-assisted interpretations remain drafts until explicit user confirmation.
 - [ADR-0004](../../adr/ADR-0004-private-by-default-intentional-sharing.md): farm operational data and sensitive captures are private by default; shared listings require intentional limited publication.
 - [ADR-0005](../../adr/ADR-0005-data-portability-and-recoverability.md): practical data portability and recoverability are foundational operating constraints.
@@ -43,8 +43,9 @@ This is an open-source small-farm support platform. The active implementation ta
 ## Current Pilot Sequencing
 
 - Local export/backup is required before meaningful farmer reliance.
+- Mobile Pilot 1 implements only `HarvestRecorded`, `MaterialUseRecorded`, and `InventoryCountRecorded`.
 - Later server compatibility must be preserved without implementing server infrastructure prematurely.
-- Private supply-need notes may support discovery, but platform publication and responses are not pilot scope.
+- Private supply-need notes, voice/photo drafts, platform publication, and responses are not Mobile Pilot 1 scope.
 
 ## Decisions Still Deferred
 
@@ -80,6 +81,9 @@ This pack identifies the baseline. It does not remove the requirement to read ac
 - `docs/README.md`: documentation authority and map.
 - `docs/adr/README.md`: ADR policy.
 - `docs/adr/decision-readiness-register.md`: deferred decisions.
+- `docs/product/mobile-pilot-1-implementation-scope.md`: exact current implementation scope.
+- `docs/domain/mobile-pilot-1-operational-records.md`: accepted Pilot 1 record meanings.
+- `docs/operations/mobile-pilot-data-safety-requirements.md`: accepted Pilot 1 data-safety requirements.
 - `docs/context/prompt-routing.md`: task classification and pack assembly.
 
 ## Required Standards

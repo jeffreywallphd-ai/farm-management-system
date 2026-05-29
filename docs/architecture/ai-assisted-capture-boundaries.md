@@ -12,7 +12,7 @@
 
 AI-assisted capture is a boundary capability that transforms user-provided source captures into reviewable drafts. It does not own or redefine the operational-record domain.
 
-In the standalone mobile pilot, AI-assisted capture is limited to constrained local draft-and-confirm experiments. Server inference, external provider transfer, synchronization of captures, and publication remain deferred unless later decisions authorize them.
+AI-assisted capture is Mobile Pilot 2 or later, not Mobile Pilot 1. When later authorized, it is limited to constrained local draft-and-confirm experiments. Server inference, external provider transfer, synchronization of captures, and publication remain deferred unless later decisions authorize them.
 
 ```text
 User Intentional Capture

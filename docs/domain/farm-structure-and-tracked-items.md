@@ -53,12 +53,12 @@ Practical location rules:
 
 Only the categories needed for initial workflows are defined here.
 
-| Category | Meaning | First-slice example uses |
+| Category | Meaning | Mobile Pilot 1 posture |
 | --- | --- | --- |
-| Crop / planting | Crop production associated with a location | Record planting/transplanting and harvest |
-| Material / input | Consumable or usable supply | Record use, count remaining amount, create supply need |
-| Equipment | Tool or machine whose condition may be noted | Record issue or maintenance-needed observation |
-| Countable item | Repeated standardized item tracked by count | Record seedling-flat or harvest-crate count; photo-count experiment |
+| Crop / planting | Crop production associated with a location | Crop/crop name is needed for harvest records; planting/transplanting records are candidate later workflows |
+| Material / input | Consumable or usable supply | Record material use and count remaining amount; supply-need records are candidate later workflows |
+| Equipment | Tool or machine whose condition may be noted | Candidate later equipment issue workflow, not Mobile Pilot 1 |
+| Countable item | Repeated standardized item tracked by count | Record manual inventory counts; photo-count experiment is Mobile Pilot 2 |
 
 These categories may share some later implementation mechanics, but they are not to be collapsed into one generic user-facing object in this document.
 
@@ -66,7 +66,7 @@ These categories may share some later implementation mechanics, but they are not
 
 A planting is a crop or crop variety associated with a growing location and relevant time period.
 
-The first slice should support enough meaning to record:
+The broader standalone mobile pilot may later support enough meaning to record:
 
 - That a crop was planted or transplanted.
 - Where it is growing.
@@ -117,7 +117,7 @@ Examples include:
 - Wash station tool.
 - Irrigation pump.
 
-The first slice may permit recording that an equipment issue exists, but should not expand into maintenance scheduling, parts inventory, telematics, or repair workflow management.
+Equipment issue recording is a candidate later standalone-mobile workflow. It should not expand into maintenance scheduling, parts inventory, telematics, or repair workflow management.
 
 ## Countable Item Concept
 
@@ -130,7 +130,7 @@ Examples include:
 - Trays.
 - Possibly bags of a standardized material.
 
-This concept supports the constrained photo-count experiment, but does not imply that the system can identify or count arbitrary objects.
+This concept supports manual inventory counts in Mobile Pilot 1 and the later constrained photo-count experiment in Mobile Pilot 2, but does not imply that the system can identify or count arbitrary objects.
 
 ## Explicit Non-Goals
 

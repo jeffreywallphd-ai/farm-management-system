@@ -14,8 +14,24 @@ This document describes representative real-world farmer workflows in plain oper
 
 The current pilot is standalone mobile. This document does not define database schemas, API contracts, synchronization mechanics, server behavior, or implementation architecture.
 
+## Workflow Status Summary
+
+| Workflow | Status |
+| --- | --- |
+| Manual harvest | Mobile Pilot 1 included |
+| Manual material use | Mobile Pilot 1 included |
+| Manual inventory count | Mobile Pilot 1 included |
+| Planting/transplanting | Candidate later workflow |
+| Item movement | Candidate later workflow |
+| Equipment issue | Candidate later workflow |
+| Private supply need | Candidate later discovery workflow |
+| Voice-assisted harvest draft | Mobile Pilot 2 experiment |
+| Photo-assisted count draft | Mobile Pilot 2 experiment |
+| Shared need publication | Future server-connected scope |
+
 ## Workflow 1: Record a Harvest in the Field Without Reception
 
+- Status: Mobile Pilot 1 included.
 - Actor: farm worker, family member, or owner/operator.
 - Physical/work context: field, bed, greenhouse, tunnel, or other production area with poor or unavailable reception.
 - Problem or trigger: produce is harvested and the worker wants to record crop, quantity, unit, and location before details are forgotten.
@@ -39,6 +55,7 @@ And the worker does not need to re-enter the harvest because a server was unavai
 
 ## Workflow 2: Record Material Use During Work
 
+- Status: Mobile Pilot 1 included.
 - Actor: worker applying or consuming a material/input.
 - Physical/work context: greenhouse, storage area, wash/pack area, field, barn, or tunnel.
 - Problem or trigger: the worker uses a material and wants the farm to retain what was used, where, and how much.
@@ -49,6 +66,7 @@ And the worker does not need to re-enter the harvest because a server was unavai
 
 ## Workflow 3: Move Items or Materials
 
+- Status: candidate later standalone-mobile workflow, not Mobile Pilot 1.
 - Actor: worker moving flats, crates, equipment, or materials between farm locations.
 - Physical/work context: greenhouse, tunnel, barn, storage area, wash/pack area, or field edge.
 - Problem or trigger: items are moved and the location/history would be useful later.
@@ -58,6 +76,7 @@ And the worker does not need to re-enter the harvest because a server was unavai
 
 ## Workflow 4: Record an Inventory Count or Observation
 
+- Status: Mobile Pilot 1 included.
 - Actor: owner/operator or worker checking materials or countable items.
 - Physical/work context: storage area, greenhouse, cooler, barn, wash/pack area, or field.
 - Problem or trigger: the observed amount differs from memory or expected quantity.
@@ -67,6 +86,7 @@ And the worker does not need to re-enter the harvest because a server was unavai
 
 ## Workflow 5: Record an Equipment Issue
 
+- Status: candidate later standalone-mobile workflow, not Mobile Pilot 1.
 - Actor: worker noticing damaged, missing, unsafe, or maintenance-needed equipment.
 - Physical/work context: any work area.
 - Problem or trigger: a tool or machine needs attention.
@@ -76,6 +96,7 @@ And the worker does not need to re-enter the harvest because a server was unavai
 
 ## Workflow 6: Voice-Assisted Harvest Draft
 
+- Status: Mobile Pilot 2 experiment, not Mobile Pilot 1.
 - Actor: worker who wants faster entry while hands are occupied.
 - Physical/work context: noisy, bright, wet, dirty, or fast-moving farm work.
 - Problem or trigger: speaking may be faster than typing for a supported workflow.
@@ -86,6 +107,7 @@ And the worker does not need to re-enter the harvest because a server was unavai
 
 ## Workflow 7: Photo-Assisted Count Draft
 
+- Status: Mobile Pilot 2 experiment, not Mobile Pilot 1.
 - Actor: worker counting a constrained item class such as seedling flats or harvest crates.
 - Physical/work context: greenhouse, wash/pack area, storage area, trailer, or barn.
 - Problem or trigger: manual counting or entry may be burdensome.
@@ -95,6 +117,7 @@ And the worker does not need to re-enter the harvest because a server was unavai
 
 ## Workflow 8: Record a Private Supply Need for Discovery
 
+- Status: candidate later discovery workflow, not Mobile Pilot 1.
 - Actor: owner/operator or worker noticing that a material/input may be needed.
 - Physical/work context: storage, greenhouse, barn, or field work.
 - Problem or trigger: a low-material observation or operational plan suggests a future need.
@@ -110,6 +133,10 @@ Server-connected expansion may later allow a farmer to transform a private suppl
 That future workflow must preserve ADR-0004: a shared listing is a limited representation, not exposure of private inventory, records, source captures, drafts, or usage history.
 
 Publication, withdrawal, responses, and external visibility are deferred from the standalone mobile pilot and require later product/ADR authorization.
+
+## Candidate Later Workflow: Planting or Transplanting
+
+Planting/transplanting remains a candidate later standalone-mobile workflow. Any reference to planting/transplanting in domain or architecture documents must not be read as Mobile Pilot 1 implementation scope.
 
 ## Future Workflow: Local Server or Hosted Synchronization
 

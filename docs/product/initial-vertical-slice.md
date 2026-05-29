@@ -4,7 +4,7 @@
 - Last reviewed: 2026-05-28
 - Canonical for: accepted standalone mobile pilot target, included pilot capabilities, pilot non-goals, and validation goals
 - Related ADRs: [ADR-0001](../adr/ADR-0001-offline-first-field-operation.md), [ADR-0003](../adr/ADR-0003-ai-interpretations-require-confirmation.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](../adr/ADR-0005-data-portability-and-recoverability.md), [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md)
-- Related docs: [Product Vision and Scope](product-vision-and-scope.md), [Field Workflows](field-workflows.md), [User Research and Validation](user-research-and-validation.md), [AI-Assisted Capture Validation Plan](ai-assisted-capture-validation-plan.md), [Local Coordination and Sharing Validation Plan](local-coordination-and-sharing-validation-plan.md), [Deployment and Data-Control Validation Plan](deployment-and-data-control-validation-plan.md), [Roadmap](roadmap.md)
+- Related docs: [Product Vision and Scope](product-vision-and-scope.md), [Mobile Pilot 1 Implementation Scope](mobile-pilot-1-implementation-scope.md), [Field Workflows](field-workflows.md), [User Research and Validation](user-research-and-validation.md), [AI-Assisted Capture Validation Plan](ai-assisted-capture-validation-plan.md), [Local Coordination and Sharing Validation Plan](local-coordination-and-sharing-validation-plan.md), [Deployment and Data-Control Validation Plan](deployment-and-data-control-validation-plan.md), [Roadmap](roadmap.md), [Mobile Pilot 1 Operational Records](../domain/mobile-pilot-1-operational-records.md), [Mobile Pilot Data-Safety Requirements](../operations/mobile-pilot-data-safety-requirements.md)
 - Related tests: not yet implemented
 - Supersedes: none
 
@@ -12,9 +12,25 @@
 
 The first vertical slice is a standalone offline-first mobile pilot that farmers can download and use during real work for customer discovery and workflow validation.
 
-The pilot supports a single-farm, device-local operating context; minimal local setup; narrowly scoped manual operational records; local activity history; understandable local saved state; constrained voice/photo draft experiments; and practical export/backup before farmers rely on the pilot for meaningful operational data.
+The broader standalone mobile pilot program supports a single-farm, device-local operating context; minimal local setup; narrowly scoped manual operational records; local activity history; understandable local saved state; later constrained voice/photo draft experiments; and practical export/backup before farmers rely on the pilot for meaningful operational data.
 
 The pilot must remain compatible with later server connection, but it does not implement server synchronization, multi-device coordination, hosted/local/cooperative server operation, in-product shared listing publication, listing responses, or broader network functionality.
+
+## Mobile Pilot 1 Exact Implementation Scope
+
+[Mobile Pilot 1](mobile-pilot-1-implementation-scope.md) is the first buildable increment of this broader standalone mobile pilot program.
+
+Mobile Pilot 1 includes only:
+
+- Manual `HarvestRecorded`.
+- Manual `MaterialUseRecorded`.
+- Manual `InventoryCountRecorded`.
+- Minimal local setup/reference information needed for those records.
+- Local activity history, clear device-local saved state, offline retention, and practical export/backup.
+
+The accepted record meanings are defined in [Mobile Pilot 1 Operational Records](../domain/mobile-pilot-1-operational-records.md). The accepted pilot data-safety requirements are defined in [Mobile Pilot Data-Safety Requirements](../operations/mobile-pilot-data-safety-requirements.md).
+
+Voice/photo assisted capture, private supply-need notes, planting/transplanting, item movement, equipment issues, and server-connected features are not Mobile Pilot 1 implementation scope unless later canonical documents intentionally authorize a later increment.
 
 ## What the Pilot Proves
 
@@ -41,17 +57,13 @@ This slice does not design account systems, multi-device membership, or final id
 
 ### B. Manual Activity and Observation Recording
 
-The pilot may include a narrow set of farmer-facing record categories:
+Mobile Pilot 1 includes the smallest accepted manual record set:
 
-- Planting or transplanting record.
 - Harvest record.
 - Material-use record.
-- Movement record.
 - Inventory observation/count.
-- Equipment issue or maintenance-needed note.
-- Private internal supply-need note, if useful for discovery.
 
-New record types should not be added casually. The pilot should begin with the smallest set that can support meaningful farmer discovery.
+Candidate later standalone workflows include planting/transplanting, movement, equipment issue or maintenance-needed note, and private internal supply-need note. They must not be implemented as Mobile Pilot 1 scope without a product-scope update or later increment authorization.
 
 ### C. Local Activity History and Saved State
 
@@ -90,7 +102,7 @@ This document does not choose export file format, backup mechanism, restore work
 
 ### F. Voice-Assisted Draft Experiment
 
-The pilot may include one constrained voice-to-draft experiment, preferably beginning with one high-value workflow such as harvest recording.
+Mobile Pilot 2 may include one constrained voice-to-draft experiment, preferably beginning with one high-value workflow such as harvest recording.
 
 Required product behavior:
 
@@ -104,7 +116,7 @@ Open-ended voice assistants, automatic recommendations, and autonomous farm acti
 
 ### G. Photo-Count Draft Experiment
 
-The pilot may include one constrained photo-count-to-draft experiment, preferably beginning with one standardized item class such as seedling flats or harvest crates.
+Mobile Pilot 2 may include one constrained photo-count-to-draft experiment, preferably beginning with one standardized item class such as seedling flats or harvest crates.
 
 Required product behavior:
 
@@ -119,7 +131,7 @@ Arbitrary object recognition, plant-disease diagnosis, weed detection, yield pre
 
 ### H. Private Supply-Need Discovery
 
-The pilot may allow a farmer to record a private internal supply need if this helps discovery.
+A later standalone mobile pilot increment may allow a farmer to record a private internal supply need if this helps discovery.
 
 Rules:
 

@@ -4,7 +4,7 @@
 - Last reviewed: 2026-05-28
 - Canonical for: backup, restore, export, portability, migration, sensitive backup handling, and data ownership requirements
 - Related ADRs: [ADR-0002](../adr/ADR-0002-history-preserving-idempotent-synchronization.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](../adr/ADR-0005-data-portability-and-recoverability.md), [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md)
-- Related docs: [Operations README](README.md), [Deployment Modes](deployment-modes.md), [Local Farm Server Experience](local-farm-server-experience.md), [Upgrades, Migrations, and Recovery Requirements](upgrades-migrations-and-recovery-requirements.md), [Persistence and Attachment Storage](../architecture/persistence-and-attachment-storage.md), [Identity, Privacy, and Sharing](../architecture/identity-privacy-and-sharing.md)
+- Related docs: [Operations README](README.md), [Mobile Pilot Data-Safety Requirements](mobile-pilot-data-safety-requirements.md), [Deployment Modes](deployment-modes.md), [Local Farm Server Experience](local-farm-server-experience.md), [Upgrades, Migrations, and Recovery Requirements](upgrades-migrations-and-recovery-requirements.md), [Persistence and Attachment Storage](../architecture/persistence-and-attachment-storage.md), [Identity, Privacy, and Sharing](../architecture/identity-privacy-and-sharing.md)
 - Related tests: not yet implemented
 - Supersedes: none
 
@@ -13,6 +13,12 @@
 This document defines product and operational requirements for backup, restore, export, portability, and data ownership before real farm records become dependent on the platform.
 
 It does not provide commands for unimplemented infrastructure.
+
+## Relationship to Mobile Pilot 1
+
+[Mobile Pilot Data-Safety Requirements](mobile-pilot-data-safety-requirements.md) is accepted and governs current Mobile Pilot 1 local retention, export/backup, farmer communication, and update/replacement safety.
+
+This proposed broader document remains future-facing guidance for later standalone-mobile increments, server backups, hosted export, local-server restore, migration between deployments, synchronization recovery, and sensitive audio/photo handling.
 
 ## Standalone Mobile Pilot Requirement
 

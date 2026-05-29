@@ -4,7 +4,7 @@
 - Last reviewed: 2026-05-28
 - Canonical for: product sequencing, conditional expansion gates, and corrected standalone mobile pilot order
 - Related ADRs: [ADR-0001](../adr/ADR-0001-offline-first-field-operation.md), [ADR-0003](../adr/ADR-0003-ai-interpretations-require-confirmation.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](../adr/ADR-0005-data-portability-and-recoverability.md), [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md)
-- Related docs: [Product Vision and Scope](product-vision-and-scope.md), [Initial Vertical Slice](initial-vertical-slice.md), [Field Workflows](field-workflows.md), [User Research and Validation](user-research-and-validation.md), [AI-Assisted Capture Validation Plan](ai-assisted-capture-validation-plan.md), [Local Coordination and Sharing Validation Plan](local-coordination-and-sharing-validation-plan.md), [Deployment and Data-Control Validation Plan](deployment-and-data-control-validation-plan.md)
+- Related docs: [Product Vision and Scope](product-vision-and-scope.md), [Initial Vertical Slice](initial-vertical-slice.md), [Mobile Pilot 1 Implementation Scope](mobile-pilot-1-implementation-scope.md), [Field Workflows](field-workflows.md), [User Research and Validation](user-research-and-validation.md), [AI-Assisted Capture Validation Plan](ai-assisted-capture-validation-plan.md), [Local Coordination and Sharing Validation Plan](local-coordination-and-sharing-validation-plan.md), [Deployment and Data-Control Validation Plan](deployment-and-data-control-validation-plan.md)
 - Related tests: not yet implemented
 - Supersedes: none
 
@@ -19,7 +19,7 @@ Server-connected functionality remains a motivating future direction, but the ac
 | Phase | Primary purpose | Implementation posture |
 | --- | --- | --- |
 | Documentation foundation and correction | Establish implementation-safe product, domain, architecture, operations, ADR, standards, and context guidance | Current foundation work |
-| Mobile Pilot 1 | Manual offline recording, minimal local farm setup, local history, local persistence, clear local saved state, export/backup | First implementation target |
+| Mobile Pilot 1 | Manual harvest, material use, inventory count, minimal local farm setup, local history, local persistence, clear local saved state, export/backup | First implementation target |
 | Mobile Pilot 2 | Constrained voice-to-draft and photo-count-to-draft experiments | Implement only within draft-confirm boundaries |
 | Farmer discovery period | Use real pilot feedback to refine workflows and determine next priorities | Evidence-gathering gate |
 | Server decision phase | Decide synchronization, hosting/local operation, coordination, and deployment priorities based on evidence | ADR/product updates required before implementation |
@@ -27,17 +27,19 @@ Server-connected functionality remains a motivating future direction, but the ac
 
 ## Mobile Pilot 1: Manual Offline Recording
 
+[Mobile Pilot 1](mobile-pilot-1-implementation-scope.md) is the exact first buildable increment.
+
 Focus:
 
 - Device-local mobile use during real farm work.
 - Basic local farm setup.
-- Narrow manual activity/observation recording.
+- Manual `HarvestRecorded`, `MaterialUseRecorded`, and `InventoryCountRecorded`.
 - Local activity history.
 - Local durable retention appropriate to the pilot.
 - Clear local saved state.
 - Practical export/backup before meaningful farmer reliance.
 
-Do not include server synchronization, shared publication, multi-device access, or server deployment.
+Do not include planting/transplanting, item movement, equipment issue, private supply-need note, AI-assisted capture, server synchronization, shared publication, multi-device access, or server deployment unless later scope is accepted.
 
 ## Mobile Pilot 2: Constrained Assisted Capture
 

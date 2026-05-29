@@ -29,6 +29,7 @@ Helps agents work on offline mobile behavior, local retention, future-sync-compa
 
 - Supported private field recording must work without server connectivity.
 - In the standalone pilot, confirmed work is retained locally and shown in local history without server synchronization.
+- Mobile Pilot 1 work concerns local retention, local history, export/backup, record identity/history, and future-sync-compatible boundaries.
 - Future server-connected synchronization becomes applicable only after later authorized scope.
 - Server acceptance must be idempotent.
 - Additive operational records should not overwrite each other.
@@ -51,11 +52,14 @@ Local/server database, sync engine/protocol/library, API transport, background s
 
 ## Explicit Non-Goals / Overreach to Avoid
 
-Do not treat this pack as authorization to implement a server, sync protocol, cross-device synchronization, or publication state during the pilot. Do not choose a sync technology, invent server APIs, implement last-write-wins for meaningful farm history, or treat local pending publication as shared visibility.
+Do not treat this pack as authorization to implement outbox behavior, server APIs, sync UI, server acceptance, a server, sync protocol, cross-device synchronization, or publication state during the pilot. Do not choose a sync technology, implement last-write-wins for meaningful farm history, or treat local pending publication as shared visibility.
 
 ## Canonical Source Documents and ADRs
 
 - `docs/architecture/offline-first-mobile-architecture.md`: local retained work responsibilities.
+- `docs/product/mobile-pilot-1-implementation-scope.md`: exact current Pilot 1 scope.
+- `docs/domain/mobile-pilot-1-operational-records.md`: accepted Pilot 1 record identity/history needs.
+- `docs/operations/mobile-pilot-data-safety-requirements.md`: local export/backup and data-safety needs.
 - `docs/architecture/synchronization-architecture.md`: sync lifecycle, statuses, idempotency, and conflict posture.
 - `docs/architecture/persistence-and-attachment-storage.md`: durable local/server storage and attachments.
 - `docs/domain/inventory-and-reconciliation-rules.md`: discrepancy behavior.

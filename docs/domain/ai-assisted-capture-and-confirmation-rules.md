@@ -14,7 +14,7 @@ AI-assisted capture is intended to reduce the burden of routine field recording,
 
 AI-assisted capture is an experimental convenience layer over trustworthy operational records. It is not an autonomous farm-management authority.
 
-The assisted-capture experiment occurs inside the standalone mobile pilot. Confirmed AI-assisted records remain local/private during the pilot unless included in a user-controlled export or backup. Future sharing, publication, server transfer, or model-provider workflows require separate later authorization.
+The assisted-capture experiment is Mobile Pilot 2 or later, not Mobile Pilot 1. Confirmed AI-assisted records remain local/private during that later pilot increment unless included in a user-controlled export or backup. Future sharing, publication, server transfer, or model-provider workflows require separate later authorization.
 
 ## Domain Concepts
 

@@ -30,6 +30,8 @@ Helps agents work on user-facing mobile workflows involving activity entry, fiel
 - Interactions occur during real farm work with limited attention, poor connectivity, glare, gloves, dirt, wet hands, noise, and physical movement.
 - Frequent workflows must be fast and understandable.
 - Farmer language governs user-facing concepts.
+- Mobile Pilot 1 covers manual entry for harvest, material use, and inventory count plus export/backup usability.
+- Voice/photo capture is Mobile Pilot 2 or later and must not be pulled into a first implementation prompt.
 - Local saved state and local history must be understandable in the standalone pilot.
 - Export/backup usability is part of pilot data trust before meaningful reliance.
 - Sync, publication, and attention states apply later only when server-connected scope is authorized.
@@ -55,7 +57,9 @@ Do not build office-first workflows, make voice/camera the only path, hide pendi
 
 - `docs/product/field-workflows.md`: representative field workflows.
 - `docs/product/initial-vertical-slice.md`: included first-slice capabilities.
+- `docs/product/mobile-pilot-1-implementation-scope.md`: exact current Pilot 1 scope.
 - `docs/architecture/offline-first-mobile-architecture.md`: mobile local-retention responsibilities.
+- `docs/operations/mobile-pilot-data-safety-requirements.md`: export/backup and update/replacement safety.
 - `docs/domain/glossary.md`: farmer-facing terminology.
 - `docs/architecture/ai-assisted-capture-boundaries.md`: assisted capture flow where relevant.
 

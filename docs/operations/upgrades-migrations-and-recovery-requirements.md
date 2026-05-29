@@ -4,7 +4,7 @@
 - Last reviewed: 2026-05-28
 - Canonical for: upgrade safety, migration expectations, synchronization repair, failure visibility, and recovery requirements
 - Related ADRs: [ADR-0001](../adr/ADR-0001-offline-first-field-operation.md), [ADR-0002](../adr/ADR-0002-history-preserving-idempotent-synchronization.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](../adr/ADR-0005-data-portability-and-recoverability.md), [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md)
-- Related docs: [Operations README](README.md), [Deployment Modes](deployment-modes.md), [Backup, Restore, and Data Export Requirements](backup-restore-and-data-export-requirements.md), [Synchronization Architecture](../architecture/synchronization-architecture.md), [Server and Deployment Operating Model](../architecture/server-and-deployment-operating-model.md)
+- Related docs: [Operations README](README.md), [Mobile Pilot Data-Safety Requirements](mobile-pilot-data-safety-requirements.md), [Deployment Modes](deployment-modes.md), [Backup, Restore, and Data Export Requirements](backup-restore-and-data-export-requirements.md), [Synchronization Architecture](../architecture/synchronization-architecture.md), [Server and Deployment Operating Model](../architecture/server-and-deployment-operating-model.md)
 - Related tests: not yet implemented
 - Supersedes: none
 
@@ -13,6 +13,8 @@
 This document defines product and operational expectations for upgrades, data migrations, synchronization repair, failure visibility, and recoverability across supported deployment modes.
 
 It establishes safety expectations without implementing upgrade tooling.
+
+[Mobile Pilot Data-Safety Requirements](mobile-pilot-data-safety-requirements.md) is accepted and governs current Mobile Pilot 1 update/replacement safety. This proposed broader document remains future-facing for later migrations, server reconnect, deployment modes, and synchronization repair.
 
 ## Why Upgrades and Recovery Matter
 

@@ -4,7 +4,7 @@
 - Last reviewed: 2026-05-28
 - Canonical for: product vision, product principles, intended users, accepted standalone mobile pilot scope, and product-scope boundaries
 - Related ADRs: [ADR-0001](../adr/ADR-0001-offline-first-field-operation.md), [ADR-0003](../adr/ADR-0003-ai-interpretations-require-confirmation.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](../adr/ADR-0005-data-portability-and-recoverability.md), [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md)
-- Related docs: [Product README](README.md), [Initial Vertical Slice](initial-vertical-slice.md), [Field Workflows](field-workflows.md), [User Research and Validation](user-research-and-validation.md), [Local Coordination and Sharing Validation Plan](local-coordination-and-sharing-validation-plan.md), [Deployment and Data-Control Validation Plan](deployment-and-data-control-validation-plan.md), [Roadmap](roadmap.md)
+- Related docs: [Product README](README.md), [Initial Vertical Slice](initial-vertical-slice.md), [Mobile Pilot 1 Implementation Scope](mobile-pilot-1-implementation-scope.md), [Field Workflows](field-workflows.md), [User Research and Validation](user-research-and-validation.md), [Local Coordination and Sharing Validation Plan](local-coordination-and-sharing-validation-plan.md), [Deployment and Data-Control Validation Plan](deployment-and-data-control-validation-plan.md), [Roadmap](roadmap.md)
 - Related tests: not yet implemented
 - Supersedes: none
 
@@ -71,7 +71,7 @@ The standalone mobile pilot is not a generic farm ERP, marketplace, social netwo
 
 The pilot must not include server synchronization, multi-device farm access, hosted/local/cooperative server implementation, in-product shared need-listing publication, listing responses, public sharing, payments, or marketplace/social functionality unless product scope and ADRs are intentionally revised.
 
-The detailed first-pilot inclusions and exclusions are defined in [Initial Vertical Slice](initial-vertical-slice.md).
+The exact first buildable Mobile Pilot 1 inclusions and exclusions are defined in [Mobile Pilot 1 Implementation Scope](mobile-pilot-1-implementation-scope.md). The broader standalone pilot program is described in [Initial Vertical Slice](initial-vertical-slice.md).
 
 ## Open Questions
 

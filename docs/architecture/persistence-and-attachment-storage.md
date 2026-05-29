@@ -4,7 +4,7 @@
 - Last reviewed: 2026-05-28
 - Canonical for: architecture-level persistence responsibilities, attachment lifecycle principles, storage boundaries, and export/data ownership implications
 - Related ADRs: [ADR-0002](../adr/ADR-0002-history-preserving-idempotent-synchronization.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](../adr/ADR-0005-data-portability-and-recoverability.md), [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md)
-- Related docs: [System Overview](system-overview.md), [Offline-First Mobile Architecture](offline-first-mobile-architecture.md), [Synchronization Architecture](synchronization-architecture.md), [AI-Assisted Capture Boundaries](ai-assisted-capture-boundaries.md), [Identity, Privacy, and Sharing](identity-privacy-and-sharing.md), [Server and Deployment Operating Model](server-and-deployment-operating-model.md), [Backup, Restore, and Data Export Requirements](../operations/backup-restore-and-data-export-requirements.md), [Operational Event Catalog](../domain/operational-event-catalog.md), [Sourcing and Local Network Model](../domain/sourcing-and-local-network-model.md)
+- Related docs: [System Overview](system-overview.md), [Offline-First Mobile Architecture](offline-first-mobile-architecture.md), [Synchronization Architecture](synchronization-architecture.md), [AI-Assisted Capture Boundaries](ai-assisted-capture-boundaries.md), [Identity, Privacy, and Sharing](identity-privacy-and-sharing.md), [Server and Deployment Operating Model](server-and-deployment-operating-model.md), [Mobile Pilot Data-Safety Requirements](../operations/mobile-pilot-data-safety-requirements.md), [Backup, Restore, and Data Export Requirements](../operations/backup-restore-and-data-export-requirements.md), [Mobile Pilot 1 Operational Records](../domain/mobile-pilot-1-operational-records.md), [Operational Event Catalog](../domain/operational-event-catalog.md), [Sourcing and Local Network Model](../domain/sourcing-and-local-network-model.md)
 - Related tests: not yet implemented
 - Supersedes: none
 
@@ -24,12 +24,14 @@ Local and server environments may eventually have different storage implementati
 
 | Data category | Examples | Durability need | Initial sharing posture |
 | --- | --- | --- | --- |
-| Farm/reference information | locations, crops, materials, countable items | Locally available enough for supported offline work; server-managed synchronization later | Private/authorized |
-| Confirmed operational records | harvest, material use, count, movement, issue | Durable locally in the pilot; durably accepted on server later if synchronization is authorized | Private by default |
-| Draft interpretations | voice/photo proposed records | Retained as needed for review; not operational history | Private |
-| Attachments | photo, audio, later document | Retained locally pending transfer; linked securely to draft or record | Follows associated privacy policy |
-| Sync state | pending/accepted/failed status, cursor/bookkeeping | Durable enough to recover from restarts/retries | Internal |
-| Shared listing records/actions | intentionally published need information | Durable with publication status | Shared only after intentional publication and acceptance |
+| Mobile Pilot 1 setup/reference information | farm context, locations, crops, materials, countable items needed for included records | Locally available enough for supported offline work; included in export/backup | Private/device-local |
+| Mobile Pilot 1 confirmed operational records | harvest, material use, inventory count | Durable locally in the pilot; included in export/backup | Private by default |
+| Local activity history | recent included records and their basic correction/status meaning | Durable enough for pilot review and export/backup | Private/device-local |
+| Export/recovery-copy data | user-controlled copy of pilot data | Complete enough to understand Mobile Pilot 1 records | Private/sensitive |
+| Draft interpretations | voice/photo proposed records | Mobile Pilot 2 or later only; not Mobile Pilot 1 operational history | Private |
+| Attachments | photo, audio, later document | Not required for Mobile Pilot 1 unless independently introduced; later retention governed separately | Follows associated privacy policy |
+| Sync state | pending/accepted/failed status, cursor/bookkeeping | Future server-connected scope only | Internal |
+| Shared listing records/actions | intentionally published need information | Future server-connected scope only | Shared only after intentional publication and acceptance |
 
 ## Structured Record Persistence Responsibilities
 
@@ -44,7 +46,7 @@ This document does not choose relational tables, document stores, event stores, 
 
 ## Attachment Responsibilities
 
-- Photos or audio may be captured and retained locally during the pilot according to policy; future server transfer remains deferred.
+- Photos or audio are not required in Mobile Pilot 1. They may be captured and retained only in Mobile Pilot 2 or later according to accepted policy; future server transfer remains deferred.
 - Attachments may be associated with unconfirmed drafts or confirmed records.
 - Operational records must remain distinguishable from source captures, interpretation drafts, and attachments.
 - Attachment retention must not cause the associated confirmed record to disappear if upload is delayed.

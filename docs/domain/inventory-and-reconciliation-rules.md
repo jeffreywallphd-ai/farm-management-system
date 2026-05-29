@@ -4,7 +4,7 @@
 - Last reviewed: 2026-05-28
 - Canonical for: first-slice inventory meaning, quantity semantics, discrepancy handling, and reconciliation principles
 - Related ADRs: [ADR-0002](../adr/ADR-0002-history-preserving-idempotent-synchronization.md), [ADR-0003](../adr/ADR-0003-ai-interpretations-require-confirmation.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md)
-- Related docs: [Glossary](glossary.md), [Farm Structure and Tracked Items](farm-structure-and-tracked-items.md), [Operational Event Catalog](operational-event-catalog.md), [AI-Assisted Capture and Confirmation Rules](ai-assisted-capture-and-confirmation-rules.md), [Privacy, Visibility, and Sharing Rules](privacy-visibility-and-sharing-rules.md), [Sourcing and Local Network Model](sourcing-and-local-network-model.md), [Initial Vertical Slice](../product/initial-vertical-slice.md)
+- Related docs: [Glossary](glossary.md), [Farm Structure and Tracked Items](farm-structure-and-tracked-items.md), [Mobile Pilot 1 Operational Records](mobile-pilot-1-operational-records.md), [Operational Event Catalog](operational-event-catalog.md), [AI-Assisted Capture and Confirmation Rules](ai-assisted-capture-and-confirmation-rules.md), [Privacy, Visibility, and Sharing Rules](privacy-visibility-and-sharing-rules.md), [Sourcing and Local Network Model](sourcing-and-local-network-model.md), [Initial Vertical Slice](../product/initial-vertical-slice.md)
 - Related tests: not yet implemented
 - Supersedes: none
 
@@ -16,7 +16,11 @@ The first release does not need a comprehensive accounting-grade inventory syste
 
 ## Initial Inventory Scope
 
-The first slice may track practical quantities for:
+Mobile Pilot 1 uses the accepted [Mobile Pilot 1 Operational Records](mobile-pilot-1-operational-records.md) document for the implemented inventory-related records: `MaterialUseRecorded` and `InventoryCountRecorded`.
+
+For Mobile Pilot 1, inventory meaning is limited to material use, inventory-count observations, and any simple expected-versus-observed display explicitly implemented for those records. Broader inventory records in the proposed event catalog do not become first-build scope through this document.
+
+The broader first slice may later track practical quantities for:
 
 - Materials/inputs.
 - Countable standardized items.
@@ -74,14 +78,14 @@ Proposed first-slice product behavior:
 
 | Record | Initial inventory interpretation |
 | --- | --- |
-| Material use recorded | Reduces expected quantity of the selected material when an expected quantity exists |
-| Inventory count recorded | Provides observed quantity at a point in time |
-| Item movement recorded | May change location assignment; does not reduce overall quantity |
-| Harvest recorded | Records output quantity but does not require full saleable inventory management |
-| Supply need recognized | Expresses a need; does not alter inventory |
-| Need listing published | Shares a need; does not alter internal inventory |
-| Equipment issue recorded | No inventory effect |
-| Planting/transplanting recorded | No required material-inventory effect initially |
+| Material use recorded | Mobile Pilot 1 included; may reduce expected quantity of the selected material when an expected quantity exists and the behavior is transparent |
+| Inventory count recorded | Mobile Pilot 1 included; provides observed quantity at a point in time |
+| Harvest recorded | Mobile Pilot 1 included; records output quantity but does not require full saleable inventory management |
+| Item movement recorded | Candidate later workflow; may change location assignment if later implemented |
+| Supply need recognized | Candidate later discovery workflow; expresses a need but does not alter inventory |
+| Need listing published | Future server-connected only; shares a need but does not alter internal inventory |
+| Equipment issue recorded | Candidate later workflow; no inventory effect |
+| Planting/transplanting recorded | Candidate later workflow; no required material-inventory effect initially |
 
 ## AI-Assisted Drafts and Inventory
 

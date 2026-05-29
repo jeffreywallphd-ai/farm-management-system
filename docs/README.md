@@ -29,6 +29,7 @@ Product scope is currently defined by:
 
 - [Product Vision and Scope](product/product-vision-and-scope.md)
 - [Initial Vertical Slice](product/initial-vertical-slice.md)
+- [Mobile Pilot 1 Implementation Scope](product/mobile-pilot-1-implementation-scope.md)
 - [Field Workflows](product/field-workflows.md)
 - [User Research and Validation](product/user-research-and-validation.md)
 - [AI-Assisted Capture Validation Plan](product/ai-assisted-capture-validation-plan.md)
@@ -42,6 +43,7 @@ Farm-domain behavior is currently defined by:
 
 - [Farm Domain Glossary](domain/glossary.md)
 - [Farm Structure and Tracked Items](domain/farm-structure-and-tracked-items.md)
+- [Mobile Pilot 1 Operational Records](domain/mobile-pilot-1-operational-records.md)
 - [Operational Event Catalog](domain/operational-event-catalog.md)
 - [Inventory and Reconciliation Rules](domain/inventory-and-reconciliation-rules.md)
 - [Sourcing and Local Network Model](domain/sourcing-and-local-network-model.md)
@@ -78,12 +80,13 @@ Accepted ADRs govern the decisions they record. ADR-0007 establishes the current
 
 Operations requirements are currently defined by:
 
+- [Mobile Pilot Data-Safety Requirements](operations/mobile-pilot-data-safety-requirements.md)
 - [Deployment Modes](operations/deployment-modes.md)
 - [Local Farm Server Experience](operations/local-farm-server-experience.md)
 - [Backup, Restore, and Data Export Requirements](operations/backup-restore-and-data-export-requirements.md)
 - [Upgrades, Migrations, and Recovery Requirements](operations/upgrades-migrations-and-recovery-requirements.md)
 
-These documents are proposed operating requirements and target experiences. They are not installation instructions for implemented deployment modes.
+The mobile pilot data-safety document is accepted for current Mobile Pilot 1 implementation. The broader operations documents are proposed operating requirements and target experiences. They are not installation instructions for implemented deployment modes.
 
 Repository-wide standards are currently defined by:
 

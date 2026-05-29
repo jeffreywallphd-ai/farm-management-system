@@ -4,7 +4,7 @@
 - Last reviewed: 2026-05-28
 - Canonical for: standalone mobile pilot offline behavior, local retained work, draft lifecycle, local saved-state boundaries, and future-sync compatibility
 - Related ADRs: [ADR-0001](../adr/ADR-0001-offline-first-field-operation.md), [ADR-0002](../adr/ADR-0002-history-preserving-idempotent-synchronization.md), [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md)
-- Related docs: [System Overview](system-overview.md), [Synchronization Architecture](synchronization-architecture.md), [Persistence and Attachment Storage](persistence-and-attachment-storage.md), [AI-Assisted Capture Boundaries](ai-assisted-capture-boundaries.md), [Identity, Privacy, and Sharing](identity-privacy-and-sharing.md), [Server and Deployment Operating Model](server-and-deployment-operating-model.md), [Initial Vertical Slice](../product/initial-vertical-slice.md), [Field Workflows](../product/field-workflows.md), [Operational Event Catalog](../domain/operational-event-catalog.md)
+- Related docs: [System Overview](system-overview.md), [Synchronization Architecture](synchronization-architecture.md), [Persistence and Attachment Storage](persistence-and-attachment-storage.md), [AI-Assisted Capture Boundaries](ai-assisted-capture-boundaries.md), [Identity, Privacy, and Sharing](identity-privacy-and-sharing.md), [Server and Deployment Operating Model](server-and-deployment-operating-model.md), [Initial Vertical Slice](../product/initial-vertical-slice.md), [Mobile Pilot 1 Implementation Scope](../product/mobile-pilot-1-implementation-scope.md), [Field Workflows](../product/field-workflows.md), [Mobile Pilot 1 Operational Records](../domain/mobile-pilot-1-operational-records.md), [Mobile Pilot Data-Safety Requirements](../operations/mobile-pilot-data-safety-requirements.md)
 - Related tests: not yet implemented
 - Supersedes: none
 
@@ -22,34 +22,31 @@ The first pilot must work without a live server. A worker must be able to record
 
 ## Definition of Offline Capability for the Standalone Pilot
 
-| Workflow | Must work offline? | Pilot result |
+| Workflow | Mobile Pilot 1 posture | Pilot result |
 | --- | ---: | --- |
-| Create minimal local farm setup/reference information | Yes | Farm context available on device |
-| Review locally stored locations/tracked items | Yes | Worker can choose local context |
-| Record planting/transplanting | Yes | Confirmed record retained locally |
-| Record harvest | Yes | Confirmed record retained locally |
-| Record material use | Yes | Confirmed record retained locally |
-| Record item movement | Yes | Confirmed record retained locally |
-| Record inventory count | Yes | Confirmed observation retained locally |
-| Record equipment issue | Yes | Confirmed observation retained locally |
-| Record private supply need, if scoped | Yes | Private local discovery note retained |
-| Review local activity history | Yes | Locally retained records are understandable |
-| Export/back up pilot data | Required before meaningful reliance | User-controlled data retrieval/backup |
-| Use voice-to-draft experiment | Pilot experiment where feasible | Draft retained locally until confirmed or discarded |
-| Use photo-count-to-draft experiment | Pilot experiment where feasible | Draft/photo retained locally until confirmed or discarded |
-| Synchronize to server | No | Deferred future behavior |
-| Publish listing externally | No | Deferred future behavior |
+| Minimal local setup/reference context | Required | Farm context available on device |
+| Manual harvest | Required | Confirmed record retained locally |
+| Manual material use | Required | Confirmed record retained locally |
+| Manual inventory count | Required | Confirmed observation retained locally |
+| Local activity history | Required | Locally retained records are understandable |
+| Export/backup | Required before meaningful reliance | User-controlled data retrieval/backup |
+| Planting/transplanting | Candidate later | Not Mobile Pilot 1 |
+| Item movement | Candidate later | Not Mobile Pilot 1 |
+| Equipment issue | Candidate later | Not Mobile Pilot 1 |
+| Private supply need | Candidate later | Not Mobile Pilot 1 |
+| Voice/photo drafts | Mobile Pilot 2 | Not Mobile Pilot 1 |
+| Server sync/publication | Deferred | Future server-connected behavior |
 
 ## Local Mobile Responsibilities
 
 The mobile pilot must be capable of retaining:
 
-- Local farm/reference context for supported entry.
-- Locally confirmed operational records.
+- Local farm/reference context for Mobile Pilot 1 entry.
+- Locally confirmed `HarvestRecorded`, `MaterialUseRecorded`, and `InventoryCountRecorded` records.
 - Local activity history.
 - User corrections or follow-up records where supported.
-- Drafts from AI-assisted capture.
-- Source captures and provenance retained according to pilot policy.
+- Drafts from AI-assisted capture only in Mobile Pilot 2 or later.
+- Source captures and provenance only where later accepted pilot policy includes them.
 - Export/backup state or guidance where relevant.
 - User-visible local saved/failure state.
 

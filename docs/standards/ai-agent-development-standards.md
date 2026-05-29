@@ -52,7 +52,7 @@ Agents must not:
 
 | Task type | Agent obligations |
 | --- | --- |
-| Standalone mobile pilot work | Read ADR-0007, product slice, offline architecture, and operations export/backup docs; preserve local retention, local history, and export/backup expectations |
+| Standalone mobile pilot work | Read ADR-0007, `docs/product/mobile-pilot-1-implementation-scope.md`, `docs/domain/mobile-pilot-1-operational-records.md`, `docs/operations/mobile-pilot-data-safety-requirements.md`, offline architecture, and relevant standards; preserve local retention, local history, and export/backup expectations |
 | Offline/mobile record work | Read offline/sync ADRs/docs; test local retention and saved state once code exists |
 | Synchronization work | Confirm later authorization first; preserve idempotency/history/discrepancy rules; add regression scenarios |
 | AI-assisted feature work | Preserve draft-confirmation boundary; no silent effects/publication |

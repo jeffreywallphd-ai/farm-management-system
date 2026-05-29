@@ -28,7 +28,7 @@ Helps agents work on future server operation/deployment modes and current mobile
 ## Core Guidance
 
 - Server and deployment work is not initial pilot implementation scope.
-- Mobile export/backup and pilot data safety are active now.
+- Mobile Pilot 1 export/backup and pilot data safety are active now and governed by `docs/operations/mobile-pilot-data-safety-requirements.md`.
 - Mobile offline capability remains required in every later deployment mode.
 - Ordinary farmers must not be assumed to administer infrastructure.
 - Hosted use and credible farmer-controlled/self-hosted operation remain compatible directions.
@@ -55,6 +55,7 @@ Do not create fake install commands, production hosting commitments, local-serve
 ## Canonical Source Documents and ADRs
 
 - `docs/architecture/server-and-deployment-operating-model.md`: deployment-neutral architecture constraints.
+- `docs/operations/mobile-pilot-data-safety-requirements.md`: accepted Mobile Pilot 1 export/backup and update/replacement safety.
 - `docs/operations/deployment-modes.md`: operations-facing mode comparison.
 - `docs/operations/local-farm-server-experience.md`: farmer-usable local operation target.
 - `docs/operations/backup-restore-and-data-export-requirements.md`: backup/export/restore requirements.
