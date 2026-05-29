@@ -38,7 +38,7 @@ Plain-language meaning: a worker records that a quantity of a crop was harvested
 
 Minimum required fields:
 
-- Crop or crop name.
+- Tracked crop reference by stable ID.
 - Source location.
 - Quantity.
 - Unit.
@@ -50,7 +50,10 @@ Mobile Pilot 1 behavior:
 - Private and device-local.
 - Appears in local activity history.
 - Included in Mobile Pilot 1 export/backup.
+- Export/recovery copies must include the tracked crop reference data needed to interpret exported harvest records.
 - Does not imply saleable inventory, customer fulfillment, marketplace availability, listing publication, or server synchronization.
+
+Crop rename, deletion, and historical name-snapshot behavior are deferred because reference-editing behavior is not yet implemented in Mobile Pilot 1. Until that behavior is deliberately scoped, harvest records should preserve stable crop identity without silently losing the crop meaning needed for local history or export.
 
 ## `MaterialUseRecorded`
 

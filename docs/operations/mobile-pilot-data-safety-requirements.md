@@ -20,7 +20,7 @@ Before a farmer relies on Mobile Pilot 1 for meaningful records:
 2. The app must provide a practical user-controlled export or backup mechanism for:
    - Local farm setup needed to interpret records.
    - Locations used by included records.
-   - Tracked crops, materials, and countable items used by included records.
+   - Tracked crops, materials, and countable items used by included records, including the crop reference data needed to interpret `HarvestRecorded` records by stable crop ID.
    - `HarvestRecorded`.
    - `MaterialUseRecorded`.
    - `InventoryCountRecorded`.
@@ -34,6 +34,7 @@ Before a farmer relies on Mobile Pilot 1 for meaningful records:
 5. App updates or test-build replacement must not silently destroy retained farmer records without clear warning and an available export/recovery step.
 6. Exported data is private and may reveal sensitive farm operations. User-facing guidance and later testing must reflect that.
 7. ADR-0009, ADR-0010, and ADR-0011 select Mobile Pilot 1 local persistence, export/recovery-copy, and runtime validation mechanisms. This document does not select cloud backup, server backup, synchronization, encryption technology, restore/import behavior, or production backup technology.
+8. Crop rename, deletion, and history-snapshot behavior remain deferred until reference-editing behavior is explicitly scoped. Export/recovery-copy behavior must still preserve enough tracked crop information to interpret saved harvest records.
 
 ## Scope Boundary
 

@@ -49,7 +49,7 @@ Accepted ADRs are binding architecture guidance for the decisions they record. P
 | [ADR-0008](ADR-0008-mobile-pilot-1-application-stack.md) | accepted | Mobile Pilot 1 uses Expo, React Native, TypeScript, development builds, and EAS/internal distribution |
 | [ADR-0009](ADR-0009-mobile-pilot-1-local-persistence.md) | accepted | Mobile Pilot 1 uses `expo-sqlite` behind local repositories/adapters with hand-written migrations and no ORM |
 | [ADR-0010](ADR-0010-mobile-pilot-1-export-and-recovery-copy.md) | accepted | Mobile Pilot 1 uses local versioned JSON export/recovery copy through Expo FileSystem and Expo Sharing |
-| [ADR-0011](ADR-0011-mobile-pilot-1-runtime-boundary-validation.md) | accepted | Mobile Pilot 1 uses Zod for runtime validation at input, persistence, and export/import boundaries |
+| [ADR-0011](ADR-0011-mobile-pilot-1-runtime-boundary-validation.md) | accepted | Mobile Pilot 1 uses Zod for runtime validation at input, persistence, and export boundaries |
 
 ## ADR Rules
 

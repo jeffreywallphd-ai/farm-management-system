@@ -4,20 +4,22 @@
 - Date: 2026-05-28
 - Last reviewed: 2026-05-28
 - Deciders: project owner and contributors
-- Canonical for: Mobile Pilot 1 runtime validation at input, persistence, and export/import boundaries
+- Canonical for: Mobile Pilot 1 runtime validation at input, persistence, and export boundaries
 - Related docs: [Mobile Pilot 1 Implementation Scope](../product/mobile-pilot-1-implementation-scope.md), [Mobile Pilot 1 Operational Records](../domain/mobile-pilot-1-operational-records.md), [Mobile Pilot Data-Safety Requirements](../operations/mobile-pilot-data-safety-requirements.md), [Coding Standards](../standards/coding-standards.md), [Testing and Verification Standards](../standards/testing-and-verification-standards.md), [Decision Readiness Register](decision-readiness-register.md)
 - Supersedes: none
 - Superseded by: none
 
 ## Context
 
-Mobile Pilot 1 will use TypeScript, local persistence, and local JSON export. Static typing helps implementation, but farmer-created data, persisted rows, migrations, and exported/imported packages still cross runtime boundaries.
+Mobile Pilot 1 will use TypeScript, local persistence, and local JSON export. Static typing helps implementation, but farmer-created data, persisted rows, migrations, and exported packages still cross runtime boundaries.
 
 The project needs explicit boundary validation without turning schemas into a competing source of domain authority.
 
 ## Decision
 
-Use Zod for runtime validation at input, persistence-boundary, and export/import-boundary edges in Mobile Pilot 1.
+Use Zod for runtime validation at input, persistence-boundary, and export-boundary edges in Mobile Pilot 1.
+
+If import/restore later becomes accepted scope, import-boundary validation should follow the same explicit runtime-validation posture.
 
 TypeScript remains the implementation language, but TypeScript alone is not runtime validation.
 
@@ -29,7 +31,7 @@ Do not create broad validation frameworks beyond Mobile Pilot 1 needs.
 
 Runtime validation protects local record creation and export integrity.
 
-Explicit schemas support later import/restore validation if that capability becomes accepted.
+Explicit schemas can support later import/restore validation if that capability becomes accepted.
 
 Zod keeps boundary validation close to TypeScript types without adding a larger framework.
 
@@ -77,10 +79,10 @@ Keeping schemas subordinate to canonical domain documents prevents code artifact
 
 ## Validation and Revisit Conditions
 
-Revisit this ADR if Zod proves inadequate for export/import validation, if later tooling requires a different schema strategy, or if validation concerns expand beyond Mobile Pilot 1.
+Revisit this ADR if Zod proves inadequate for export validation, if import/restore becomes accepted and requires a different schema strategy, or if validation concerns expand beyond Mobile Pilot 1.
 
 ## Documentation and Test Impact
 
 Documentation and context routing must identify Zod as accepted for Mobile Pilot 1 runtime boundary validation only.
 
-Future implementation must test validation failures at input, persistence, and export/import boundaries once those behaviors exist.
+Future implementation must test validation failures at input, persistence, and export boundaries once those behaviors exist. Import validation applies later only if import/restore becomes accepted scope.

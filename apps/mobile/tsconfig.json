@@ -10,6 +10,8 @@
     }
   },
   "include": [
+    "expo-env.d.ts",
+    ".expo/types/**/*.ts",
     "app/**/*.ts",
     "app/**/*.tsx",
     "src/**/*.ts",

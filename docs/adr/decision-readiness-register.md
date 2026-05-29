@@ -38,7 +38,7 @@ This register identifies whether additional candidate decisions are accepted, pr
 | [ADR-0008](ADR-0008-mobile-pilot-1-application-stack.md) | Mobile Pilot 1 application stack | Implementation planning now needs a concrete installed mobile app stack | Mobile Pilot 1 uses Expo, React Native, TypeScript, development builds, and EAS/internal distribution |
 | [ADR-0009](ADR-0009-mobile-pilot-1-local-persistence.md) | Mobile Pilot 1 local persistence | Local retention is required before meaningful farmer reliance | Mobile Pilot 1 uses `expo-sqlite` behind repositories/adapters, hand-written migrations, and no ORM |
 | [ADR-0010](ADR-0010-mobile-pilot-1-export-and-recovery-copy.md) | Mobile Pilot 1 export/recovery-copy mechanism | Pilot data must be retrievable without server/cloud decisions | Mobile Pilot 1 uses local versioned JSON export through Expo FileSystem and Expo Sharing |
-| [ADR-0011](ADR-0011-mobile-pilot-1-runtime-boundary-validation.md) | Mobile Pilot 1 runtime boundary validation | TypeScript alone cannot validate runtime data boundaries | Mobile Pilot 1 uses Zod for input, persistence, and export/import boundary validation |
+| [ADR-0011](ADR-0011-mobile-pilot-1-runtime-boundary-validation.md) | Mobile Pilot 1 runtime boundary validation | TypeScript alone cannot validate runtime data boundaries | Mobile Pilot 1 uses Zod for input, persistence, and export boundary validation; import validation applies only if import/restore becomes accepted |
 
 ## Proposed and Deferred Decisions
 
