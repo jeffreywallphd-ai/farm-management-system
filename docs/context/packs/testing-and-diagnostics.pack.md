@@ -29,7 +29,7 @@ Helps agents work on defects, regression fixes, tests, verification strategy, lo
 
 - Protect farmer-relevant behavior and accepted ADR invariants, not vanity coverage.
 - Add regression tests for meaningful defects when practical.
-- High-risk scenarios include mobile local retention, local saved-state clarity, export/backup failure, app update/replacement data loss, duplicate future sync effects, privacy exposure, AI auto-confirmation, publication state, attachment leakage, restore/migration failure, and sensitive diagnostics.
+- High-risk scenarios include mobile local retention, local saved-state clarity, manual record validation, unified local history, export/backup failure, app update/replacement data loss, duplicate future sync effects, privacy exposure, AI auto-confirmation, publication state, attachment leakage, restore/migration failure, and sensitive diagnostics.
 - Diagnostics must be structured and privacy-safe.
 - User-visible status is required where farmers need to know whether pilot work is saved locally, exported/backed up, synchronized later, published later, or failed.
 - Do not expose sensitive payloads in logs, fixtures, screenshots, or debugging artifacts.

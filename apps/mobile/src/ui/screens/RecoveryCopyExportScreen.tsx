@@ -6,7 +6,7 @@ import type { Farm } from "../../domain/farm/Farm";
 import type { ExportRepository, MobilePilotExportFile } from "../../application/ports/ExportRepository";
 import type { FarmReferenceRepository } from "../../application/ports/FarmReferenceRepository";
 import type { LocalRecordRepository } from "../../application/ports/LocalRecordRepository";
-import { createHarvestRecoveryCopy } from "../../application/use-cases/export-mobile-pilot-data/CreateHarvestRecoveryCopy";
+import { createMobilePilotRecoveryCopy } from "../../application/use-cases/export-mobile-pilot-data/CreateHarvestRecoveryCopy";
 import { systemClock } from "../../infrastructure/system/clock";
 import { Button } from "../components/Button";
 import { Card } from "../components/Card";
@@ -16,6 +16,7 @@ import { PrivateDataNotice } from "../components/PrivateDataNotice";
 import { Screen } from "../components/Screen";
 import { SectionHeading } from "../components/SectionHeading";
 import { theme } from "../theme/theme";
+import { replaceRoute } from "../navigation";
 
 export function RecoveryCopyExportScreen({
   exportRepository,
@@ -39,7 +40,7 @@ export function RecoveryCopyExportScreen({
     setFile(null);
 
     try {
-      const nextFile = await createHarvestRecoveryCopy(
+      const nextFile = await createMobilePilotRecoveryCopy(
         { farmId: farm.id },
         { clock: systemClock, exportRepository, farmReferenceRepository, localRecordRepository },
       );
@@ -58,10 +59,10 @@ export function RecoveryCopyExportScreen({
         supportingText="Save or share a copy of data stored on this device."
         title="Create recovery copy"
       />
-      <PrivateDataNotice text="The recovery copy contains private farm setup and harvest records. The app does not upload it automatically." />
+      <PrivateDataNotice text="The recovery copy contains private farm setup, harvest records, material-use records, and inventory-count observations. The app does not upload it automatically." />
       <Card>
         <SectionHeading
-          detail="This includes farm setup, locations, tracked items, and saved harvest records. Restore/import is not available yet."
+          detail="This includes farm setup, locations, tracked items, harvests, material use, and inventory counts. Restore/import is not available yet."
           title="What is included"
         />
         <Text style={styles.body}>
@@ -71,7 +72,7 @@ export function RecoveryCopyExportScreen({
         {error ? <Text style={styles.error}>{error}</Text> : null}
         <Button disabled={isExporting} label={isExporting ? "Creating..." : "Create recovery copy"} onPress={handleExport} />
       </Card>
-      <Button label="Back to farm" onPress={() => router.replace("/")} variant="secondary" />
+      <Button label="Back to farm" onPress={() => replaceRoute(router, "/")} variant="secondary" />
     </Screen>
   );
 }

@@ -46,6 +46,38 @@ const harvestRecordSchema = z.object({
   note: z.string().optional(),
 });
 
+const materialUseRecordSchema = z.object({
+  id: z.string().min(1),
+  kind: z.literal("MaterialUseRecorded"),
+  farmId: z.string().min(1),
+  materialId: z.string().min(1),
+  quantity: z.object({
+    amount: z.number().positive(),
+    unit: harvestUnitSchema,
+  }),
+  useLocationId: z.string().optional(),
+  createdAt: isoDateTimeString,
+  effectiveAt: isoDateTimeString,
+  privacy: z.literal("privateToFarm"),
+  note: z.string().optional(),
+});
+
+const inventoryCountRecordSchema = z.object({
+  id: z.string().min(1),
+  kind: z.literal("InventoryCountRecorded"),
+  farmId: z.string().min(1),
+  trackedItemId: z.string().min(1),
+  observedQuantity: z.object({
+    amount: z.number().min(0),
+    unit: harvestUnitSchema,
+  }),
+  locationId: z.string().optional(),
+  createdAt: isoDateTimeString,
+  effectiveAt: isoDateTimeString,
+  privacy: z.literal("privateToFarm"),
+  note: z.string().optional(),
+});
+
 export const mobilePilotRecoveryCopySchema = z.object({
   exportVersion: z.literal(MOBILE_PILOT_RECOVERY_COPY_EXPORT_VERSION),
   createdAt: isoDateTimeString,
@@ -54,4 +86,6 @@ export const mobilePilotRecoveryCopySchema = z.object({
   locations: z.array(locationSchema),
   trackedItems: z.array(trackedItemSchema),
   harvestRecords: z.array(harvestRecordSchema),
+  materialUseRecords: z.array(materialUseRecordSchema),
+  inventoryCountRecords: z.array(inventoryCountRecordSchema),
 });

@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import type { ExportRepository, MobilePilotExportFile } from "../ports/ExportRepository";
-import type { HarvestRecordView, LocalRecordRepository } from "../ports/LocalRecordRepository";
+import type { HarvestRecordView, LocalActivityRecordView, LocalRecordRepository } from "../ports/LocalRecordRepository";
 import { createHarvestRecoveryCopy, formatRecoveryCopyFileName } from "./export-mobile-pilot-data/CreateHarvestRecoveryCopy";
 import { getHarvestDetail } from "./get-harvest-detail/GetHarvestDetail";
 import { listHarvestHistory } from "./list-harvest-history/ListHarvestHistory";
@@ -164,14 +164,14 @@ test("recovery copy export contains farm references and harvest records", async 
   assert.equal(file.fileName, "farm-pilot-recovery-copy-20260529T110000.json");
   assert.equal(exportRepository.sharedFile?.fileName, file.fileName);
   const payload = JSON.parse(exportRepository.contents);
-  assert.equal(payload.exportVersion, 1);
-  assert.equal(payload.appDataSchemaVersion, 2);
+  assert.equal(payload.exportVersion, 2);
+  assert.equal(payload.appDataSchemaVersion, 3);
   assert.equal(payload.farm.name, "Green Hill Farm");
   assert.equal(payload.locations[0].name, "North Field");
   assert.equal(payload.trackedItems[0].name, "Kale");
   assert.equal(payload.harvestRecords[0].kind, "HarvestRecorded");
-  assert.equal(payload.materialUseRecords, undefined);
-  assert.equal(payload.inventoryCountRecords, undefined);
+  assert.deepEqual(payload.materialUseRecords, []);
+  assert.deepEqual(payload.inventoryCountRecords, []);
 });
 
 test("recovery copy filename avoids farm names", () => {
@@ -206,6 +206,22 @@ class FailingLocalRecordRepository implements LocalRecordRepository {
     throw new Error("storage failed");
   }
 
+  async saveMaterialUse() {
+    return this.delegate.saveMaterialUse(arguments[0]);
+  }
+
+  async saveInventoryCount() {
+    return this.delegate.saveInventoryCount(arguments[0]);
+  }
+
+  async listLocalActivityHistory(farmId: string): Promise<LocalActivityRecordView[]> {
+    return this.delegate.listLocalActivityHistory(farmId);
+  }
+
+  async getLocalActivityDetail(farmId: string, kind: Parameters<LocalRecordRepository["getLocalActivityDetail"]>[1], id: string) {
+    return this.delegate.getLocalActivityDetail(farmId, kind, id);
+  }
+
   async listHarvestHistory(farmId: string): Promise<HarvestRecordView[]> {
     return this.delegate.listHarvestHistory(farmId);
   }
@@ -216,5 +232,13 @@ class FailingLocalRecordRepository implements LocalRecordRepository {
 
   async listHarvestRecordsForExport(farmId: string) {
     return this.delegate.listHarvestRecordsForExport(farmId);
+  }
+
+  async listMaterialUseRecordsForExport(farmId: string) {
+    return this.delegate.listMaterialUseRecordsForExport(farmId);
+  }
+
+  async listInventoryCountRecordsForExport(farmId: string) {
+    return this.delegate.listInventoryCountRecordsForExport(farmId);
   }
 }

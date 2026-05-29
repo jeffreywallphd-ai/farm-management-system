@@ -14,6 +14,7 @@ import { Screen } from "../components/Screen";
 import { SectionHeading } from "../components/SectionHeading";
 import { formatHarvestQuantity, formatRecordDate } from "../formatters";
 import { theme } from "../theme/theme";
+import { replaceRoute } from "../navigation";
 
 export function HarvestDetailScreen({
   farm,
@@ -58,7 +59,7 @@ export function HarvestDetailScreen({
           <EmptyState text="This harvest could not be found on this device." />
         )}
       </Card>
-      <Button label="Back to harvest history" onPress={() => router.replace("/harvest")} variant="secondary" />
+      <Button label="Back to harvest history" onPress={() => replaceRoute(router, "/harvest")} variant="secondary" />
     </Screen>
   );
 }

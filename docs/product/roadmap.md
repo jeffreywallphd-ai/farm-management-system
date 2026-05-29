@@ -19,7 +19,7 @@ Server-connected functionality remains a motivating future direction, but the ac
 | Phase | Primary purpose | Implementation posture |
 | --- | --- | --- |
 | Documentation foundation and correction | Establish implementation-safe product, domain, architecture, operations, ADR, standards, and context guidance | Current foundation work |
-| Mobile Pilot 1 | Manual harvest, material use, inventory count, minimal local farm setup, local history, local persistence, clear local saved state, export/backup | First implementation target |
+| Mobile Pilot 1 | Manual harvest, material use, inventory count, minimal local farm setup, local history, local persistence, clear local saved state, export/backup | Core manual implementation complete; needs pre-distribution quality review |
 | Mobile Pilot 2 | Constrained voice-to-draft and photo-count-to-draft experiments | Implement only within draft-confirm boundaries |
 | Farmer discovery period | Use real pilot feedback to refine workflows and determine next priorities | Evidence-gathering gate |
 | Server decision phase | Decide synchronization, hosting/local operation, coordination, and deployment priorities based on evidence | ADR/product updates required before implementation |

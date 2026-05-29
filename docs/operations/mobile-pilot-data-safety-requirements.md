@@ -5,7 +5,7 @@
 - Canonical for: device-local Mobile Pilot 1 data retention, export/backup expectations, farmer communication, update/replacement safety, and limitations before real pilot reliance
 - Related ADRs: [ADR-0001](../adr/ADR-0001-offline-first-field-operation.md), [ADR-0002](../adr/ADR-0002-history-preserving-idempotent-synchronization.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](../adr/ADR-0005-data-portability-and-recoverability.md), [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md), [ADR-0009](../adr/ADR-0009-mobile-pilot-1-local-persistence.md), [ADR-0010](../adr/ADR-0010-mobile-pilot-1-export-and-recovery-copy.md), [ADR-0011](../adr/ADR-0011-mobile-pilot-1-runtime-boundary-validation.md)
 - Related docs: [Mobile Pilot 1 Implementation Scope](../product/mobile-pilot-1-implementation-scope.md), [Mobile Pilot 1 Operational Records](../domain/mobile-pilot-1-operational-records.md), [Offline-First Mobile Architecture](../architecture/offline-first-mobile-architecture.md), [Backup, Restore, and Data Export Requirements](backup-restore-and-data-export-requirements.md), [Upgrades, Migrations, and Recovery Requirements](upgrades-migrations-and-recovery-requirements.md), [Mobile App README](../../apps/mobile/README.md)
-- Related tests: [Harvest use-case tests](../../apps/mobile/src/application/use-cases/harvestUseCases.test.ts)
+- Related tests: [Harvest use-case tests](../../apps/mobile/src/application/use-cases/harvestUseCases.test.ts), [Manual record use-case tests](../../apps/mobile/src/application/use-cases/manualRecordUseCases.test.ts)
 - Supersedes: none
 
 ## Purpose
@@ -36,7 +36,7 @@ Before a farmer relies on Mobile Pilot 1 for meaningful records:
 7. ADR-0009, ADR-0010, and ADR-0011 select Mobile Pilot 1 local persistence, export/recovery-copy, and runtime validation mechanisms. This document does not select cloud backup, server backup, synchronization, encryption technology, restore/import behavior, or production backup technology.
 8. Crop rename, deletion, and history-snapshot behavior remain deferred until reference-editing behavior is explicitly scoped. Export/recovery-copy behavior must still preserve enough tracked crop information to interpret saved harvest records.
 
-Phase 2 implements a one-way versioned JSON recovery copy for the current completed slice: local farm setup/reference data and saved `HarvestRecorded` records. The recovery copy is generated locally and passed to the device-native share/save flow. Restore/import is still not implemented, so user-facing language must continue to say "recovery copy" or "export" rather than full backup/restore.
+Phase 3 implements a one-way versioned JSON recovery copy for the complete manual Mobile Pilot 1 core: local farm setup/reference data and saved `HarvestRecorded`, `MaterialUseRecorded`, and `InventoryCountRecorded` records. The recovery copy is generated locally and passed to the device-native share/save flow. Restore/import is still not implemented, so user-facing language must continue to say "recovery copy" or "export" rather than full backup/restore.
 
 ## Scope Boundary
 

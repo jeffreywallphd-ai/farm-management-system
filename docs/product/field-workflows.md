@@ -5,7 +5,7 @@
 - Canonical for: representative farmer-facing workflows that motivate the standalone mobile pilot
 - Related ADRs: [ADR-0001](../adr/ADR-0001-offline-first-field-operation.md), [ADR-0003](../adr/ADR-0003-ai-interpretations-require-confirmation.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md)
 - Related docs: [Product Vision and Scope](product-vision-and-scope.md), [Initial Vertical Slice](initial-vertical-slice.md), [User Research and Validation](user-research-and-validation.md), [AI-Assisted Capture Validation Plan](ai-assisted-capture-validation-plan.md), [Local Coordination and Sharing Validation Plan](local-coordination-and-sharing-validation-plan.md), [Deployment and Data-Control Validation Plan](deployment-and-data-control-validation-plan.md)
-- Related tests: not yet implemented
+- Related tests: [Harvest use-case tests](../../apps/mobile/src/application/use-cases/harvestUseCases.test.ts), [Manual record use-case tests](../../apps/mobile/src/application/use-cases/manualRecordUseCases.test.ts), [Manual record validation tests](../../apps/mobile/src/domain/validation/manualRecordValidation.test.ts), [Phase 3 manual smoke test](../../apps/mobile/src/testing/phase-3-manual-smoke-test.md)
 - Supersedes: none
 
 ## Purpose
@@ -37,7 +37,7 @@ The current pilot is standalone mobile. This document does not define database s
 - Problem or trigger: produce is harvested and the worker wants to record crop, quantity, unit, and location before details are forgotten.
 - Desired user action: quickly record the harvest at or near the harvest location.
 - Expected pilot outcome: the harvest activity is saved locally, visible in local history, and clearly identified as stored on the device.
-- Implementation note: Phase 2 implements manual harvest entry, harvest-specific history/detail, and recovery-copy export for saved harvest records.
+- Implementation note: Phase 3 includes manual harvest entry in unified local activity history/detail and recovery-copy export for all implemented manual records.
 - Why it matters: harvest records are high-value operational records and are easy to lose when entry is delayed.
 - Online/offline relevance: included workflow must remain usable without live connectivity or server availability.
 - Future server note: a later server-connected version may synchronize the retained record, but synchronization state is not part of the standalone pilot.
@@ -62,6 +62,7 @@ And the worker does not need to re-enter the harvest because a server was unavai
 - Problem or trigger: the worker uses a material and wants the farm to retain what was used, where, and how much.
 - Desired user action: record material, quantity/unit, use context, and optional note.
 - Expected pilot outcome: the material-use activity is saved locally and contributes to local history or local expected inventory where supported.
+- Implementation note: Phase 3 implements manual material-use entry, read-only detail, unified local history, and recovery-copy export. It does not implement automatic inventory deduction or supply recommendations.
 - Why it matters: material-use records are easy to omit after work is finished.
 - Future server note: later synchronization must preserve the confirmed local record without duplicate effects, but no server submission is part of the pilot.
 
@@ -83,6 +84,7 @@ And the worker does not need to re-enter the harvest because a server was unavai
 - Problem or trigger: the observed amount differs from memory or expected quantity.
 - Desired user action: record observed quantity/count and context.
 - Expected pilot outcome: the observation is saved locally, and discrepancy meaning is preserved where the pilot displays expected versus observed understanding.
+- Implementation note: Phase 3 implements inventory-count observations for materials and countable items. A count is saved as its own record and does not overwrite earlier history.
 - Why it matters: an inventory count is evidence of current reality, not a reason to erase prior history.
 
 ## Workflow 5: Record an Equipment Issue

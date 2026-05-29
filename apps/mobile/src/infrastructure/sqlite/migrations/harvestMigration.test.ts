@@ -2,6 +2,8 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { createHarvestRecords } from "./0002_create_harvest_records";
+import { createMaterialUseAndInventoryCountRecords } from "./0003_create_material_use_and_inventory_count_records";
+import { expandManualRecordUnits } from "./0004_expand_manual_record_units";
 
 test("harvest migration creates only harvest record storage", () => {
   const sql = createHarvestRecords.statements.join("\n");
@@ -15,4 +17,19 @@ test("harvest migration creates only harvest record storage", () => {
   assert.doesNotMatch(sql, /publication/i);
   assert.doesNotMatch(sql, /material_use_records/i);
   assert.doesNotMatch(sql, /inventory_count_records/i);
+});
+
+test("phase 3 migrations add material use, inventory counts, and expanded pilot units", () => {
+  const sql = [...createMaterialUseAndInventoryCountRecords.statements, ...expandManualRecordUnits.statements].join("\n");
+
+  assert.equal(createMaterialUseAndInventoryCountRecords.version, 3);
+  assert.equal(expandManualRecordUnits.version, 4);
+  assert.match(sql, /CREATE TABLE IF NOT EXISTS material_use_records/);
+  assert.match(sql, /CREATE TABLE IF NOT EXISTS inventory_count_records/);
+  assert.match(sql, /'bag'/);
+  assert.match(sql, /'gal'/);
+  assert.match(sql, /'flat'/);
+  assert.match(sql, /'tray'/);
+  assert.doesNotMatch(sql, /sync/i);
+  assert.doesNotMatch(sql, /publication/i);
 });

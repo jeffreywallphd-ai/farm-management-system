@@ -5,7 +5,7 @@
 - Canonical for: first-slice inventory meaning, quantity semantics, discrepancy handling, and reconciliation principles
 - Related ADRs: [ADR-0002](../adr/ADR-0002-history-preserving-idempotent-synchronization.md), [ADR-0003](../adr/ADR-0003-ai-interpretations-require-confirmation.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md)
 - Related docs: [Glossary](glossary.md), [Farm Structure and Tracked Items](farm-structure-and-tracked-items.md), [Mobile Pilot 1 Operational Records](mobile-pilot-1-operational-records.md), [Operational Event Catalog](operational-event-catalog.md), [AI-Assisted Capture and Confirmation Rules](ai-assisted-capture-and-confirmation-rules.md), [Privacy, Visibility, and Sharing Rules](privacy-visibility-and-sharing-rules.md), [Sourcing and Local Network Model](sourcing-and-local-network-model.md), [Initial Vertical Slice](../product/initial-vertical-slice.md)
-- Related tests: not yet implemented
+- Related tests: [Manual record validation tests](../../apps/mobile/src/domain/validation/manualRecordValidation.test.ts), [Manual record use-case tests](../../apps/mobile/src/application/use-cases/manualRecordUseCases.test.ts), [Harvest migration tests](../../apps/mobile/src/infrastructure/sqlite/migrations/harvestMigration.test.ts)
 - Supersedes: none
 
 ## Purpose
@@ -69,7 +69,7 @@ Proposed first-slice product behavior:
 ## Quantity and Units
 
 - Every tracked quantity must be paired with a unit.
-- Units must be understandable to the farm and match the workflow, such as pounds, bags, flats, crates, each, trays, feet, gallons, or another configured unit.
+- Mobile Pilot 1 currently accepts only this small pilot unit vocabulary: `lb`, `oz`, `kg`, `g`, `each`, `bunch`, `crate`, `bag`, `gal`, `L`, `flat`, and `tray`.
 - Do not silently combine quantities using incompatible units.
 - Unit-conversion behavior is deferred unless explicitly required for the first slice.
 - A material may commonly be tracked in a farm-specific unit, such as bags rather than weight.

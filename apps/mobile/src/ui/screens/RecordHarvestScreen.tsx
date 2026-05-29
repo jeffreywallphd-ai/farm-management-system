@@ -24,6 +24,7 @@ import { Screen } from "../components/Screen";
 import { SelectField } from "../components/SelectField";
 import { SectionHeading } from "../components/SectionHeading";
 import { theme } from "../theme/theme";
+import { replaceRoute } from "../navigation";
 
 interface FormErrors {
   cropId?: string;
@@ -84,7 +85,7 @@ export function RecordHarvestScreen({
           localRecordRepository,
         },
       );
-      router.replace("/harvest?saved=1");
+      replaceRoute(router, "/activity?saved=harvest");
     } catch (caughtError) {
       if (caughtError instanceof z.ZodError) {
         setErrors(mapZodErrors(caughtError));
@@ -109,7 +110,7 @@ export function RecordHarvestScreen({
           <SectionHeading title="Finish setup first" />
           {crops.length === 0 ? <EmptyState text="Add a crop before recording a harvest." /> : null}
           {locations.length === 0 ? <EmptyState text="Add a location before recording a harvest." /> : null}
-          <Button label="Back to farm setup" onPress={() => router.replace("/")} variant="secondary" />
+          <Button label="Back to farm setup" onPress={() => replaceRoute(router, "/")} variant="secondary" />
         </Card>
       ) : (
         <Card>

@@ -6,6 +6,8 @@ Phase 1 implements minimal local farm setup and reference data. A farmer can cre
 
 Phase 2 implements the first complete operational workflow: manual harvest recording, harvest history, read-only harvest detail, and a local versioned JSON recovery-copy export for farm setup/reference data and saved harvest records.
 
+Phase 3 completes the core manual Mobile Pilot 1 workflow set. Farmers can now record harvests, material use, and inventory counts, review those records in one local activity history, inspect read-only details, and create a local versioned JSON recovery copy for the implemented manual records and required reference data.
+
 ## Accepted Stack
 
 - Expo + React Native + TypeScript: [ADR-0008](../../docs/adr/ADR-0008-mobile-pilot-1-application-stack.md)
@@ -14,6 +16,8 @@ Phase 2 implements the first complete operational workflow: manual harvest recor
 - Runtime boundary validation with Zod: [ADR-0011](../../docs/adr/ADR-0011-mobile-pilot-1-runtime-boundary-validation.md)
 
 Package versions are pinned in `package.json`, and `package-lock.json` records the app-local dependency resolution.
+
+`react-dom@19.1.0` is explicitly pinned only to stabilize Expo Router/npm peer dependency resolution under Expo SDK 54. The mobile pilot remains native-only; web application support is not part of Mobile Pilot 1.
 
 ## Pilot 1 Records
 
@@ -32,17 +36,23 @@ Canonical record meaning lives in [Mobile Pilot 1 Operational Records](../../doc
 - Local tracked crops, materials, and countable items.
 - SQLite-backed local persistence through the repository boundary.
 - Manual `HarvestRecorded` creation using an existing crop and location.
-- Local harvest history and read-only harvest detail.
-- Local JSON recovery-copy file generation and device-native share/save flow for implemented harvest data.
-- Zod validation for setup/reference names, tracked item kinds, harvest input, and recovery-copy export payloads.
-- A reusable earthy mobile UI foundation for setup, harvest, history, and data-safety screens.
+- Manual `MaterialUseRecorded` creation using an existing material and optional location.
+- Manual `InventoryCountRecorded` creation using an existing material or countable item and optional location.
+- Unified local activity history and read-only detail views for all three implemented manual records.
+- Local JSON recovery-copy file generation and device-native share/save flow for implemented manual records and required reference data.
+- Zod validation for setup/reference names, tracked item kinds, manual record inputs, and recovery-copy export payloads.
+- A reusable earthy mobile UI foundation for setup, manual record, history, and data-safety screens.
 
 ## Planned But Not Implemented Yet
 
-- Manual `MaterialUseRecorded` entry.
-- Manual `InventoryCountRecorded` entry.
-- Unified multi-record activity history.
 - Import or restore from a recovery copy.
+- Physical-device pre-distribution review and internal farmer-test build preparation.
+
+## Pilot Unit Vocabulary
+
+Mobile Pilot 1 uses this small unit set for manual records: `lb`, `oz`, `kg`, `g`, `each`, `bunch`, `crate`, `bag`, `gal`, `L`, `flat`, and `tray`.
+
+The app does not convert between units, calculate equivalencies, or present authoritative inventory totals.
 
 ## Deferred Capabilities
 

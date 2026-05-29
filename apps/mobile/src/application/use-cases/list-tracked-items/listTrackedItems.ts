@@ -4,7 +4,7 @@ import type { FarmReferenceRepository } from "../../ports/FarmReferenceRepositor
 
 export function listTrackedItems(
   farmId: FarmId,
-  kind: TrackedItemKind,
+  kind: TrackedItemKind | undefined,
   repository: FarmReferenceRepository,
 ): Promise<TrackedItem[]> {
   return repository.listTrackedItems(farmId, kind);

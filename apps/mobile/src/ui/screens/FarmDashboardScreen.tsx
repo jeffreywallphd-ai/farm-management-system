@@ -21,6 +21,7 @@ import { PageHeader } from "../components/PageHeader";
 import { Screen } from "../components/Screen";
 import { SectionHeading } from "../components/SectionHeading";
 import { theme } from "../theme/theme";
+import { pushRoute } from "../navigation";
 
 type ReferenceSection =
   | { type: "location"; title: string; addLabel: string; placeholder: string; items: FarmLocation[] }
@@ -84,14 +85,13 @@ export function FarmDashboardScreen({
       />
       <LocalDataNotice />
       <Card>
-        <SectionHeading
-          detail="Record harvests now, then keep building the rest of Mobile Pilot 1 as the pilot grows."
-          title="Farm work"
-        />
+        <SectionHeading detail="Record field work and review what is saved locally." title="Farm work" />
         <View style={styles.actionStack}>
-          <Button label="Record harvest" onPress={() => router.push("/harvest/new")} />
-          <Button label="Harvest history" onPress={() => router.push("/harvest")} variant="secondary" />
-          <Button label="Create recovery copy" onPress={() => router.push("/data-safety/export")} variant="secondary" />
+          <Button label="Record harvest" onPress={() => pushRoute(router, "/harvest/new")} />
+          <Button label="Record material use" onPress={() => pushRoute(router, "/material-use/new")} variant="secondary" />
+          <Button label="Record inventory count" onPress={() => pushRoute(router, "/inventory-count/new")} variant="secondary" />
+          <Button label="View activity history" onPress={() => pushRoute(router, "/activity")} variant="secondary" />
+          <Button label="Create recovery copy" onPress={() => pushRoute(router, "/data-safety/export")} variant="secondary" />
         </View>
       </Card>
       <Card>

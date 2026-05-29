@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { HARVEST_UNITS } from "../quantities/HarvestUnit";
+import { PILOT_UNITS } from "../quantities/PilotUnit";
 
 export const MANUAL_RECORD_NOTE_MAX_LENGTH = 500;
 
@@ -21,17 +21,24 @@ const noteSchema = z
   .pipe(z.string().max(MANUAL_RECORD_NOTE_MAX_LENGTH, "Your note is too long."))
   .transform((value) => (value.length > 0 ? value : undefined));
 
-const positiveQuantity = z
-  .string()
-  .transform((value) => Number(value.trim()))
-  .pipe(z.number({ message: "Enter an amount greater than zero." }).positive("Enter an amount greater than zero."));
+function numericText(message: string) {
+  return z
+    .string()
+    .transform((value) => value.trim())
+    .pipe(z.string().min(1, message))
+    .transform((value) => Number(value))
+    .pipe(z.number({ message }).refine((value) => Number.isFinite(value), message));
+}
 
-const zeroOrMoreQuantity = z
-  .string()
-  .transform((value) => Number(value.trim()))
-  .pipe(z.number({ message: "Enter a count of zero or more." }).min(0, "Enter a count of zero or more."));
+const positiveQuantity = numericText("Enter an amount greater than zero.").pipe(
+  z.number().positive("Enter an amount greater than zero."),
+);
 
-export const pilotUnitSchema = z.enum(HARVEST_UNITS, { message: "Choose a unit." });
+const zeroOrMoreQuantity = numericText("Enter a count of zero or more.").pipe(
+  z.number().min(0, "Enter a count of zero or more."),
+);
+
+export const pilotUnitSchema = z.enum(PILOT_UNITS, { message: "Choose a unit." });
 
 export const materialUseInputSchema = z.object({
   materialId: requiredId("Choose a material."),
@@ -48,7 +55,6 @@ export const inventoryCountInputSchema = z.object({
   locationId: optionalId.optional().default(""),
   note: noteSchema.optional().default(""),
 });
-
 export interface MaterialUseInput {
   materialId: string;
   quantityText: string;

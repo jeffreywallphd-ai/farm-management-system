@@ -16,6 +16,7 @@ import { Screen } from "../components/Screen";
 import { SectionHeading } from "../components/SectionHeading";
 import { formatHarvestQuantity, formatRecordDate } from "../formatters";
 import { theme } from "../theme/theme";
+import { pushRoute } from "../navigation";
 
 export function HarvestHistoryScreen({
   farm,
@@ -61,14 +62,14 @@ export function HarvestHistoryScreen({
                 view.record.effectiveAt,
               )}`}
               key={view.record.id}
-              onPress={() => router.push(`/harvest/${view.record.id}`)}
+              onPress={() => pushRoute(router, `/harvest/${view.record.id}`)}
               title={view.crop.name}
             />
           ))
         )}
       </Card>
-      <Button label="Record harvest" onPress={() => router.push("/harvest/new")} />
-      <Button label="Create recovery copy" onPress={() => router.push("/data-safety/export")} variant="secondary" />
+      <Button label="Record harvest" onPress={() => pushRoute(router, "/harvest/new")} />
+      <Button label="Create recovery copy" onPress={() => pushRoute(router, "/data-safety/export")} variant="secondary" />
     </Screen>
   );
 }

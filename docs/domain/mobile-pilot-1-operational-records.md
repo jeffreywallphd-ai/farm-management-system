@@ -5,7 +5,7 @@
 - Canonical for: operational-record meanings implemented in Mobile Pilot 1
 - Related ADRs: [ADR-0001](../adr/ADR-0001-offline-first-field-operation.md), [ADR-0002](../adr/ADR-0002-history-preserving-idempotent-synchronization.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](../adr/ADR-0005-data-portability-and-recoverability.md), [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md), [ADR-0009](../adr/ADR-0009-mobile-pilot-1-local-persistence.md), [ADR-0010](../adr/ADR-0010-mobile-pilot-1-export-and-recovery-copy.md), [ADR-0011](../adr/ADR-0011-mobile-pilot-1-runtime-boundary-validation.md)
 - Related docs: [Glossary](glossary.md), [Inventory and Reconciliation Rules](inventory-and-reconciliation-rules.md), [Initial Vertical Slice](../product/initial-vertical-slice.md), [Mobile Pilot 1 Implementation Scope](../product/mobile-pilot-1-implementation-scope.md), [Offline-First Mobile Architecture](../architecture/offline-first-mobile-architecture.md), [Mobile Pilot Data-Safety Requirements](../operations/mobile-pilot-data-safety-requirements.md), [Mobile App README](../../apps/mobile/README.md)
-- Related tests: [Harvest validation tests](../../apps/mobile/src/domain/validation/harvestValidation.test.ts), [Harvest use-case tests](../../apps/mobile/src/application/use-cases/harvestUseCases.test.ts)
+- Related tests: [Harvest validation tests](../../apps/mobile/src/domain/validation/harvestValidation.test.ts), [Harvest use-case tests](../../apps/mobile/src/application/use-cases/harvestUseCases.test.ts), [Manual record validation tests](../../apps/mobile/src/domain/validation/manualRecordValidation.test.ts), [Manual record use-case tests](../../apps/mobile/src/application/use-cases/manualRecordUseCases.test.ts)
 - Supersedes: none
 
 ## Purpose
@@ -28,6 +28,8 @@ Manual save or confirmation creates the operational record. These records must b
 
 Each record must preserve enough meaning for current local use and future server compatibility: stable identity or future-map-able identity, recorded/effective timestamps, farm-reference meaning, quantity and unit meaning, privacy classification, and correction/discrepancy meaning.
 
+The implemented Mobile Pilot 1 unit vocabulary is `lb`, `oz`, `kg`, `g`, `each`, `bunch`, `crate`, `bag`, `gal`, `L`, `flat`, and `tray`. Unit conversion, packaging equivalency, and authoritative inventory calculation are not implemented.
+
 Mobile Pilot 1 has no server acceptance, synchronization state, cross-device visibility, external sharing, or publication state. No record becomes shared externally.
 
 Basic correction for obvious entry mistakes may be supported if deliberately implemented. Correction must not silently erase meaningful recorded history or hide inventory discrepancy meaning. More advanced correction lineage, audit trail, adjustment records, and supersession workflows are deferred unless explicitly scoped later.
@@ -48,11 +50,11 @@ Minimum required fields:
 Mobile Pilot 1 behavior:
 
 - Private and device-local.
-- Appears in harvest-specific local history.
+- Appears in unified local activity history.
 - Included in the implemented Mobile Pilot 1 recovery-copy export.
 - Export/recovery copies must include the tracked crop reference data needed to interpret exported harvest records.
 - Does not imply saleable inventory, customer fulfillment, marketplace availability, listing publication, or server synchronization.
-- Phase 2 implements read-only saved harvest records; editing, deletion, correction lineage, and supersession are deferred.
+- The implemented app presents read-only saved harvest records; editing, deletion, correction lineage, and supersession are deferred.
 
 Crop rename, deletion, and historical name-snapshot behavior are deferred because reference-editing behavior is not yet implemented in Mobile Pilot 1. Until that behavior is deliberately scoped, harvest records should preserve stable crop identity without silently losing the crop meaning needed for local history or export.
 
@@ -72,7 +74,8 @@ Minimum required fields:
 Mobile Pilot 1 behavior:
 
 - Private and device-local.
-- Included in Mobile Pilot 1 export/backup.
+- Appears in unified local activity history.
+- Included in the implemented Mobile Pilot 1 recovery-copy export.
 - May affect expected material quantity only where the pilot implements that behavior transparently.
 - Does not automatically create a supply need, publish a need, notify anyone, or imply server synchronization.
 
@@ -92,7 +95,8 @@ Minimum required fields:
 Mobile Pilot 1 behavior:
 
 - Private and device-local.
-- Included in Mobile Pilot 1 export/backup.
+- Appears in unified local activity history.
+- Included in the implemented Mobile Pilot 1 recovery-copy export.
 - The count is an observation, not a destructive replacement of earlier history.
 - If material use and counts are both displayed, discrepancy interpretation must preserve the difference between expected and observed quantity rather than silently overwrite prior records.
 

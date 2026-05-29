@@ -1,6 +1,6 @@
 import type { Migration } from "./migrationRunner";
 
-const unitCheck = "('lb', 'oz', 'kg', 'g', 'each', 'bunch', 'crate')";
+const unitCheck = "('lb', 'oz', 'kg', 'g', 'each', 'bunch', 'crate', 'bag', 'gal', 'L', 'flat', 'tray')";
 
 export const createMaterialUseAndInventoryCountRecords: Migration = {
   version: 3,

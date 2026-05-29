@@ -5,7 +5,7 @@
 - Canonical for: exact first buildable standalone mobile pilot increment before AI experiments or server-connected features
 - Related ADRs: [ADR-0001](../adr/ADR-0001-offline-first-field-operation.md), [ADR-0002](../adr/ADR-0002-history-preserving-idempotent-synchronization.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](../adr/ADR-0005-data-portability-and-recoverability.md), [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md), [ADR-0008](../adr/ADR-0008-mobile-pilot-1-application-stack.md), [ADR-0009](../adr/ADR-0009-mobile-pilot-1-local-persistence.md), [ADR-0010](../adr/ADR-0010-mobile-pilot-1-export-and-recovery-copy.md), [ADR-0011](../adr/ADR-0011-mobile-pilot-1-runtime-boundary-validation.md)
 - Related docs: [Initial Vertical Slice](initial-vertical-slice.md), [Field Workflows](field-workflows.md), [Roadmap](roadmap.md), [Mobile Pilot 1 Operational Records](../domain/mobile-pilot-1-operational-records.md), [Mobile Pilot Data-Safety Requirements](../operations/mobile-pilot-data-safety-requirements.md), [Offline-First Mobile Architecture](../architecture/offline-first-mobile-architecture.md), [Mobile App README](../../apps/mobile/README.md)
-- Related tests: [Reference use-case tests](../../apps/mobile/src/application/use-cases/referenceUseCases.test.ts), [Reference validation tests](../../apps/mobile/src/domain/validation/referenceValidation.test.ts), [Harvest use-case tests](../../apps/mobile/src/application/use-cases/harvestUseCases.test.ts), [Harvest validation tests](../../apps/mobile/src/domain/validation/harvestValidation.test.ts), [Phase 1 manual smoke test](../../apps/mobile/src/testing/phase-1-manual-smoke-test.md), [Phase 2 manual smoke test](../../apps/mobile/src/testing/phase-2-manual-smoke-test.md)
+- Related tests: [Reference use-case tests](../../apps/mobile/src/application/use-cases/referenceUseCases.test.ts), [Reference validation tests](../../apps/mobile/src/domain/validation/referenceValidation.test.ts), [Harvest use-case tests](../../apps/mobile/src/application/use-cases/harvestUseCases.test.ts), [Manual record use-case tests](../../apps/mobile/src/application/use-cases/manualRecordUseCases.test.ts), [Harvest validation tests](../../apps/mobile/src/domain/validation/harvestValidation.test.ts), [Manual record validation tests](../../apps/mobile/src/domain/validation/manualRecordValidation.test.ts), [Phase 1 manual smoke test](../../apps/mobile/src/testing/phase-1-manual-smoke-test.md), [Phase 2 manual smoke test](../../apps/mobile/src/testing/phase-2-manual-smoke-test.md), [Phase 3 manual smoke test](../../apps/mobile/src/testing/phase-3-manual-smoke-test.md)
 - Supersedes: none
 
 ## Scope Statement
@@ -14,9 +14,9 @@
 
 The Mobile Pilot 1 implementation stack is selected in ADR-0008 through ADR-0011. Phase 1 setup/reference behavior now exists under `apps/mobile`: one local farm profile, farm locations, tracked crops, tracked materials, tracked countable items, SQLite-backed local persistence, Zod validation, and a reusable earthy UI foundation.
 
-Phase 2 now implements manual `HarvestRecorded` creation, harvest-specific local history/detail, and a versioned JSON recovery-copy export for farm setup/reference data and saved harvest records.
+Phase 3 now implements the complete manual Mobile Pilot 1 core: manual `HarvestRecorded`, `MaterialUseRecorded`, and `InventoryCountRecorded` creation; unified local activity history/detail; and a versioned JSON recovery-copy export for farm setup/reference data and all implemented manual records.
 
-`MaterialUseRecorded`, `InventoryCountRecorded`, unified multi-record history, import/restore, AI-assisted capture, and server-connected behavior are still not implemented.
+Import/restore, AI-assisted capture, server-connected behavior, farmer distribution configuration, and later candidate workflows are still not implemented.
 
 ## Included Mobile Pilot 1 Capabilities
 
@@ -71,6 +71,8 @@ The project needs a usable farmer-facing pilot quickly enough to test real work 
 Harvest, material use, and inventory count records are high-value because they connect everyday field work, material awareness, local history, and the original sourcing motivation without requiring server infrastructure.
 
 A smaller record set makes field usability, offline retention, local history, and export/backup easier to verify before the project adds AI experiments, more workflows, or server-connected coordination. Additional records should be justified by discovery evidence rather than assumed into the first build.
+
+The implemented Mobile Pilot 1 unit vocabulary is intentionally small: `lb`, `oz`, `kg`, `g`, `each`, `bunch`, `crate`, `bag`, `gal`, `L`, `flat`, and `tray`. Unit conversion, packaging math, and authoritative inventory calculation are not part of Mobile Pilot 1.
 
 ## Implementation-Readiness Criteria
 

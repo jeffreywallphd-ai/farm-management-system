@@ -26,6 +26,7 @@ Helps agents evaluate or introduce dependencies, external services, providers, r
 
 - Dependency or technology selection must serve an approved current need.
 - ADR-0008 through ADR-0011 accept only the Mobile Pilot 1 app stack, local persistence, local export/recovery-copy mechanism, and runtime boundary validation.
+- `react-dom@19.1.0` is pinned only for Expo Router/npm peer dependency resolution under Expo SDK 54; it does not authorize web support.
 - Deferred technology choices cannot be selected casually during unrelated feature work.
 - Evaluate licensing, maintenance, vulnerabilities, offline impact, privacy/data transmission, deployment burden, portability, resource use, and replaceability.
 - Core open-source behavior must not depend on proprietary/source-restricted infrastructure without explicit decision treatment.
