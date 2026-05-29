@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
+import { useRouter } from "expo-router";
 import { z } from "zod";
 
 import type { Farm } from "../../domain/farm/Farm";
@@ -48,6 +49,7 @@ export function FarmDashboardScreen({
   repository: FarmReferenceRepository;
   onReferenceSaved: () => Promise<void>;
 }) {
+  const router = useRouter();
   const sections: ReferenceSection[] = [
     {
       type: "location",
@@ -83,7 +85,18 @@ export function FarmDashboardScreen({
       <LocalDataNotice />
       <Card>
         <SectionHeading
-          detail="Start with just enough setup for harvests, material use, and inventory counts."
+          detail="Record harvests now, then keep building the rest of Mobile Pilot 1 as the pilot grows."
+          title="Farm work"
+        />
+        <View style={styles.actionStack}>
+          <Button label="Record harvest" onPress={() => router.push("/harvest/new")} />
+          <Button label="Harvest history" onPress={() => router.push("/harvest")} variant="secondary" />
+          <Button label="Create recovery copy" onPress={() => router.push("/data-safety/export")} variant="secondary" />
+        </View>
+      </Card>
+      <Card>
+        <SectionHeading
+          detail="Setup stays on this device and supports local harvest records."
           title="Local setup"
         />
         <Text style={styles.progress}>
@@ -174,6 +187,9 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
   list: {
+    gap: theme.spacing.sm,
+  },
+  actionStack: {
     gap: theme.spacing.sm,
   },
 });

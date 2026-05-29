@@ -1,4 +1,5 @@
 import type { PrivacyClassification } from "../privacy/PrivacyClassification";
+import type { FarmId } from "../farm/Farm";
 
 export type OperationalRecordId = string;
 
@@ -12,7 +13,8 @@ export type OperationalRecordKind =
 export interface OperationalRecordBase {
   id: OperationalRecordId;
   kind: OperationalRecordKind;
-  recordedAt: IsoDateTimeString;
+  farmId: FarmId;
+  createdAt: IsoDateTimeString;
   effectiveAt: IsoDateTimeString;
   privacy: PrivacyClassification;
   note?: string;

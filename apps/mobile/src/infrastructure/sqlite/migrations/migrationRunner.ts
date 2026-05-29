@@ -1,6 +1,8 @@
 import type { SQLiteDatabase } from "expo-sqlite";
 
 import { createReferenceTables } from "./0001_create_reference_tables";
+import { createHarvestRecords } from "./0002_create_harvest_records";
+import { createMaterialUseAndInventoryCountRecords } from "./0003_create_material_use_and_inventory_count_records";
 
 export interface Migration {
   version: number;
@@ -8,7 +10,11 @@ export interface Migration {
   statements: string[];
 }
 
-const migrations: Migration[] = [createReferenceTables];
+const migrations: Migration[] = [
+  createReferenceTables,
+  createHarvestRecords,
+  createMaterialUseAndInventoryCountRecords,
+];
 
 export async function runMigrations(database: SQLiteDatabase): Promise<void> {
   await database.execAsync(`

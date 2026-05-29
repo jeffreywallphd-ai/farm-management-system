@@ -2,7 +2,9 @@
 
 Mobile Pilot 1 is the standalone offline-first mobile app for farmer testing. It validates manual device-local recording, local activity history, clear saved-state communication, and user-controlled export/recovery copy before server-connected features exist.
 
-Phase 1 now implements minimal local farm setup and reference data. A farmer can create one device-local farm profile, add locations, crops, materials, and countable items, and reopen the app to see that setup data retained locally.
+Phase 1 implements minimal local farm setup and reference data. A farmer can create one device-local farm profile, add locations, crops, materials, and countable items, and reopen the app to see that setup data retained locally.
+
+Phase 2 implements the first complete operational workflow: manual harvest recording, harvest history, read-only harvest detail, and a local versioned JSON recovery-copy export for farm setup/reference data and saved harvest records.
 
 ## Accepted Stack
 
@@ -29,15 +31,18 @@ Canonical record meaning lives in [Mobile Pilot 1 Operational Records](../../doc
 - Local locations.
 - Local tracked crops, materials, and countable items.
 - SQLite-backed local persistence through the repository boundary.
-- Zod validation for setup/reference names and tracked item kinds.
-- A reusable earthy mobile UI foundation for Phase 1 setup screens.
+- Manual `HarvestRecorded` creation using an existing crop and location.
+- Local harvest history and read-only harvest detail.
+- Local JSON recovery-copy file generation and device-native share/save flow for implemented harvest data.
+- Zod validation for setup/reference names, tracked item kinds, harvest input, and recovery-copy export payloads.
+- A reusable earthy mobile UI foundation for setup, harvest, history, and data-safety screens.
 
 ## Planned But Not Implemented Yet
 
-- Manual entry for the three accepted records.
-- Local activity history.
-- Versioned JSON export/recovery copy.
-- Export/import boundary validation.
+- Manual `MaterialUseRecorded` entry.
+- Manual `InventoryCountRecorded` entry.
+- Unified multi-record activity history.
+- Import or restore from a recovery copy.
 
 ## Deferred Capabilities
 
@@ -52,7 +57,7 @@ Do not add packages or implementation for server synchronization, server APIs, m
 | `src/domain/` | Farmer-centered domain types for accepted Pilot 1 concepts |
 | `src/application/` | Use-case boundaries and ports |
 | `src/infrastructure/` | Future adapters for SQLite, export, and validation |
-| `src/ui/` | Future screens, components, and theme code |
+| `src/ui/` | Mobile screens, components, and theme code |
 | `src/testing/` | Future test fixtures and helpers |
 
 ## UI Foundation
@@ -78,7 +83,7 @@ The Phase 1 UI uses a calm earthy palette designed for repeated field use. Futur
 | `onPrimary` | `#FFFCF6` |
 | `onAccent` | `#FFFCF6` |
 
-Reusable components now include `Screen`, `PageHeader`, `Card`, `Button`, `FormField`, `EmptyState`, `ListRow`, `LocalDataNotice`, and `SectionHeading`.
+Reusable components now include `Screen`, `PageHeader`, `Card`, `Button`, `FormField`, `SelectField`, `EmptyState`, `ListRow`, `LocalDataNotice`, `PrivateDataNotice`, `LocalSaveConfirmation`, and `SectionHeading`.
 
 ## Local Development Notes
 

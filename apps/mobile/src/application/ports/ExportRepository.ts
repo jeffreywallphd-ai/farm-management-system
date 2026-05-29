@@ -5,6 +5,6 @@ export interface MobilePilotExportFile {
 }
 
 export interface ExportRepository {
-  createRecoveryCopy(): Promise<MobilePilotExportFile>;
+  writeRecoveryCopy(input: { fileName: string; contents: string }): Promise<MobilePilotExportFile>;
   shareRecoveryCopy(file: MobilePilotExportFile): Promise<void>;
 }

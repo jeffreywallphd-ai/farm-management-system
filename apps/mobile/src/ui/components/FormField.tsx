@@ -9,6 +9,8 @@ export function FormField({
   error,
   placeholder,
   onSubmitEditing,
+  keyboardType,
+  multiline = false,
 }: {
   label: string;
   value: string;
@@ -16,18 +18,22 @@ export function FormField({
   error?: string;
   placeholder?: string;
   onSubmitEditing?: () => void;
+  keyboardType?: "default" | "decimal-pad";
+  multiline?: boolean;
 }) {
   return (
     <View style={styles.container}>
       <Text style={styles.label}>{label}</Text>
       <TextInput
         accessibilityLabel={label}
+        keyboardType={keyboardType}
+        multiline={multiline}
         onChangeText={onChangeText}
         onSubmitEditing={onSubmitEditing}
         placeholder={placeholder}
         placeholderTextColor={theme.colors.textSecondary}
         returnKeyType="done"
-        style={[styles.input, error ? styles.inputError : null]}
+        style={[styles.input, multiline ? styles.multilineInput : null, error ? styles.inputError : null]}
         value={value}
       />
       {error ? <Text style={styles.error}>{error}</Text> : null}
@@ -54,6 +60,10 @@ const styles = StyleSheet.create({
     minHeight: 48,
     paddingHorizontal: theme.spacing.md,
     paddingVertical: theme.spacing.md,
+  },
+  multilineInput: {
+    minHeight: 96,
+    textAlignVertical: "top",
   },
   inputError: {
     borderColor: theme.colors.error,
