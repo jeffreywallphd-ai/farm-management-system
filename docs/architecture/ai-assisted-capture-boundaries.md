@@ -3,7 +3,7 @@
 - Status: proposed
 - Last reviewed: 2026-05-28
 - Canonical for: architecture boundaries separating AI inference, drafts, confirmation, operational records, offline retention, attachments, privacy handoff, and model-evaluation constraints
-- Related ADRs: [ADR-0003](../adr/ADR-0003-ai-interpretations-require-confirmation.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md)
+- Related ADRs: [ADR-0003](../adr/ADR-0003-ai-interpretations-require-confirmation.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md)
 - Related docs: [AI-Assisted Capture and Confirmation Rules](../domain/ai-assisted-capture-and-confirmation-rules.md), [AI-Assisted Capture Validation Plan](../product/ai-assisted-capture-validation-plan.md), [Privacy, Visibility, and Sharing Rules](../domain/privacy-visibility-and-sharing-rules.md), [Identity, Privacy, and Sharing](identity-privacy-and-sharing.md), [Offline-First Mobile Architecture](offline-first-mobile-architecture.md), [Synchronization Architecture](synchronization-architecture.md), [Persistence and Attachment Storage](persistence-and-attachment-storage.md)
 - Related tests: not yet implemented
 - Supersedes: none
@@ -11,6 +11,8 @@
 ## Architecture Purpose
 
 AI-assisted capture is a boundary capability that transforms user-provided source captures into reviewable drafts. It does not own or redefine the operational-record domain.
+
+In the standalone mobile pilot, AI-assisted capture is limited to constrained local draft-and-confirm experiments. Server inference, external provider transfer, synchronization of captures, and publication remain deferred unless later decisions authorize them.
 
 ```text
 User Intentional Capture

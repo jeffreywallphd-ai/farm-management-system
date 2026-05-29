@@ -1,90 +1,101 @@
-# Product Roadmap
+# Roadmap
 
-- Status: proposed
+- Status: accepted
 - Last reviewed: 2026-05-28
-- Canonical for: product sequencing, conditional future opportunities, and product scope-change rules
-- Related ADRs: [Decision Readiness Register](../adr/decision-readiness-register.md)
-- Related docs: [Product Vision and Scope](product-vision-and-scope.md), [Initial Vertical Slice](initial-vertical-slice.md), [Field Workflows](field-workflows.md), [User Research and Validation](user-research-and-validation.md), [Deployment and Data-Control Validation Plan](deployment-and-data-control-validation-plan.md)
+- Canonical for: product sequencing, conditional expansion gates, and corrected standalone mobile pilot order
+- Related ADRs: [ADR-0001](../adr/ADR-0001-offline-first-field-operation.md), [ADR-0003](../adr/ADR-0003-ai-interpretations-require-confirmation.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](../adr/ADR-0005-data-portability-and-recoverability.md), [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md)
+- Related docs: [Product Vision and Scope](product-vision-and-scope.md), [Initial Vertical Slice](initial-vertical-slice.md), [Field Workflows](field-workflows.md), [User Research and Validation](user-research-and-validation.md), [AI-Assisted Capture Validation Plan](ai-assisted-capture-validation-plan.md), [Local Coordination and Sharing Validation Plan](local-coordination-and-sharing-validation-plan.md), [Deployment and Data-Control Validation Plan](deployment-and-data-control-validation-plan.md)
 - Related tests: not yet implemented
 - Supersedes: none
 
-## Purpose
+## Roadmap Posture
 
-This roadmap provides product sequencing only. It is not an implementation task list or a technical architecture document.
+This roadmap sequences learning and implementation. It is not a promise that every later phase will ship.
 
-## Roadmap Principle
+Server-connected functionality remains a motivating future direction, but the accepted first implementation target is the standalone offline-first mobile pilot defined by [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md).
 
-Roadmap order is driven by validated farmer usefulness and trustworthy offline operation, not by building the broadest possible feature set.
+## Sequenced Phases
 
-## Foundation Stage
+| Phase | Primary purpose | Implementation posture |
+| --- | --- | --- |
+| Documentation foundation and correction | Establish implementation-safe product, domain, architecture, operations, ADR, standards, and context guidance | Current foundation work |
+| Mobile Pilot 1 | Manual offline recording, minimal local farm setup, local history, local persistence, clear local saved state, export/backup | First implementation target |
+| Mobile Pilot 2 | Constrained voice-to-draft and photo-count-to-draft experiments | Implement only within draft-confirm boundaries |
+| Farmer discovery period | Use real pilot feedback to refine workflows and determine next priorities | Evidence-gathering gate |
+| Server decision phase | Decide synchronization, hosting/local operation, coordination, and deployment priorities based on evidence | ADR/product updates required before implementation |
+| Server-connected expansion, if justified | Multi-device sync, intentional shared need listings, controlled communication, hosted/local/cooperative deployment modes | Conditional future work |
 
-The current stage is documentation and validation. It should:
+## Mobile Pilot 1: Manual Offline Recording
 
-- Establish product, domain, architecture, ADR, standards, and AI-context foundations.
-- Interview or observe farmers and workers.
-- Test assumptions around record burden, offline constraints, sourcing, voice, and photo counting.
-- Test assumptions around hosted, local, cooperative, backup, export, and recovery preferences.
-- Keep future implementation aligned to the first vertical slice instead of broad farm-management ambitions.
+Focus:
 
-## Release 1: Offline Farm Activity Recorder
+- Device-local mobile use during real farm work.
+- Basic local farm setup.
+- Narrow manual activity/observation recording.
+- Local activity history.
+- Local durable retention appropriate to the pilot.
+- Clear local saved state.
+- Practical export/backup before meaningful farmer reliance.
 
-Release 1 should implement the first vertical slice described in [Initial Vertical Slice](initial-vertical-slice.md):
+Do not include server synchronization, shared publication, multi-device access, or server deployment.
 
-- Basic farm setup for one farm context.
-- Basic locations and tracked items.
-- Manual recording for a small set of farm activities.
-- Recent activity history and understandable synchronization status.
-- Offline retention of field work until connectivity permits synchronization.
-- Narrow voice-assisted draft experiment.
-- Narrow photo-count draft experiment.
-- One intentionally shared local-sourcing need workflow.
+## Mobile Pilot 2: Constrained Assisted Capture
 
-Release 1 should generate practical feedback for domain modeling, offline/sync architecture, AI-confirmation rules, privacy boundaries, and deployment planning.
+Focus:
 
-## Possible Release 2: Improved Operational Records and Local Needs Coordination
+- One voice-to-draft workflow, preferably beginning with a high-value manual record such as harvest.
+- One photo-count-to-draft workflow for a constrained item class.
+- Explicit review, correction, confirmation, and rejection.
+- Manual alternatives.
+- Privacy and retention expectations for source captures.
 
-Potential scope, dependent on validation:
+Do not include autonomous AI records, broad computer vision, disease/treatment advice, model-training assumptions, or AI-selected publication.
 
-- Refined inventory visibility.
-- More usable material needs and offers.
-- Improved activity history.
-- Expanded but still controlled voice workflows.
-- Practical worker roles and permissions.
-- Basic local communication tied to listings.
+## Farmer Discovery Period
 
-These items are not accepted scope until supported by evidence and reflected in updated product documentation.
+Use pilot learning to answer:
 
-## Possible Release 3: Broader Farm Operations Support
+- Which manual workflows deserve first-class support?
+- Which fields are essential during real work?
+- Whether local history and export/backup build trust.
+- Whether voice/photo assistance reduces real burden.
+- Whether farmers want future sourcing/coordination functionality.
+- What server, synchronization, hosting, local operation, or network capabilities are justified.
 
-Potential scope only if evidence supports it:
+## Server Decision Phase
 
-- Additional crop workflows.
-- Equipment maintenance.
-- Shared purchase coordination.
-- Supplier directory.
-- More robust reporting and export.
-- Enhanced local or cooperative deployment.
+Before building server-connected scope, the project should decide through product/ADR work:
 
-Release 3 should not become a generic farm ERP without a deliberate scope revision.
+- Whether server synchronization should be implemented next.
+- Whether multi-device farm access is required.
+- Whether hosted, local, cooperative, or technical self-hosted operation should be prioritized.
+- Whether in-product need-listing publication is valuable enough to implement.
+- Whether responses, contact workflows, or messaging are required.
+- How export/backup/restore expectations change when a server exists.
 
-## Long-Term Possibilities, Not Commitments
+## Conditional Server-Connected Expansion
 
-Long-term possibilities may include:
+If justified by evidence and accepted decisions, later expansion may include:
 
-- Integrations with other agricultural or market systems.
-- Cooperative infrastructure.
-- Advanced analytics.
-- Additional computer-vision workflows.
-- Traceability or compliance support where justified.
-- Managed hosting or support services.
+- Multi-device synchronization.
+- Server-backed farm administration.
+- Intentional shared need listings.
+- Controlled responses or contact workflows.
+- Hosted service, simplified local server, technical self-hosting, or cooperative/private-cloud operation.
+- Broader backup, restore, migration, and recovery pathways.
 
-These are possibilities rather than accepted scope.
+These are not automatically next. Each must remain consistent with ADR-0001 through ADR-0007, the decision-readiness register, and updated product validation.
 
-## Scope-Change Rule
+## Explicitly Deferred or Excluded Areas
 
-Expanding product scope should require:
+- Public marketplace.
+- Payments, orders, ecommerce, accounting, payroll.
+- Broad social networking.
+- Regulatory/compliance system.
+- Disease diagnosis and treatment recommendations.
+- Autonomous AI farm decisions.
+- Arbitrary object recognition.
+- Server federation.
+- Generalized workflow engine or premature microservices.
 
-- Evidence or strong user need.
-- Update to product documents.
-- Review of affected domain, architecture, privacy, and offline constraints.
-- An ADR when the change introduces a durable product-technical decision.
+Future interest in these areas requires product validation and likely ADR work before implementation.

@@ -32,11 +32,11 @@ Then add only the relevant specialized pack(s), accepted ADRs, canonical documen
 | --- | --- | --- |
 | `packs/index.pack.md` | Baseline project constraints and routing rules | Every non-trivial implementation/review task |
 | `packs/product-and-domain.pack.md` | Product scope and farmer-centered domain behavior | New workflows, record types, terminology, first-slice scope |
-| `packs/offline-sync.pack.md` | Offline retention, synchronization, idempotency, discrepancy behavior | Mobile offline data, sync, reconnect, conflicts |
+| `packs/offline-sync.pack.md` | Offline retention, future-sync compatibility, synchronization constraints, idempotency, discrepancy behavior | Mobile offline data, local history, future sync, reconnect, conflicts |
 | `packs/mobile-field-capture.pack.md` | Field workflow and practical mobile interaction constraints | Activity entry UI, offline state UX, capture initiation |
 | `packs/ai-assisted-recording.pack.md` | Voice/photo draft-confirmation trust boundary | Transcription, counting, AI-assisted capture |
 | `packs/privacy-and-sharing.pack.md` | Private-by-default and intentional sharing constraints | Listings, visibility, attachments, identities |
-| `packs/server-deployment-and-operations.pack.md` | Hosted/local/self-hosted operations and recoverability | Server, deployment, export, backup, upgrades |
+| `packs/server-deployment-and-operations.pack.md` | Mobile export/backup plus future hosted/local/self-hosted operations and recoverability | Export, backup, upgrades, future server/deployment |
 | `packs/testing-and-diagnostics.pack.md` | Verification and privacy-safe diagnostics obligations | Tests, defect fixes, logs, incident diagnosis |
 | `packs/dependency-and-technology-selection.pack.md` | Dependency review and deferred technology decision discipline | New libraries, providers, technical stack evaluation |
 | `packs/documentation-and-adr-governance.pack.md` | Canonical documentation and decision updates | Docs, ADRs, architecture changes, reviews |

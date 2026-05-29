@@ -3,7 +3,7 @@
 - Status: proposed
 - Last reviewed: 2026-05-28
 - Canonical for: technology-neutral implementation discipline, boundary separation, and high-risk coding obligations
-- Related ADRs: [ADR-0001](../adr/ADR-0001-offline-first-field-operation.md), [ADR-0002](../adr/ADR-0002-history-preserving-idempotent-synchronization.md), [ADR-0003](../adr/ADR-0003-ai-interpretations-require-confirmation.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](../adr/ADR-0005-data-portability-and-recoverability.md)
+- Related ADRs: [ADR-0001](../adr/ADR-0001-offline-first-field-operation.md), [ADR-0002](../adr/ADR-0002-history-preserving-idempotent-synchronization.md), [ADR-0003](../adr/ADR-0003-ai-interpretations-require-confirmation.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](../adr/ADR-0005-data-portability-and-recoverability.md), [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md)
 - Related docs: [System Overview](../architecture/system-overview.md), [Operational Event Catalog](../domain/operational-event-catalog.md), [Synchronization Architecture](../architecture/synchronization-architecture.md), [AI-Assisted Capture Boundaries](../architecture/ai-assisted-capture-boundaries.md), [Identity, Privacy, and Sharing](../architecture/identity-privacy-and-sharing.md), [Change Impact Matrix](change-impact-matrix.md)
 - Related tests: not yet implemented
 - Supersedes: none
@@ -43,6 +43,8 @@ A later module/dependency architecture document may formalize code placement and
 ## Implementation Restraint
 
 - Implement only behavior authorized by current product scope and canonical docs.
+- For the current pilot, implement standalone mobile-local behavior before server-connected scope.
+- Do not implement server synchronization, multi-device access, shared publication, responses, or server deployment merely because future architecture documents describe those boundaries.
 - Avoid generic platform abstractions before multiple real needs exist.
 - Do not create extensibility mechanisms for deferred marketplace, payments, broad AI, federation, or microservice designs.
 - Prefer small, comprehensible vertical-slice implementations over speculative framework-building.
@@ -51,7 +53,9 @@ A later module/dependency architecture document may formalize code placement and
 
 ## Offline and Synchronization Coding Obligations
 
-Code touching offline or synchronization behavior must preserve:
+Code touching current pilot offline behavior must preserve local confirmed-record durability, local saved-state clarity, local history, export/backup expectations, and future-sync-compatible record boundaries.
+
+Code touching later authorized synchronization behavior must preserve:
 
 - Locally confirmed record durability.
 - Visible pending, synchronized, failed, or attention-required state.

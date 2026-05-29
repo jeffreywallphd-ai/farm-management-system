@@ -22,6 +22,9 @@ For all non-trivial work:
 
 | Task category | Required specialized pack(s) | Primary canonical docs/ADRs/standards to read | Typical documentation impact |
 | --- | --- | --- | --- |
+| Standalone mobile pilot implementation | `product-and-domain`, `mobile-field-capture`, `offline-sync`, `testing-and-diagnostics` | ADR-0007, initial vertical slice, field workflows, offline architecture, export/backup operations docs | Product/architecture/operations/test impact |
+| Mobile local history/persistence/export/backup | `offline-sync`, `mobile-field-capture`, `server-deployment-and-operations`, `testing-and-diagnostics`, `privacy-and-sharing` as needed | ADR-0007, ADR-0005, offline architecture, backup/export docs, upgrade/recovery docs | Operations/privacy/verification impact |
+| Mobile voice/photo draft experiment | `ai-assisted-recording`, `mobile-field-capture`, `product-and-domain`, `privacy-and-sharing` as needed | ADR-0003, ADR-0007, AI domain/architecture docs, validation plan | Active only within constrained confirmed-draft boundaries |
 | New or changed farm workflow | `product-and-domain`, possibly `mobile-field-capture` | Product scope/workflows, glossary, event catalog, relevant ADRs, naming/usability/testing standards | Product/domain updates likely |
 | New or changed operational record | `product-and-domain`, `offline-sync`, `testing-and-diagnostics` | Event catalog, inventory rules, sync docs/ADR, testing standards | Domain/architecture/ADR review likely |
 | Offline mobile persistence/status | `offline-sync`, `mobile-field-capture`, `testing-and-diagnostics` | Offline architecture, sync ADR/docs, usability/logging standards | Architecture/verification impact |
@@ -29,6 +32,9 @@ For all non-trivial work:
 | Voice-assisted recording | `ai-assisted-recording`, `mobile-field-capture`, `privacy-and-sharing` as needed | AI ADR/docs, field workflow, attachment/privacy docs | Product/domain/architecture/test impact |
 | Photo-assisted count | `ai-assisted-recording`, `mobile-field-capture`, `privacy-and-sharing`, `offline-sync` as needed | AI/inventory/attachment/privacy docs | Domain/architecture/test/privacy impact |
 | Need listing/publication/local sharing | `privacy-and-sharing`, `product-and-domain`, `offline-sync` if offline publication involved | Privacy ADR/docs, sourcing model, sync docs | Privacy/domain/architecture impact |
+| Server synchronization implementation | `offline-sync`, `documentation-and-adr-governance`, `dependency-and-technology-selection`, `testing-and-diagnostics` | ADR-0007, ADR-0002, synchronization architecture, readiness register | Deferred; requires later product/ADR authorization |
+| Need-listing publication or farm-to-farm communication | `privacy-and-sharing`, `product-and-domain`, `documentation-and-adr-governance` | ADR-0007, ADR-0004, sourcing/privacy docs, validation plan | Deferred; requires later product/ADR authorization |
+| Hosting/local-server/cooperative implementation | `server-deployment-and-operations`, `documentation-and-adr-governance`, `dependency-and-technology-selection` | ADR-0007, ADR-0006, deployment/operations docs, readiness register | Deferred; requires later product/ADR authorization |
 | Attachments/source captures | `privacy-and-sharing`, `ai-assisted-recording` or `server-deployment-and-operations` as applicable | Attachment, AI, privacy, export/backup docs | Privacy/operations impact |
 | Identity/access/security behavior | `privacy-and-sharing`, `dependency-and-technology-selection` if evaluating mechanisms | Privacy architecture, security standards, readiness register | New ADR likely before durable choice |
 | Server/deployment mode work | `server-deployment-and-operations`, `offline-sync`, `privacy-and-sharing` where relevant | Deployment/operations docs, portability ADR, privacy docs | Architecture/operations/ADR impact |
@@ -47,6 +53,7 @@ For all non-trivial work:
 - Include `offline-sync` whenever work may change retained field work, status, retry, conflicts, or publication timing.
 - Include `documentation-and-adr-governance` when making architecture/decision changes or selecting previously deferred technology.
 - Include `testing-and-diagnostics` for bug fixes and behavior-changing implementation.
+- Treat server synchronization, need-listing publication, farm-to-farm communication, and hosted/local/cooperative server implementation as deferred unless the task explicitly includes product/ADR authorization.
 
 ## Task-Splitting Guidance
 
@@ -87,20 +94,22 @@ Baseline:
 Add:
 - product-and-domain.pack.md
 - mobile-field-capture.pack.md
-- offline-sync.pack.md, if offline persistence/sync behavior changes
+- offline-sync.pack.md, if local persistence, local history, future-sync-compatible identity, or recovery behavior changes
 - testing-and-diagnostics.pack.md
 
 Then read named canonical sources and affected implementation/tests.
 ```
 
-### Example B: Implement or Review Synchronization Retry Behavior
+### Example B: Implement or Review Local Mobile Retention or Export/Backup
 
 ```text
 Baseline plus:
 - offline-sync.pack.md
 - testing-and-diagnostics.pack.md
+- server-deployment-and-operations.pack.md, if export/backup/recovery is affected
+- privacy-and-sharing.pack.md, if sensitive records, captures, or export contents are affected
 
-Add privacy-and-sharing.pack.md only if publication, cross-farm visibility, or sensitive attachments are affected.
+This is active pilot scope when limited to local mobile behavior.
 ```
 
 ### Example C: Implement a Voice-Assisted Harvest Draft
@@ -111,18 +120,22 @@ Baseline plus:
 - mobile-field-capture.pack.md
 - product-and-domain.pack.md
 - privacy-and-sharing.pack.md, if audio retention/transfer/access is involved
-- offline-sync.pack.md, if offline capture/confirmation/sync behavior is involved
+- offline-sync.pack.md, if local capture/confirmation/history/export behavior is involved
 - testing-and-diagnostics.pack.md
 ```
 
-### Example D: Implement Need-Listing Publication
+### Example D: Evaluate Future Need-Listing Publication
 
 ```text
 Baseline plus:
 - privacy-and-sharing.pack.md
 - product-and-domain.pack.md
-- offline-sync.pack.md, if pending offline publication is involved
-- testing-and-diagnostics.pack.md
+- documentation-and-adr-governance.pack.md
+
+Required:
+- treat implementation as deferred from the standalone mobile pilot;
+- read ADR-0007 and the local coordination validation plan;
+- update product/ADR scope before any implementation prompt.
 ```
 
 ### Example E: Evaluate Server Language, Database, or Sync Technology
@@ -146,8 +159,10 @@ Required:
 Baseline plus:
 - server-deployment-and-operations.pack.md
 - privacy-and-sharing.pack.md
-- offline-sync.pack.md where reconnect/pending data behavior may change
+- offline-sync.pack.md where local retention, future reconnect, or pending data behavior may change
 - testing-and-diagnostics.pack.md
+
+Mobile pilot export/backup is active scope; local-server capability is deferred and requires later authorization.
 ```
 
 ### Example G: Documentation or ADR Review

@@ -2,8 +2,8 @@
 
 - Status: proposed
 - Last reviewed: 2026-05-28
-- Canonical for: AI-assisted capture domain meaning, draft confirmation, provenance, ambiguity handling, and first-slice assisted-capture boundaries
-- Related ADRs: [ADR-0003](../adr/ADR-0003-ai-interpretations-require-confirmation.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md)
+- Canonical for: AI-assisted capture domain meaning, draft confirmation, provenance, ambiguity handling, and standalone-pilot assisted-capture boundaries
+- Related ADRs: [ADR-0003](../adr/ADR-0003-ai-interpretations-require-confirmation.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md)
 - Related docs: [Glossary](glossary.md), [Operational Event Catalog](operational-event-catalog.md), [Inventory and Reconciliation Rules](inventory-and-reconciliation-rules.md), [Privacy, Visibility, and Sharing Rules](privacy-visibility-and-sharing-rules.md), [AI-Assisted Capture Boundaries](../architecture/ai-assisted-capture-boundaries.md), [Initial Vertical Slice](../product/initial-vertical-slice.md), [Field Workflows](../product/field-workflows.md), [AI-Assisted Capture Validation Plan](../product/ai-assisted-capture-validation-plan.md)
 - Related tests: not yet implemented
 - Supersedes: none
@@ -13,6 +13,8 @@
 AI-assisted capture is intended to reduce the burden of routine field recording, especially when workers' hands are occupied or dirty, typing into multiple form fields is inconvenient, standardized objects need to be counted repeatedly, or connectivity is unavailable or unreliable.
 
 AI-assisted capture is an experimental convenience layer over trustworthy operational records. It is not an autonomous farm-management authority.
+
+The assisted-capture experiment occurs inside the standalone mobile pilot. Confirmed AI-assisted records remain local/private during the pilot unless included in a user-controlled export or backup. Future sharing, publication, server transfer, or model-provider workflows require separate later authorization.
 
 ## Domain Concepts
 

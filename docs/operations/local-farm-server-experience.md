@@ -3,7 +3,7 @@
 - Status: proposed
 - Last reviewed: 2026-05-28
 - Canonical for: farmer-usable local server target experience, local-operation motivations, and distinction from technical self-hosting
-- Related ADRs: [ADR-0001](../adr/ADR-0001-offline-first-field-operation.md), [ADR-0005](../adr/ADR-0005-data-portability-and-recoverability.md), [ADR-0006](../adr/ADR-0006-deployment-mode-compatibility.md), [Decision Readiness Register](../adr/decision-readiness-register.md)
+- Related ADRs: [ADR-0001](../adr/ADR-0001-offline-first-field-operation.md), [ADR-0005](../adr/ADR-0005-data-portability-and-recoverability.md), [ADR-0006](../adr/ADR-0006-deployment-mode-compatibility.md), [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md), [Decision Readiness Register](../adr/decision-readiness-register.md)
 - Related docs: [Operations README](README.md), [Deployment Modes](deployment-modes.md), [Server and Deployment Operating Model](../architecture/server-and-deployment-operating-model.md), [Backup, Restore, and Data Export Requirements](backup-restore-and-data-export-requirements.md), [Deployment and Data-Control Validation Plan](../product/deployment-and-data-control-validation-plan.md)
 - Related tests: not yet implemented
 - Supersedes: none
@@ -13,6 +13,8 @@
 This document defines what a genuinely farmer-usable local server experience should eventually mean, distinct from developer or technical administrator self-hosting.
 
 "Self-hosted" is insufficient if it still requires farmers to administer infrastructure they do not understand.
+
+The standalone mobile pilot does not include local server implementation. This document remains future-facing guidance for later server-connected work if farmer evidence and ADRs justify it.
 
 ## Why Local Farm Operation May Matter
 

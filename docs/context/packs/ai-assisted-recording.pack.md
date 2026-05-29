@@ -52,7 +52,7 @@ Do not implement autonomous records, automatic inventory updates, automatic publ
 
 ## Canonical Source Documents and ADRs
 
-- `docs/domain/ai-assisted-capture-and-confirmation-rules.md`: AI domain states and first-slice capture boundaries.
+- `docs/domain/ai-assisted-capture-and-confirmation-rules.md`: AI domain states and standalone-pilot capture boundaries.
 - `docs/architecture/ai-assisted-capture-boundaries.md`: inference/draft/confirmation architecture.
 - `docs/product/ai-assisted-capture-validation-plan.md`: hypotheses and expansion gates.
 - `docs/architecture/persistence-and-attachment-storage.md`: source capture and attachment handling.

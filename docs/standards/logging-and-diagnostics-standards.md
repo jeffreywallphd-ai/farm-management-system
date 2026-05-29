@@ -3,14 +3,14 @@
 - Status: proposed
 - Last reviewed: 2026-05-28
 - Canonical for: privacy-safe diagnostics, structured failure visibility, and operational supportability expectations
-- Related ADRs: [ADR-0001](../adr/ADR-0001-offline-first-field-operation.md), [ADR-0002](../adr/ADR-0002-history-preserving-idempotent-synchronization.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](../adr/ADR-0005-data-portability-and-recoverability.md)
+- Related ADRs: [ADR-0001](../adr/ADR-0001-offline-first-field-operation.md), [ADR-0002](../adr/ADR-0002-history-preserving-idempotent-synchronization.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](../adr/ADR-0005-data-portability-and-recoverability.md), [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md)
 - Related docs: [Synchronization Architecture](../architecture/synchronization-architecture.md), [Identity, Privacy, and Sharing](../architecture/identity-privacy-and-sharing.md), [Upgrades, Migrations, and Recovery Requirements](../operations/upgrades-migrations-and-recovery-requirements.md), [Security and Privacy Engineering Standards](security-and-privacy-engineering-standards.md)
 - Related tests: not yet implemented
 - Supersedes: none
 
 ## Diagnostics Purpose
 
-Logs and diagnostics exist to identify failures, retries, synchronization issues, migration problems, attachment failures, privacy-boundary violations, and local/hosted operational problems.
+Logs and diagnostics exist to identify local pilot save/export/backup failures, later retries and synchronization issues, migration problems, attachment failures, privacy-boundary violations, and local/hosted operational problems.
 
 Diagnostics must support troubleshooting without making private farm contents a routine part of logs. Logs are not an acceptable substitute for user-visible status where a farmer needs to know whether work is saved, synchronized, published, or requires attention.
 
@@ -21,7 +21,7 @@ Future implementation should use structured, consistently identifiable diagnosti
 | Diagnostic category | Examples |
 | --- | --- |
 | Application lifecycle | Startup, shutdown, configuration validation |
-| Local record lifecycle | Retained locally, pending sync, confirmation transition |
+| Local record lifecycle | Retained locally, local save failed, confirmation transition, export/backup status |
 | Synchronization | Submission attempted, accepted, retry scheduled, rejected, attention required |
 | Publication | Publication requested, accepted, withdrawn, failed |
 | Attachment transfer | Queued, transferred, failed, removed |

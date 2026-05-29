@@ -1,9 +1,9 @@
 # Documentation Standards
 
-- Status: proposed
+- Status: accepted
 - Last reviewed: 2026-05-28
 - Canonical for: repository-wide documentation authority, metadata, change completeness, and drift prevention
-- Related ADRs: [ADR-0001](../adr/ADR-0001-offline-first-field-operation.md), [ADR-0002](../adr/ADR-0002-history-preserving-idempotent-synchronization.md), [ADR-0003](../adr/ADR-0003-ai-interpretations-require-confirmation.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](../adr/ADR-0005-data-portability-and-recoverability.md)
+- Related ADRs: [ADR-0001](../adr/ADR-0001-offline-first-field-operation.md), [ADR-0002](../adr/ADR-0002-history-preserving-idempotent-synchronization.md), [ADR-0003](../adr/ADR-0003-ai-interpretations-require-confirmation.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](../adr/ADR-0005-data-portability-and-recoverability.md), [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md)
 - Related docs: [Documentation Governance](../README.md), [Decision Readiness Register](../adr/decision-readiness-register.md), [Change Impact Matrix](change-impact-matrix.md)
 - Related tests: not yet implemented
 - Supersedes: none
@@ -43,6 +43,19 @@ Substantive canonical documents must use the repository metadata block defined i
 - Update `Related ADRs` after accepted or proposed ADRs are created or superseded.
 - Update `Related tests` after implementation creates tests that enforce documented behavior.
 - Mark superseded documents or clearly link their replacements rather than leaving conflicting sources active.
+
+## Non-ADR Status Semantics
+
+For substantive product, domain, architecture, operations, and standards documents, status values mean:
+
+| Status | Meaning for non-ADR canonical documents |
+| --- | --- |
+| `proposed` | A useful canonical working draft, validation plan, future option, or constraint candidate. It may guide exploration but should not be treated as accepted implementation authority where scope or durable behavior is unsettled. |
+| `accepted` | Current implementation-governing documentation for its stated canonical scope. Future work should build against it unless it is superseded or a contradiction is surfaced. |
+| `superseded` | Replaced by a newer canonical document or decision. It remains historical/contextual and must link to the replacement. |
+| `deprecated` | Still present but no longer recommended for new work; use only as described until removed or superseded. |
+
+An implementation-driving first-slice document must have a clear accepted-authority posture before agents are asked to build against it. Validation hypotheses may remain proposed even when accepted pilot scope defines how they will be tested.
 
 ## Documentation Update Triggers
 

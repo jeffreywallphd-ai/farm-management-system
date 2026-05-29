@@ -3,7 +3,7 @@
 - Status: proposed
 - Last reviewed: 2026-05-28
 - Canonical for: product hypotheses, field-testing expectations, evaluation dimensions, and gates for expanding AI-assisted capture scope
-- Related ADRs: [ADR-0003](../adr/ADR-0003-ai-interpretations-require-confirmation.md), [Decision Readiness Register](../adr/decision-readiness-register.md)
+- Related ADRs: [ADR-0003](../adr/ADR-0003-ai-interpretations-require-confirmation.md), [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md), [Decision Readiness Register](../adr/decision-readiness-register.md)
 - Related docs: [Initial Vertical Slice](initial-vertical-slice.md), [Field Workflows](field-workflows.md), [User Research and Validation](user-research-and-validation.md), [AI-Assisted Capture and Confirmation Rules](../domain/ai-assisted-capture-and-confirmation-rules.md), [AI-Assisted Capture Boundaries](../architecture/ai-assisted-capture-boundaries.md)
 - Related tests: not yet implemented
 - Supersedes: none
@@ -18,7 +18,9 @@ Voice assistance and photo counting are promising concepts motivated by the need
 
 Their actual usefulness, error tolerance, preferred workflows, offline requirements, and privacy acceptability have not yet been sufficiently validated with farmers/workers in this repository.
 
-These features must remain controlled experiments in the first slice until evidence supports expansion.
+These features must remain controlled draft-and-confirm experiments in the standalone mobile pilot until evidence supports expansion.
+
+During the pilot, confirmed AI-assisted records remain local/private unless exported or backed up by the user. Any future sharing, publication, server inference, model provider, synchronization, or capture transfer remains a separate later decision.
 
 ## Validation Principles
 
@@ -47,7 +49,7 @@ These features must remain controlled experiments in the first slice until evide
 | Photos of flats can be captured under realistic conditions | Determines feasibility | Collect consented sample scenarios/prototype testing | Usable framing and correction flow |
 | Harvest crates are a valuable secondary count category | Determines expansion | Observe wash/pack or harvest flow | Clear operational value |
 | Users trust a corrected count observation | Determines workflow acceptance | Show draft/correction interaction | Users understand count is not silently final |
-| Captured photos are acceptable to retain or sync | Determines privacy and storage posture | Discuss retention options directly | Explicit preference/consent pattern |
+| Captured photos are acceptable to retain locally, export/back up, or later transfer | Determines privacy and storage posture | Discuss retention/export/backup options directly | Explicit preference/consent pattern |
 
 ## Evaluation Dimensions
 

@@ -3,7 +3,7 @@
 - Status: proposed
 - Last reviewed: 2026-05-28
 - Canonical for: backup, restore, export, portability, migration, sensitive backup handling, and data ownership requirements
-- Related ADRs: [ADR-0002](../adr/ADR-0002-history-preserving-idempotent-synchronization.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](../adr/ADR-0005-data-portability-and-recoverability.md)
+- Related ADRs: [ADR-0002](../adr/ADR-0002-history-preserving-idempotent-synchronization.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](../adr/ADR-0005-data-portability-and-recoverability.md), [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md)
 - Related docs: [Operations README](README.md), [Deployment Modes](deployment-modes.md), [Local Farm Server Experience](local-farm-server-experience.md), [Upgrades, Migrations, and Recovery Requirements](upgrades-migrations-and-recovery-requirements.md), [Persistence and Attachment Storage](../architecture/persistence-and-attachment-storage.md), [Identity, Privacy, and Sharing](../architecture/identity-privacy-and-sharing.md)
 - Related tests: not yet implemented
 - Supersedes: none
@@ -14,6 +14,16 @@ This document defines product and operational requirements for backup, restore, 
 
 It does not provide commands for unimplemented infrastructure.
 
+## Standalone Mobile Pilot Requirement
+
+Before farmers rely on a standalone mobile pilot for meaningful operational data, the pilot must provide a practical export/backup pathway.
+
+The farmer must understand what is included in the export/backup, especially whether local setup/reference information, confirmed records, local history, private supply needs, photos, audio, provenance, AI drafts, and discarded drafts are included or excluded.
+
+The pilot must not imply production-grade disaster recovery unless that recovery behavior is implemented and verified. Device loss, app uninstall, test build replacement, app update, local data corruption, and phone replacement are immediate pilot data-risk scenarios.
+
+Export/backup format and implementation technology remain deferred to implementation planning and possible ADR work. The capability is now required by pilot scope; the mechanism is not selected here.
+
 ## Why Backup, Restore, and Export Are Foundational
 
 The platform may eventually retain farm operational history, inventory observations, local sourcing records, sensitive photos/audio, AI capture provenance, sharing/publication history, membership, and configuration data.
@@ -22,7 +32,7 @@ Losing access to such data or trapping it in an inaccessible deployment would un
 
 ## Data Ownership Posture
 
-A farm must eventually have a practical means to retrieve its operational data and associated farm-owned content in a usable form, regardless of whether it uses hosted or self-hosted operation.
+A farm must have a practical means to retrieve or back up meaningful standalone mobile pilot data before relying on the pilot operationally. The farm must eventually have a practical means to retrieve its operational data and associated farm-owned content in a usable form across later hosted or self-hosted operation.
 
 This is a product requirement, not production legal ownership language.
 
@@ -40,13 +50,13 @@ This is a product requirement, not production legal ownership language.
 
 | Information category | Backup requirement posture | Export requirement posture | Privacy sensitivity |
 | --- | --- | --- | --- |
-| Farm configuration/reference data | Required once relied upon | Required eventually | Moderate/private |
-| Confirmed operational records | Required | Required | Private |
+| Farm configuration/reference data | Required for meaningful standalone pilot reliance | Required for pilot export/backup | Moderate/private |
+| Confirmed operational records | Required for meaningful standalone pilot reliance | Required for pilot export/backup | Private |
 | Inventory observations/discrepancy history | Required | Required | Private/sensitive |
-| Supply needs and listing history | Required according to retained product behavior | Required eventually | Mixed private/shared |
-| Shared published listings | Required if retained in product history | Exportable with visibility metadata later | Shared but potentially sensitive |
-| AI drafts | Policy required; not necessarily retained indefinitely | Policy required | Sensitive/private |
-| Source photos/audio | Required only if retained as product data under later policy | Exportable/deletable according to policy | Highly sensitive |
+| Supply needs and listing history | Private pilot supply needs required if retained; listing history future only | Private pilot needs exportable if retained; listing export later | Mixed private/shared |
+| Shared published listings | Future server-connected requirement only | Exportable with visibility metadata later | Shared but potentially sensitive |
+| AI drafts | Pilot retention policy required; not necessarily retained indefinitely | Policy required | Sensitive/private |
+| Source photos/audio | Required if retained as pilot product data | Exportable/deletable according to policy | Highly sensitive |
 | Attachments deliberately shared with listings, later | Required if supported and retained | Exportable with sharing context | Potentially sensitive |
 | Sync state/pending local records | Recovery requirement critical | Not necessarily ordinary export format | Operationally critical |
 | Accounts/membership/access metadata | Required for restore where implemented | Policy required | Sensitive |

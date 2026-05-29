@@ -3,7 +3,7 @@
 - Status: proposed
 - Last reviewed: 2026-05-28
 - Canonical for: server operating modes, deployment-mode architecture constraints, mobile/server relationship, data portability, and deployment-neutral product invariants
-- Related ADRs: [ADR-0001](../adr/ADR-0001-offline-first-field-operation.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](../adr/ADR-0005-data-portability-and-recoverability.md), [ADR-0006](../adr/ADR-0006-deployment-mode-compatibility.md)
+- Related ADRs: [ADR-0001](../adr/ADR-0001-offline-first-field-operation.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](../adr/ADR-0005-data-portability-and-recoverability.md), [ADR-0006](../adr/ADR-0006-deployment-mode-compatibility.md), [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md)
 - Related docs: [System Overview](system-overview.md), [Offline-First Mobile Architecture](offline-first-mobile-architecture.md), [Synchronization Architecture](synchronization-architecture.md), [Persistence and Attachment Storage](persistence-and-attachment-storage.md), [Identity, Privacy, and Sharing](identity-privacy-and-sharing.md), [Deployment Modes](../operations/deployment-modes.md), [Backup, Restore, and Data Export Requirements](../operations/backup-restore-and-data-export-requirements.md), [Deployment and Data-Control Validation Plan](../product/deployment-and-data-control-validation-plan.md)
 - Related tests: not yet implemented
 - Supersedes: none
@@ -16,11 +16,13 @@ The system must therefore avoid being designed exclusively for permanent cloud c
 
 ## Operating Model Overview
 
+The first implemented pilot is standalone mobile and does not include a server. The following operating model describes future server-connected expansion that the pilot should not foreclose.
+
 ```text
 Mobile Field Client
 |-- Works offline for supported field-recording workflows
 |-- Retains confirmed operational records locally
-|-- Synchronizes when a permitted server becomes reachable
+|-- May synchronize later when a permitted server feature exists
 `-- May communicate with hosted, local, cooperative, or private-cloud server mode
 
 Server Operating Mode
@@ -48,14 +50,14 @@ These are operating modes the architecture should not foreclose. This document d
 
 ## First-Slice Deployment Posture
 
-The first vertical slice requires:
+The first implemented pilot requires:
 
-- A mobile field experience capable of offline record capture.
-- Some synchronization-capable server environment for validating the end-to-end workflow.
-- Data export and recovery requirements documented before relying on real operational data.
+- A standalone mobile field experience capable of offline local record capture.
+- Local activity history and understandable local saved state.
+- Practical mobile export/backup before farmers rely on real operational data.
 - No assumption that ordinary farm users will administer developer infrastructure.
 
-This document does not dictate whether the first working implementation is initially tested against a developer-managed server, a hosted test instance, or a local prototype environment. Implementation planning and ADR work must choose a sequence consistent with validation needs and operational simplicity.
+The first pilot does not require a synchronization-capable server environment. Implementation planning and ADR work must authorize any later server sequence after evidence justifies it.
 
 ## Hosted-Service Architecture Implications
 

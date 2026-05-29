@@ -1,43 +1,47 @@
 # Initial Vertical Slice
 
-- Status: proposed
+- Status: accepted
 - Last reviewed: 2026-05-28
-- Canonical for: first implementation target, included product capabilities, first-slice non-goals, and validation goals
-- Related ADRs: [ADR-0001](../adr/ADR-0001-offline-first-field-operation.md), [ADR-0003](../adr/ADR-0003-ai-interpretations-require-confirmation.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md)
-- Related docs: [Product Vision and Scope](product-vision-and-scope.md), [Field Workflows](field-workflows.md), [User Research and Validation](user-research-and-validation.md), [Local Coordination and Sharing Validation Plan](local-coordination-and-sharing-validation-plan.md), [Deployment and Data-Control Validation Plan](deployment-and-data-control-validation-plan.md), [Roadmap](roadmap.md)
+- Canonical for: accepted standalone mobile pilot target, included pilot capabilities, pilot non-goals, and validation goals
+- Related ADRs: [ADR-0001](../adr/ADR-0001-offline-first-field-operation.md), [ADR-0003](../adr/ADR-0003-ai-interpretations-require-confirmation.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](../adr/ADR-0005-data-portability-and-recoverability.md), [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md)
+- Related docs: [Product Vision and Scope](product-vision-and-scope.md), [Field Workflows](field-workflows.md), [User Research and Validation](user-research-and-validation.md), [AI-Assisted Capture Validation Plan](ai-assisted-capture-validation-plan.md), [Local Coordination and Sharing Validation Plan](local-coordination-and-sharing-validation-plan.md), [Deployment and Data-Control Validation Plan](deployment-and-data-control-validation-plan.md), [Roadmap](roadmap.md)
 - Related tests: not yet implemented
 - Supersedes: none
 
 ## First-Slice Statement
 
-The first vertical slice is an offline-capable mobile farm activity recorder that allows a single farm and its workers to define basic locations and tracked items, manually record a small set of farm activities, synchronize retained work when connectivity permits, experiment with one voice-to-draft flow and one photo-count-to-draft flow, and convert one low-material observation into an intentionally shared sourcing need.
+The first vertical slice is a standalone offline-first mobile pilot that farmers can download and use during real work for customer discovery and workflow validation.
 
-This slice should be narrow enough to build, test with real users, and revise without committing the repository to a broad farm-management platform.
+The pilot supports a single-farm, device-local operating context; minimal local setup; narrowly scoped manual operational records; local activity history; understandable local saved state; constrained voice/photo draft experiments; and practical export/backup before farmers rely on the pilot for meaningful operational data.
 
-## What the Slice Proves
+The pilot must remain compatible with later server connection, but it does not implement server synchronization, multi-device coordination, hosted/local/cooperative server operation, in-product shared listing publication, listing responses, or broader network functionality.
 
-- Farm workers can record useful activity in the moment with less friction than a form-heavy workflow.
-- Offline field capture is a core product requirement, not a later convenience feature.
-- A small set of farmer-facing activity types can guide initial domain modeling.
-- Voice and photo assistance can be evaluated as reviewable drafts rather than trusted automation.
-- A material shortage can become an intentionally shared sourcing need without exposing private operational records.
+## What the Pilot Proves
 
-## Included Capabilities
+- Farmers can record useful activity in the moment with less friction than a form-heavy workflow.
+- Offline field capture and local retention are core product requirements.
+- Local activity history is understandable and useful without a server.
+- Constrained AI-assisted drafts can be evaluated without granting AI operational authority.
+- Practical export/backup is necessary before mobile-only pilot data becomes meaningful to farmers.
+- Private internal supply-need notes, if scoped, help test whether later sourcing/coordination deserves priority.
+- Future server-connected functionality should be based on evidence gathered from the mobile pilot.
 
-### A. Basic Farm Setup
+## Included Pilot Capabilities
 
-The first slice includes:
+### A. Mobile-Only Farm Context
 
-- One farm organization or farm account context.
-- Worker/member access only to the extent needed for first-slice use.
-- Basic farm locations such as field, bed, greenhouse, tunnel, barn, or storage area.
-- Basic tracked items sufficient for workflows: selected crops, materials, equipment, or standardized countable items.
+The pilot includes:
 
-This document does not design detailed identity architecture or a generalized asset taxonomy.
+- A single-farm device-local operating context.
+- Minimal local farm setup.
+- Basic farm locations such as field, bed, greenhouse, tunnel, barn, storage area, or wash/pack area.
+- Basic tracked items sufficient for scoped workflows: selected crops, materials, equipment, or countable items.
 
-### B. Manual Farm Activity Recording
+This slice does not design account systems, multi-device membership, or final identity architecture.
 
-The first slice includes these initial activity categories at the product level:
+### B. Manual Activity and Observation Recording
+
+The pilot may include a narrow set of farmer-facing record categories:
 
 - Planting or transplanting record.
 - Harvest record.
@@ -45,138 +49,151 @@ The first slice includes these initial activity categories at the product level:
 - Movement record.
 - Inventory observation/count.
 - Equipment issue or maintenance-needed note.
+- Private internal supply-need note, if useful for discovery.
 
-A later domain prompt will define precise operational events, vocabulary, and rules.
+New record types should not be added casually. The pilot should begin with the smallest set that can support meaningful farmer discovery.
 
-### C. Activity History
+### C. Local Activity History and Saved State
 
-The first slice includes:
+The pilot includes:
 
-- Ability to review recent recorded activities.
-- Ability to recognize records awaiting synchronization when offline.
-- Ability to review activity associated with a relevant item or location at a practical level.
+- Review of recent locally recorded activities and observations.
+- Practical review by item or location where useful and simple.
+- Clear indication that records are stored locally on the device.
+- Clear distinction between confirmed local records and unconfirmed drafts.
 
-This document does not define detailed reporting architecture.
+The standalone pilot does not show server synchronization state because no server is implemented. Future server-enabled versions may introduce awaiting synchronization, synchronized, rejected, and attention-required states.
 
-### D. Offline Field Behavior
+### D. Offline Local Retention
 
-The first slice includes these product requirements:
+The pilot includes:
 
-- Field recording remains usable without live reception.
-- Work created offline is retained.
-- The user receives understandable synchronization status.
-- Reconnecting should allow retained work to be synchronized without requiring re-entry.
+- Field recording without live reception or server connectivity.
+- Local retention of confirmed records appropriate to the pilot.
+- Recovery from ordinary app interruption/restart without silent loss where durability is claimed.
+- Local data boundaries that do not make later synchronization unnecessarily difficult.
 
-This document does not choose synchronization technology, storage design, or conflict algorithm.
+This document does not choose mobile persistence technology, identifier implementation, or record storage format.
 
-The first slice requires an end-to-end synchronization environment for validation, but it does not require production-grade hosted packaging, local-server packaging, cooperative hosting, or private-cloud deployment unless later product scope is revised.
+### E. Practical Export/Backup
 
-### E. Voice-Assisted Draft Experiment
+Before farmers rely on the pilot for meaningful operational records, the pilot must provide a practical export/backup pathway.
 
-The first voice proof should be limited to a small number of activity categories, preferably:
+The farmer must be able to understand:
 
-- Harvest.
-- Material use.
-- Movement.
+- What records are included.
+- Whether local setup/reference information is included.
+- Whether source photos, audio, provenance, and drafts are included or excluded.
+- What risks remain if a device is lost, the app is uninstalled, a test build is replaced, or an update fails.
+
+This document does not choose export file format, backup mechanism, restore workflow, encryption mechanism, or cloud/local storage provider.
+
+### F. Voice-Assisted Draft Experiment
+
+The pilot may include one constrained voice-to-draft experiment, preferably beginning with one high-value workflow such as harvest recording.
 
 Required product behavior:
 
 - User initiates voice capture.
 - System proposes interpreted fields.
-- User confirms, edits, or rejects the draft.
-- Only confirmed information is treated as an activity record.
+- User confirms, edits and confirms, or rejects the draft.
+- Only confirmed information becomes an operational record.
+- Manual entry remains available.
 
 Open-ended voice assistants, automatic recommendations, and autonomous farm actions are not included.
 
-### F. Photo-Count Draft Experiment
+### G. Photo-Count Draft Experiment
 
-Candidate item types for initial validation include:
-
-- Seedling flats.
-- Harvest crates.
-- Stacked bags of a standard material, only if real-world validation supports it.
+The pilot may include one constrained photo-count-to-draft experiment, preferably beginning with one standardized item class such as seedling flats or harvest crates.
 
 Required product behavior:
 
-- User chooses the type of item being counted.
+- User chooses the supported item type being counted.
 - User captures a photo.
 - System proposes a count.
 - User confirms or corrects the result.
-- The confirmed count becomes an observation.
+- The confirmed count becomes an inventory observation.
+- Manual counting/entry remains available.
 
-Arbitrary asset recognition, plant-disease diagnosis, weed detection, yield prediction, and autonomous inventory adjustment are not included.
+Arbitrary object recognition, plant-disease diagnosis, weed detection, yield prediction, and autonomous inventory adjustment are not included.
 
-### G. Narrow Local-Sourcing Workflow
+### H. Private Supply-Need Discovery
 
-The first slice includes:
+The pilot may allow a farmer to record a private internal supply need if this helps discovery.
 
-- A user can turn an observed material shortage or need into a deliberately shared need listing.
-- The listing includes only information intentionally provided for sharing.
-- Private operational records and total inventory remain private by default.
-- Source captures, AI drafts, private attachments, material-use history, and inventory discrepancies are not disclosed automatically.
-- A listing created while offline remains pending publication until synchronization and acceptance.
-- An initial response/contact mechanism may be minimal.
+Rules:
 
-The first slice does not include a full marketplace, payment system, public ecommerce system, cooperative procurement engine, or general-purpose social platform.
+- The need remains device-local and private in the pilot.
+- It is not a shared listing.
+- It is not published through the platform.
+- It may help validate whether server-connected sourcing should be prioritized later.
 
-## Explicit Non-Goals for the First Vertical Slice
+## Explicitly Deferred From the Pilot
 
-The following are explicitly deferred:
+The following are outside the standalone mobile pilot:
 
-- Accounting and bookkeeping.
-- Payroll.
-- Point-of-sale.
-- Customer ecommerce.
-- Payment handling.
-- Regulatory or compliance reporting.
-- Full crop planning.
-- Full livestock-health or medication tracking.
-- Agronomic treatment recommendations.
-- Pesticide recommendations.
-- Crop-disease diagnosis.
+- Configured server synchronization.
+- Server acceptance or synchronization status.
+- Multi-device farm access.
+- Hosted, local, cooperative, or private-cloud server implementation.
+- In-product need-listing publication.
+- Listing responses or farmer-to-farmer communication through the application.
+- External sharing audiences.
+- Server-based backup/recovery.
+- Public marketplace features.
+- General social networking.
+- Payments, orders, accounting, payroll, or ecommerce.
+- Regulatory/compliance reporting.
+- Disease diagnosis, treatment recommendations, or broad agronomic advice.
 - Autonomous AI-created operational records.
-- Broad object recognition.
-- Route or logistics optimization.
-- Advanced cooperative purchasing.
-- Independent-server federation.
-- Broad public marketplace features.
-- Generalized workflow engines.
-- Microservice decomposition or infrastructure complexity unrelated to validating the slice.
+- Broad computer vision.
+- Server federation.
+- Generalized workflow engines or premature microservices.
 
-A deferred capability may later become important, but it must not be pulled into the first implementation without an intentional product-scope revision.
+A deferred capability may later become important, but it must not be pulled into the pilot without intentional product-scope and ADR review.
 
-## First-Slice Success Criteria
+## Future-Server Extensibility Requirement
 
-- A farmer or worker can record the selected activities with materially less friction than a form-heavy workflow.
-- Core recording remains possible without connectivity.
-- Users understand what is saved locally and what has synchronized.
-- Voice capture reduces entry friction without undermining trust.
-- Photo counting is either useful within the constrained case or is rejected early based on real evidence.
-- The sourcing workflow helps test whether farms want intentionally shared local material requests tied to their operational needs.
-- The first slice generates feedback sufficient to refine domain and architecture decisions.
+The pilot should not be a throwaway data model. Local record identity, timestamps, quantities, units, locations/items, provenance, privacy classification, and correction/discrepancy meaning should be represented so later synchronization is feasible.
 
-## Product Questions This Slice Should Validate
+This is a design constraint, not authorization to implement synchronization, server APIs, server storage, multi-device behavior, or publication.
+
+## Pilot Success Criteria
+
+- A farmer or worker can record selected activities during real work without live connectivity.
+- Locally saved records remain understandable and available on the device.
+- Users understand that pilot records are local to the device unless exported/backed up.
+- Export/backup is practical enough before meaningful farmer reliance.
+- Voice capture reduces entry friction without undermining trust, or is rejected based on evidence.
+- Photo counting is useful within the constrained case, or is rejected based on evidence.
+- Private supply-need capture, if included, helps determine whether later sourcing coordination is worth building.
+- The pilot generates feedback sufficient to refine product scope, domain rules, and later architecture decisions.
+
+## Product Questions This Pilot Should Validate
 
 - Which activity types are frequent enough to deserve first-class support?
-- Which fields are necessary during real work and which can be deferred or optional?
-- Whether offline status is understandable to non-technical users.
+- Which fields are necessary during real work and which can be optional or deferred?
+- Whether local history helps farmers understand recent work.
+- Whether farmers understand local saved state and export/backup responsibilities.
 - Whether voice drafts save time compared with manual entry.
-- Whether photo counting works for constrained item types in real farm lighting and clutter.
-- Whether farms want to share needs or offers with trusted local contacts.
+- Whether photo counting works for constrained item types in real farm lighting, clutter, and movement.
+- Whether farmers want future sharing of needs/offers with trusted local contacts.
+- What future server, synchronization, hosting, or local-network capabilities are justified by evidence.
 
 ## Decisions Intentionally Deferred
 
 This product document does not decide:
 
 - Final technical stack.
-- Server language.
 - Mobile framework.
-- Database.
+- Local persistence technology.
+- Export or backup format.
+- AI runtime or model.
+- Server language.
+- Server database or storage.
 - Offline synchronization technology.
 - Data model or event schema.
-- Final AI runtime or model.
 - Hosting packaging.
+- Authentication or authorization mechanism.
 - Payment or business model.
 - Final public/private sharing system.
-
-These decisions require later architecture work and ADRs where appropriate.

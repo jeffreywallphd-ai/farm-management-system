@@ -1,84 +1,71 @@
 # Offline-First Mobile Architecture
 
-- Status: proposed
+- Status: accepted
 - Last reviewed: 2026-05-28
-- Canonical for: mobile offline behavior, local retained work, draft lifecycle, and offline user-facing boundaries
-- Related ADRs: [ADR-0001](../adr/ADR-0001-offline-first-field-operation.md), [ADR-0002](../adr/ADR-0002-history-preserving-idempotent-synchronization.md)
+- Canonical for: standalone mobile pilot offline behavior, local retained work, draft lifecycle, local saved-state boundaries, and future-sync compatibility
+- Related ADRs: [ADR-0001](../adr/ADR-0001-offline-first-field-operation.md), [ADR-0002](../adr/ADR-0002-history-preserving-idempotent-synchronization.md), [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md)
 - Related docs: [System Overview](system-overview.md), [Synchronization Architecture](synchronization-architecture.md), [Persistence and Attachment Storage](persistence-and-attachment-storage.md), [AI-Assisted Capture Boundaries](ai-assisted-capture-boundaries.md), [Identity, Privacy, and Sharing](identity-privacy-and-sharing.md), [Server and Deployment Operating Model](server-and-deployment-operating-model.md), [Initial Vertical Slice](../product/initial-vertical-slice.md), [Field Workflows](../product/field-workflows.md), [Operational Event Catalog](../domain/operational-event-catalog.md)
 - Related tests: not yet implemented
 - Supersedes: none
 
 ## Purpose
 
-This document defines what offline-first means for the mobile field experience and what architectural responsibilities the mobile side must eventually fulfill.
+This document defines what offline-first means for the standalone mobile pilot and what local architecture responsibilities must be preserved before server-connected features exist.
 
-It defines behavior and boundaries. It does not choose a mobile framework or local database technology.
+It defines behavior and boundaries. It does not choose a mobile framework, local database technology, export format, synchronization technology, or server design.
 
-## Why Offline-First Is a Core Architecture Requirement
+## Why Offline-First Is Required Now
 
 Farms may have fields, barns, tunnels, greenhouses, and storage areas without reliable reception. Recording should happen close to the work, not later from memory.
 
-If a worker cannot record a harvest, material use, movement, count, equipment issue, or supply need while disconnected, the product fails its first-slice purpose. Sourcing publication may wait for connectivity, but private operational capture must not. This remains true whether the configured server is hosted, local, cooperative, private-cloud, or technically self-hosted.
+The first pilot must work without a live server. A worker must be able to record supported activities and observations locally, review local history, and understand that the data is stored on the device unless exported/backed up.
 
-The product workflows that drive this requirement are defined in [Field Workflows](../product/field-workflows.md) and [Initial Vertical Slice](../product/initial-vertical-slice.md).
+## Definition of Offline Capability for the Standalone Pilot
 
-## Definition of Offline Capability for Release 1
-
-| Workflow | Must work offline? | Offline result |
+| Workflow | Must work offline? | Pilot result |
 | --- | ---: | --- |
-| Review sufficient known farm locations/tracked items for new entry | Yes | Worker can choose relevant known context locally |
+| Create minimal local farm setup/reference information | Yes | Farm context available on device |
+| Review locally stored locations/tracked items | Yes | Worker can choose local context |
 | Record planting/transplanting | Yes | Confirmed record retained locally |
 | Record harvest | Yes | Confirmed record retained locally |
 | Record material use | Yes | Confirmed record retained locally |
 | Record item movement | Yes | Confirmed record retained locally |
 | Record inventory count | Yes | Confirmed observation retained locally |
 | Record equipment issue | Yes | Confirmed observation retained locally |
-| Recognize private supply need | Yes | Private record retained locally |
-| Create a shared need-listing draft | Yes/proposed | Pending publication stored locally |
-| Make a listing externally visible | Not necessarily | Requires synchronization/acceptance unless later architecture proves otherwise |
-| Use voice-to-draft experiment | Intended where feasible; AI-assisted capture docs define details | Draft retained locally until confirmed or discarded |
-| Use photo-count-to-draft experiment | Intended where feasible; AI-assisted capture docs define details | Draft/photo retained locally until confirmed or discarded |
-
-The canonical product documents require review and confirmation for voice/photo experiments, but they defer detailed offline processing expectations. [AI-Assisted Capture Boundaries](ai-assisted-capture-boundaries.md) documents the open decision: first-release interpretation may need to run fully offline, or offline capture may wait for later interpretation if farmer validation supports that limitation. Private manual operational recording remains offline-required regardless.
+| Record private supply need, if scoped | Yes | Private local discovery note retained |
+| Review local activity history | Yes | Locally retained records are understandable |
+| Export/back up pilot data | Required before meaningful reliance | User-controlled data retrieval/backup |
+| Use voice-to-draft experiment | Pilot experiment where feasible | Draft retained locally until confirmed or discarded |
+| Use photo-count-to-draft experiment | Pilot experiment where feasible | Draft/photo retained locally until confirmed or discarded |
+| Synchronize to server | No | Deferred future behavior |
+| Publish listing externally | No | Deferred future behavior |
 
 ## Local Mobile Responsibilities
 
-The mobile client must eventually be capable of retaining:
+The mobile pilot must be capable of retaining:
 
-- Enough locally available farm/reference context for supported field entry.
+- Local farm/reference context for supported entry.
 - Locally confirmed operational records.
-- Unsynchronized record state.
-- User corrections or related follow-up records when allowed by later design.
-- Drafts from future AI-assisted capture.
-- Pending attachments required for first-slice workflows.
-- Synchronization cursors/status/outcomes or equivalent bookkeeping.
-- User-visible failure/attention status.
+- Local activity history.
+- User corrections or follow-up records where supported.
+- Drafts from AI-assisted capture.
+- Source captures and provenance retained according to pilot policy.
+- Export/backup state or guidance where relevant.
+- User-visible local saved/failure state.
 
-## Local-First Read Behavior
-
-First-slice mobile workflows should read from local retained data during field work rather than require a server fetch for each interaction.
-
-Synchronization updates local available context when connectivity permits. Offline field recording operates against locally available context. Stale reference context must be visible or bounded where it could matter later, and the product must not falsely imply that network-visible information is current when the device is offline.
-
-Cached shared-listing information may also be stale while offline. A locally prepared shared-listing draft or publication request must remain visibly pending until synchronization and publication acceptance succeed.
-
-This document does not prescribe client-state libraries or database technologies.
+The pilot should not present server synchronization state when no server exists. It should instead communicate local saved state, local history availability, and export/backup status or risk where relevant.
 
 ## Local Confirmed Record Lifecycle
 
 ```text
 Entry started
 -> User completes or confirms record
--> Record retained locally as confirmed operational record
--> Record marked awaiting synchronization
--> Submission attempted when connectivity permits
--> Server accepts, rejects, or requires attention
--> Mobile retains visible synchronization outcome
+-> Record retained locally as a confirmed operational record
+-> Record appears in local activity history
+-> Record is included in export/backup according to pilot policy
 ```
 
-A private operational record is validly captured for the user once locally confirmed and retained, even before synchronization. Server acceptance is still required for shared/multi-device authoritative synchronization.
-
-Rejected or attention-required records must not disappear silently.
+A private operational record is validly captured for the user once locally confirmed and retained. Future server acceptance is not part of the standalone pilot.
 
 ## Draft Lifecycle
 
@@ -87,29 +74,43 @@ Capture initiated
 -> Draft interpretation created or pending
 -> User reviews
 -> User confirms, edits and confirms, or discards
--> Confirmed farm record enters local operational-record lifecycle
+-> Confirmed farm record enters local confirmed-record lifecycle
 ```
 
-Unconfirmed drafts must not alter activity history or inventory interpretation. Attachments may have separate retained/pending-transfer status. Detailed provenance and AI inference requirements are defined in [AI-Assisted Capture Boundaries](ai-assisted-capture-boundaries.md).
+Unconfirmed drafts must not alter local activity history or inventory interpretation. Attachments/source captures may have separate retention/export/backup treatment. Detailed provenance and AI inference requirements are defined in [AI-Assisted Capture Boundaries](ai-assisted-capture-boundaries.md).
+
+## Future Synchronization Compatibility
+
+The pilot must not implement synchronization merely because local records are designed with future synchronization in mind.
+
+Local design should preserve:
+
+- Stable local record identity or an equivalent future-map-able identity concept.
+- Timestamps/effective dates.
+- Farm/location/item references.
+- Quantity and unit meaning.
+- Draft versus confirmed state.
+- Provenance and source-capture association where retained.
+- Privacy/visibility classification.
+- Correction/discrepancy meaning.
+
+These constraints reduce later sync risk but do not authorize server APIs, outbox/inbox implementation, server acceptance, cross-device distribution, or publication state in the pilot.
 
 ## Offline Limitations That Must Be Communicated Honestly
 
-Offline-first does not mean every system action can be completed globally while disconnected.
-
-- A local private activity can be retained offline.
-- A shared listing may be prepared offline but not visible to others until sync succeeds.
-- Another device's newest records may not be visible until synchronization occurs.
-- Network messages or responses may be unavailable while disconnected.
-- A worker may see expected inventory that does not yet incorporate unsynchronized records on another device.
-- Scarce-resource commitments should not be represented as confirmed across farms until validated by the shared server boundary.
-- Local server reachability may improve synchronization opportunities later, but it does not remove the local-retention requirement.
+- Local records are stored on the device unless exported/backed up.
+- A lost device, app uninstall, failed update, or test build replacement may risk data if export/backup is not used.
+- Other devices will not see local records because multi-device synchronization is deferred.
+- No nearby farm can see a private supply need because in-product publication is deferred.
+- Voice/photo interpretation may be limited by the pilot's selected AI approach; manual entry must remain available.
+- Future server-dependent content may not be current or available until server-connected scope exists.
 
 ## Usability Implications to Preserve
 
-Later standards and UI work must preserve these implications:
+Later UI work must preserve these implications:
 
-- Synchronization status must be understandable, not hidden.
+- Local saved state must be understandable.
 - Offline recording should not force repeated network-error interruptions.
-- Users should not have to understand synchronization internals to record normal work.
-- Records requiring attention should be surfaced separately from ordinary successful background synchronization.
-- Long offline periods must not make the application appear broken merely because network-dependent features are unavailable.
+- Users should not have to understand synchronization internals to record normal pilot work.
+- Export/backup availability and limitations must be understandable before meaningful reliance.
+- Long offline periods must not make the application appear broken merely because server-dependent features are not part of the pilot.

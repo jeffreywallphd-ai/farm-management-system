@@ -3,7 +3,7 @@
 - Status: proposed
 - Last reviewed: 2026-05-28
 - Canonical for: future dependency, external-service, license, privacy, and operational-burden review
-- Related ADRs: [ADR-0001](../adr/ADR-0001-offline-first-field-operation.md), [ADR-0003](../adr/ADR-0003-ai-interpretations-require-confirmation.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](../adr/ADR-0005-data-portability-and-recoverability.md), [ADR-0006](../adr/ADR-0006-deployment-mode-compatibility.md)
+- Related ADRs: [ADR-0001](../adr/ADR-0001-offline-first-field-operation.md), [ADR-0003](../adr/ADR-0003-ai-interpretations-require-confirmation.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](../adr/ADR-0005-data-portability-and-recoverability.md), [ADR-0006](../adr/ADR-0006-deployment-mode-compatibility.md), [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md)
 - Related docs: [Decision Readiness Register](../adr/decision-readiness-register.md), [Server and Deployment Operating Model](../architecture/server-and-deployment-operating-model.md), [Security and Privacy Engineering Standards](security-and-privacy-engineering-standards.md), [Change Impact Matrix](change-impact-matrix.md)
 - Related tests: not yet implemented
 - Supersedes: none
@@ -29,7 +29,7 @@ Add dependencies only when they solve a concrete approved need, fit the accepted
 
 ## Special Scrutiny Categories
 
-Heightened review is required for future dependencies involving synchronization engines, databases/storage systems, authentication/identity providers, cloud services, AI/model APIs, speech transcription, computer vision, maps/geolocation, analytics/telemetry, notification services, backup/storage providers, encryption/security libraries, mobile native permissions, and container/infrastructure dependencies.
+Heightened review is required for future dependencies involving mobile local persistence, local export/backup, synchronization engines, databases/storage systems, authentication/identity providers, cloud services, AI/model APIs, speech transcription, computer vision, maps/geolocation, analytics/telemetry, notification services, backup/storage providers, encryption/security libraries, mobile native permissions, and container/infrastructure dependencies.
 
 ## Open-Source and Licensing Posture
 

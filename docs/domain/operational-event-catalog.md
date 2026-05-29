@@ -3,7 +3,7 @@
 - Status: proposed
 - Last reviewed: 2026-05-28
 - Canonical for: initial first-slice activities, observations, draft/confirmed record distinction, and correction principles
-- Related ADRs: [ADR-0002](../adr/ADR-0002-history-preserving-idempotent-synchronization.md), [ADR-0003](../adr/ADR-0003-ai-interpretations-require-confirmation.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md)
+- Related ADRs: [ADR-0002](../adr/ADR-0002-history-preserving-idempotent-synchronization.md), [ADR-0003](../adr/ADR-0003-ai-interpretations-require-confirmation.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md)
 - Related docs: [Glossary](glossary.md), [Farm Structure and Tracked Items](farm-structure-and-tracked-items.md), [Inventory and Reconciliation Rules](inventory-and-reconciliation-rules.md), [Sourcing and Local Network Model](sourcing-and-local-network-model.md), [Privacy, Visibility, and Sharing Rules](privacy-visibility-and-sharing-rules.md), [AI-Assisted Capture and Confirmation Rules](ai-assisted-capture-and-confirmation-rules.md), [Initial Vertical Slice](../product/initial-vertical-slice.md), [Field Workflows](../product/field-workflows.md)
 - Related tests: not yet implemented
 - Supersedes: none
@@ -144,17 +144,17 @@ This record does not define a maintenance scheduling, parts inventory, telematic
 
 Reference identifier: `SupplyNeedRecorded`
 
-Plain-language meaning: records that the farm recognizes a need for a material or resource.
+Plain-language meaning: records that the farm privately recognizes a need for a material or resource.
 
-- Why included: supports the narrow sourcing workflow without exposing internal inventory.
+- Why included: supports standalone mobile discovery around sourcing needs without exposing internal inventory.
 - Example farmer statement: "We need more potting mix before next week."
 - Minimum conceptual information: needed item or description; desired quantity/unit if known; desired timing if known; optional internal note.
 - Type: observation/intent record.
 - Offline capture required: yes, as an internal farm record.
 - Inventory effect: may be motivated by inventory observation but must not require exposing internal quantity.
-- Private/shared posture: private unless intentionally converted into a shared need listing.
-- Correction considerations: a need may be changed, withdrawn, resolved, or converted into a listing while preserving that the need was recognized.
-- First-slice status: included only to support the narrow sourcing workflow.
+- Private/shared posture: private in the standalone mobile pilot. Later server-connected scope may allow intentional conversion into a shared need listing.
+- Correction considerations: a need may be changed, withdrawn, or resolved while preserving that the need was recognized. Conversion into a listing is future server-connected behavior.
+- First-slice status: optional private device-local pilot workflow for discovery.
 
 ## H. Need Listing Intentionally Published
 
@@ -162,15 +162,15 @@ Reference identifier: `NeedListingPublished`
 
 Plain-language meaning: records that the farm intentionally shares selected supply-need information with an allowed audience.
 
-- Why included: tests whether local sourcing coordination is useful without creating a marketplace.
+- Why included: defines the later server-connected publication concept if farmer discovery justifies it.
 - Example farmer statement: "Share that we are looking for five bags of potting mix this week."
 - Minimum conceptual information: public/shared description of needed item; requested amount/unit if the farm chooses to share it; timing; sharing audience or visibility category; contact/response pathway at the product level.
 - Type: shared coordination record.
-- Offline capture required: a draft or pending publish action may be created offline, but publication/availability to others requires synchronization and acceptance.
+- Offline capture required: not part of the standalone mobile pilot. A later server-connected version may allow a draft or pending publish action to be created offline, but publication/availability to others requires synchronization and acceptance.
 - Inventory effect: must not automatically reveal internal inventory records or shortage calculation.
 - Private/shared posture: shared only because the farmer intentionally publishes selected listing information; source captures, AI drafts, private attachments, and internal need history are not listing content by default.
 - Correction considerations: a listing may be changed, withdrawn, expired, or resolved with history sufficient to avoid confusion.
-- First-slice status: included in a narrow form.
+- First-slice status: deferred from the standalone mobile pilot; conceptually defined for later server-connected functionality.
 
 ## I. Availability Listing Intentionally Published
 
@@ -209,6 +209,6 @@ Capture method does not replace operational meaning. Retention and visibility of
 | Item movement recorded | Activity | Yes | Changes location understanding | No | Included; voice candidate |
 | Inventory count recorded | Observation | Yes | Reconciles expected versus observed | No | Included; photo candidate |
 | Equipment issue recorded | Observation | Yes | No | No | Included minimally |
-| Supply need recognized | Observation/intent record | Yes | No direct disclosure | No | Included narrowly |
-| Need listing published | Shared coordination record | Pending publication may begin offline | No automatic disclosure | Intentionally shared | Included narrowly |
+| Supply need recognized | Observation/intent record | Yes | No direct disclosure | No | Optional private pilot workflow |
+| Need listing published | Shared coordination record | Future only | No automatic disclosure | Intentionally shared | Deferred from standalone mobile pilot |
 | Availability listing published | Shared coordination record | To be determined | No automatic disclosure | Intentionally shared | Deferred unless scope changes |

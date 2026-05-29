@@ -3,7 +3,7 @@
 - Status: proposed
 - Last reviewed: 2026-05-28
 - Canonical for: upgrade safety, migration expectations, synchronization repair, failure visibility, and recovery requirements
-- Related ADRs: [ADR-0001](../adr/ADR-0001-offline-first-field-operation.md), [ADR-0002](../adr/ADR-0002-history-preserving-idempotent-synchronization.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](../adr/ADR-0005-data-portability-and-recoverability.md)
+- Related ADRs: [ADR-0001](../adr/ADR-0001-offline-first-field-operation.md), [ADR-0002](../adr/ADR-0002-history-preserving-idempotent-synchronization.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](../adr/ADR-0005-data-portability-and-recoverability.md), [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md)
 - Related docs: [Operations README](README.md), [Deployment Modes](deployment-modes.md), [Backup, Restore, and Data Export Requirements](backup-restore-and-data-export-requirements.md), [Synchronization Architecture](../architecture/synchronization-architecture.md), [Server and Deployment Operating Model](../architecture/server-and-deployment-operating-model.md)
 - Related tests: not yet implemented
 - Supersedes: none
@@ -18,6 +18,8 @@ It establishes safety expectations without implementing upgrade tooling.
 
 Operational software used during farm work must not become unreliable or data-destructive when application versions change, mobile devices are offline during server updates, schema or record formats evolve, attachment transfers fail, local servers experience hardware or power failures, hosted systems have interruptions, devices reconnect after extended disconnection, or users replace devices or change deployment modes later.
 
+For the standalone mobile pilot, app updates, test build replacement, reinstall, phone replacement, local data representation changes, and local export/backup failures are immediate recovery risks even before a server exists.
+
 ## Upgrade Safety Principles
 
 1. Upgrades must not silently destroy or reinterpret confirmed operational records.
@@ -27,6 +29,14 @@ Operational software used during farm work must not become unreliable or data-de
 5. A recovery/rollback or backup requirement must exist before destructive migrations.
 6. Users should not have to reason about low-level schema migrations during ordinary product updates.
 7. Technical administrators may receive detailed migration guidance for self-hosted operation; simplified local users require safer guided behavior later.
+
+## Standalone Mobile Pilot Update Safety
+
+- A pilot app update must not silently discard locally retained records.
+- Changing local data representation during pilot iterations requires migration/recovery consideration before farmers rely on recorded data.
+- A test build replacement, reinstall, or app reset must not be treated casually once farmers have recorded real work.
+- Export/backup should be available and understandable before risky pilot upgrades or replacements.
+- Later server reconnect/synchronization constraints remain future-facing and must not be represented as current pilot recovery capability.
 
 ## Mobile/Server Version Compatibility Implication
 

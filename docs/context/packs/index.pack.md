@@ -19,7 +19,7 @@ Do not use as the only context for behavior-changing work; add relevant speciali
 
 ## Project Identity
 
-This is an open-source small-farm support platform. The initial direction prioritizes practical farm activity recording, offline field use, trustworthy AI assistance, controlled local coordination, and data control/recovery. The first slice remains intentionally narrow.
+This is an open-source small-farm support platform. The active implementation target is a standalone offline-first mobile pilot for practical farm activity recording, local history, trustworthy AI-assisted draft experiments, and data control/recovery. The first slice remains intentionally narrow.
 
 ## Core Guidance
 
@@ -38,10 +38,17 @@ This is an open-source small-farm support platform. The initial direction priori
 - [ADR-0003](../../adr/ADR-0003-ai-interpretations-require-confirmation.md): AI-assisted interpretations remain drafts until explicit user confirmation.
 - [ADR-0004](../../adr/ADR-0004-private-by-default-intentional-sharing.md): farm operational data and sensitive captures are private by default; shared listings require intentional limited publication.
 - [ADR-0005](../../adr/ADR-0005-data-portability-and-recoverability.md): practical data portability and recoverability are foundational operating constraints.
+- [ADR-0007](../../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md): the first implemented pilot is standalone mobile; server connection and in-product shared publication are deferred.
+
+## Current Pilot Sequencing
+
+- Local export/backup is required before meaningful farmer reliance.
+- Later server compatibility must be preserved without implementing server infrastructure prematurely.
+- Private supply-need notes may support discovery, but platform publication and responses are not pilot scope.
 
 ## Decisions Still Deferred
 
-This pack does not authorize selection of implementation language/framework, database/storage/synchronization technology, AI model/runtime, identity/security mechanism, deployment packaging, first production deployment mode, local-server shipping timeline, or scope expansion beyond the documented first slice.
+This pack does not authorize selection of implementation language/framework, database/storage/synchronization technology, AI model/runtime, identity/security mechanism, deployment packaging, first production deployment mode, local-server shipping timeline, server synchronization, need-listing publication, or scope expansion beyond the documented standalone mobile pilot.
 
 Use the [Decision Readiness Register](../../adr/decision-readiness-register.md) before touching deferred decisions.
 

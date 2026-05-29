@@ -3,7 +3,7 @@
 - Status: proposed
 - Last reviewed: 2026-05-28
 - Canonical for: product hypotheses and validation gates for hosted use, local operation, technical self-hosting, cooperative hosting, export, backup, and data-control preferences
-- Related ADRs: [ADR-0005](../adr/ADR-0005-data-portability-and-recoverability.md), [ADR-0006](../adr/ADR-0006-deployment-mode-compatibility.md), [Decision Readiness Register](../adr/decision-readiness-register.md)
+- Related ADRs: [ADR-0005](../adr/ADR-0005-data-portability-and-recoverability.md), [ADR-0006](../adr/ADR-0006-deployment-mode-compatibility.md), [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md), [Decision Readiness Register](../adr/decision-readiness-register.md)
 - Related docs: [Product Vision and Scope](product-vision-and-scope.md), [Initial Vertical Slice](initial-vertical-slice.md), [Field Workflows](field-workflows.md), [User Research and Validation](user-research-and-validation.md), [Server and Deployment Operating Model](../architecture/server-and-deployment-operating-model.md), [Deployment Modes](../operations/deployment-modes.md), [Backup, Restore, and Data Export Requirements](../operations/backup-restore-and-data-export-requirements.md)
 - Related tests: not yet implemented
 - Supersedes: none
@@ -18,9 +18,11 @@ Offline mobile use is a foundational product constraint based on the intended fa
 
 Interest in local/self-hosted and hosted server modes exists as a design requirement and open-source/data-control goal.
 
-The preferred initial operating experience for farms has not yet been sufficiently validated in this repository.
+The accepted initial operating experience is a standalone mobile pilot. Server-connected deployment preferences remain future validation questions.
 
 Many farms may prefer minimal setup, while some may value local control, weak-internet operation, cooperative hosting, or managed support. Deployment priorities must be tested with real users and organizations.
+
+The mobile pilot should also test immediate data-control expectations: what export/backup experience farmers need before relying on device-local records, and how sensitive audio/photo retention affects trust.
 
 ## Validation Principles
 
@@ -40,7 +42,8 @@ Many farms may prefer minimal setup, while some may value local control, weak-in
 | Some farms prefer local operation due to connectivity or data-control concerns | Determines need for simplified local mode | Present local-server scenario | Local-server roadmap |
 | Local synchronization over farm Wi-Fi during internet loss provides meaningful value | Determines topology complexity | Ask multi-worker farms about outages/work patterns | Local-network server capability |
 | Farmers will not accept direct infrastructure administration requirements | Determines local UX expectations | Discuss setup/maintenance responsibilities | Packaging/installer posture |
-| Data export is important even for hosted users | Determines portability requirements | Present service-dependence scenarios | Export scope |
+| Data export/backup is important for standalone mobile pilot users | Determines immediate pilot data-safety requirements | Mobile pilot feedback and device-loss/app-update scenarios | Pilot export/backup scope |
+| Data export is important even for hosted users | Determines later portability requirements | Present service-dependence scenarios | Future hosted export scope |
 | Simple backup/restore is essential for local operation | Determines local viability | Discuss hardware-loss scenario | Operations requirements |
 | Cooperatives or regional organizations may host services for multiple farms | Determines later multi-farm deployment value | Interview organizations where available | Cooperative roadmap |
 | Sensitive audio/photos influence hosting preference | Determines privacy/deployment decisions | Discuss AI-capture retention scenarios | Attachment and hosting policy |

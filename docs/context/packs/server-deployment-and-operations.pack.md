@@ -7,17 +7,18 @@
 
 ## Purpose
 
-Helps agents work on server operation, deployment modes, local-server experience, hosting, export, backup, restore, upgrade, migration, recovery, and operational support.
+Helps agents work on future server operation/deployment modes and current mobile pilot export, backup, restore, upgrade, migration, recovery, and operational support.
 
 ## Use When
 
-- Server implementation planning.
+- Server implementation planning after later authorization.
 - Hosted, local, self-hosted, cooperative, or private-cloud mode.
 - Installation, appliance, or farmer-usable local experience.
 - Backup, export, restore, upgrade, or migration.
 - Diagnostics for local/hosted operation.
 - Data portability.
-- Server availability and mobile sync destination concerns.
+- Mobile pilot data safety, export/backup, and update/replacement concerns.
+- Future server availability and mobile sync destination concerns.
 
 ## Do Not Use When
 
@@ -26,7 +27,9 @@ Helps agents work on server operation, deployment modes, local-server experience
 
 ## Core Guidance
 
-- Mobile offline capability remains required in every deployment mode.
+- Server and deployment work is not initial pilot implementation scope.
+- Mobile export/backup and pilot data safety are active now.
+- Mobile offline capability remains required in every later deployment mode.
 - Ordinary farmers must not be assumed to administer infrastructure.
 - Hosted use and credible farmer-controlled/self-hosted operation remain compatible directions.
 - Deployment priority and implementation technology remain unresolved unless later accepted.
@@ -47,7 +50,7 @@ Server language, database, object storage, packaging, containers/installers/appl
 
 ## Explicit Non-Goals / Overreach to Avoid
 
-Do not create fake install commands, production hosting commitments, local-server shipping promises, pricing/business model, federation, or infrastructure configuration in a docs-only or evaluation task.
+Do not create fake install commands, production hosting commitments, local-server shipping promises, pricing/business model, federation, server implementation, or infrastructure configuration in a docs-only or pilot task.
 
 ## Canonical Source Documents and ADRs
 

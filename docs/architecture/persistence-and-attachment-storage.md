@@ -3,14 +3,14 @@
 - Status: proposed
 - Last reviewed: 2026-05-28
 - Canonical for: architecture-level persistence responsibilities, attachment lifecycle principles, storage boundaries, and export/data ownership implications
-- Related ADRs: [ADR-0002](../adr/ADR-0002-history-preserving-idempotent-synchronization.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](../adr/ADR-0005-data-portability-and-recoverability.md)
+- Related ADRs: [ADR-0002](../adr/ADR-0002-history-preserving-idempotent-synchronization.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](../adr/ADR-0005-data-portability-and-recoverability.md), [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md)
 - Related docs: [System Overview](system-overview.md), [Offline-First Mobile Architecture](offline-first-mobile-architecture.md), [Synchronization Architecture](synchronization-architecture.md), [AI-Assisted Capture Boundaries](ai-assisted-capture-boundaries.md), [Identity, Privacy, and Sharing](identity-privacy-and-sharing.md), [Server and Deployment Operating Model](server-and-deployment-operating-model.md), [Backup, Restore, and Data Export Requirements](../operations/backup-restore-and-data-export-requirements.md), [Operational Event Catalog](../domain/operational-event-catalog.md), [Sourcing and Local Network Model](../domain/sourcing-and-local-network-model.md)
 - Related tests: not yet implemented
 - Supersedes: none
 
 ## Purpose
 
-This document defines architecture-level persistence and attachment responsibilities needed for offline and synchronization behavior while avoiding premature database/storage technology selection.
+This document defines architecture-level persistence and attachment responsibilities needed for the standalone mobile pilot and later synchronization behavior while avoiding premature database/storage technology selection.
 
 It is narrower than a full server deployment or storage implementation design.
 
@@ -25,7 +25,7 @@ Local and server environments may eventually have different storage implementati
 | Data category | Examples | Durability need | Initial sharing posture |
 | --- | --- | --- | --- |
 | Farm/reference information | locations, crops, materials, countable items | Locally available enough for supported offline work; server-managed synchronization later | Private/authorized |
-| Confirmed operational records | harvest, material use, count, movement, issue | Durable locally before sync and durably accepted on server later | Private by default |
+| Confirmed operational records | harvest, material use, count, movement, issue | Durable locally in the pilot; durably accepted on server later if synchronization is authorized | Private by default |
 | Draft interpretations | voice/photo proposed records | Retained as needed for review; not operational history | Private |
 | Attachments | photo, audio, later document | Retained locally pending transfer; linked securely to draft or record | Follows associated privacy policy |
 | Sync state | pending/accepted/failed status, cursor/bookkeeping | Durable enough to recover from restarts/retries | Internal |
@@ -34,7 +34,7 @@ Local and server environments may eventually have different storage implementati
 ## Structured Record Persistence Responsibilities
 
 - Mobile must durably retain confirmed offline-created records.
-- Server must durably retain accepted synchronized records.
+- Future server implementation must durably retain accepted synchronized records if server-connected scope is later authorized.
 - Synchronization metadata must permit safe retry and outcome tracking.
 - Operational history must support later correction/audit expectations.
 - Private and shared record categories must remain distinguishable.
@@ -44,7 +44,7 @@ This document does not choose relational tables, document stores, event stores, 
 
 ## Attachment Responsibilities
 
-- Photos or audio may be captured before synchronization.
+- Photos or audio may be captured and retained locally during the pilot according to policy; future server transfer remains deferred.
 - Attachments may be associated with unconfirmed drafts or confirmed records.
 - Operational records must remain distinguishable from source captures, interpretation drafts, and attachments.
 - Attachment retention must not cause the associated confirmed record to disappear if upload is delayed.
@@ -69,13 +69,13 @@ Retention durations and exact deletion behavior are not decided here.
 
 Local storage supports disconnected field work and pending transfer.
 
-Server storage supports synchronized durability, authorized multi-device use, shared-publication behavior, and later export/backup.
+Future server storage supports synchronized durability, authorized multi-device use, shared-publication behavior, and later export/backup if server-connected scope is authorized.
 
 The architecture must permit later local-server and hosted-server deployment modes. No particular physical storage implementation is selected here.
 
 ## Export and Data Ownership Implication
 
-Accepted farm operational records and user-owned associated content should eventually be exportable in a usable form.
+Accepted farm operational records and user-owned associated content must be exportable/backed up in a practical way before meaningful standalone mobile pilot reliance, and should eventually remain exportable in a usable form across later server modes.
 
 Backup, restore, and export mechanics are defined at a requirements level in [Backup, Restore, and Data Export Requirements](../operations/backup-restore-and-data-export-requirements.md). Persistence decisions must not make user data practically unrecoverable or locked exclusively into a managed service.
 

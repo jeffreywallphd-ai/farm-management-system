@@ -45,6 +45,7 @@ Accepted ADRs are binding architecture guidance for the decisions they record. P
 | [ADR-0004](ADR-0004-private-by-default-intentional-sharing.md) | accepted | Farm operational data is private by default; shared listings are intentional limited representations |
 | [ADR-0005](ADR-0005-data-portability-and-recoverability.md) | accepted | Data portability, backup, restore, migration safety, and recoverability are operating-model constraints |
 | [ADR-0006](ADR-0006-deployment-mode-compatibility.md) | proposed | Architecture should remain compatible with multiple server operating modes, pending validation and planning |
+| [ADR-0007](ADR-0007-standalone-mobile-pilot-before-server-connected-features.md) | accepted | The first implemented pilot is standalone offline-first mobile before server-connected features |
 
 ## ADR Rules
 
@@ -69,6 +70,12 @@ Accepted ADRs are binding architecture guidance for the decisions they record. P
 - [Identity, Privacy, and Sharing](../architecture/identity-privacy-and-sharing.md)
 - [Server and Deployment Operating Model](../architecture/server-and-deployment-operating-model.md)
 - [Backup, Restore, and Data Export Requirements](../operations/backup-restore-and-data-export-requirements.md)
+
+## Current Implementation Sequence
+
+[ADR-0007](ADR-0007-standalone-mobile-pilot-before-server-connected-features.md) is the accepted implementation-sequencing decision. The current implementation target is a standalone offline-first mobile pilot.
+
+Server synchronization, multi-device operation, in-product need-listing publication, responses/messaging, hosted/local/cooperative server implementation, and broader network functionality are deferred from the pilot. Future server compatibility remains required, but it does not authorize building a server now.
 
 Use `docs/adr/template.md` for new ADRs.
 

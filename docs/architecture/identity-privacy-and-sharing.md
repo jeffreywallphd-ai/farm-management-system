@@ -2,8 +2,8 @@
 
 - Status: proposed
 - Last reviewed: 2026-05-28
-- Canonical for: identity, authorized access, visibility, publication, sensitive attachments, and local-network sharing architecture boundaries
-- Related ADRs: [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](../adr/ADR-0005-data-portability-and-recoverability.md)
+- Canonical for: identity, authorized access, visibility, publication, sensitive attachments, local pilot privacy, and future local-network sharing architecture boundaries
+- Related ADRs: [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](../adr/ADR-0005-data-portability-and-recoverability.md), [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md)
 - Related docs: [System Overview](system-overview.md), [Synchronization Architecture](synchronization-architecture.md), [Persistence and Attachment Storage](persistence-and-attachment-storage.md), [AI-Assisted Capture Boundaries](ai-assisted-capture-boundaries.md), [Server and Deployment Operating Model](server-and-deployment-operating-model.md), [Privacy, Visibility, and Sharing Rules](../domain/privacy-visibility-and-sharing-rules.md), [Sourcing and Local Network Model](../domain/sourcing-and-local-network-model.md), [Local Coordination and Sharing Validation Plan](../product/local-coordination-and-sharing-validation-plan.md)
 - Related tests: not yet implemented
 - Supersedes: none
@@ -18,6 +18,8 @@ The system contains fundamentally different categories of data:
 4. Later coordination interactions visible only to relevant participants.
 
 The architecture must prevent accidental movement from private context to external visibility. This document defines system responsibility boundaries, not authentication technology, authorization frameworks, APIs, encryption mechanisms, storage products, or deployment choices.
+
+The standalone mobile pilot does not include external publication, local-network participants, responses, or server identity implementation. These boundaries still govern local private pilot records and later server-connected expansion.
 
 ## Conceptual Actors and Trust Boundaries
 

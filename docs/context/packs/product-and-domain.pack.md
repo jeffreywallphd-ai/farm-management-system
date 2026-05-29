@@ -26,11 +26,13 @@ Helps agents handle product scope, farmer workflows, farm terminology, tracked i
 
 ## Core Guidance
 
-- First-slice scope is narrow and farmer-centered.
+- First-slice scope is a narrow standalone mobile pilot.
 - Use farmer-understandable terms from the glossary.
 - Operational records represent confirmed activities or observations.
 - Inventory observations preserve discrepancy/history meaning.
-- Internal supply needs are private unless intentionally represented in shared listings.
+- Farmer workflows in the pilot are local/device-based.
+- Private supply needs may be captured for discovery if scoped.
+- External need-listing publication is deferred server-connected scope.
 - Capture method is not operational meaning.
 - Broad farm ERP areas remain deferred.
 
@@ -42,7 +44,7 @@ Helps agents handle product scope, farmer workflows, farm terminology, tracked i
 
 ## Decisions Still Deferred
 
-New record types, availability listings, messaging, group purchasing, equipment sharing, and broader coordination require validation and canonical scope updates.
+New record types, need-listing publication, availability listings, messaging, group purchasing, equipment sharing, and broader coordination require validation and canonical scope updates.
 
 ## Explicit Non-Goals / Overreach to Avoid
 

@@ -60,8 +60,8 @@ This glossary is the authoritative vocabulary for the first product slice. It sh
 | Inventory observation | A count or measured observation about an item at a point in time. |
 | Discrepancy | A difference between expected inventory and an observed count. |
 | Supply need | A farm's recognized need for a material, input, equipment access, or other resource. |
-| Need listing | An intentionally shared request derived from or created for a supply need. |
-| Availability listing | An intentionally shared offer of a material, item, equipment access, or resource. This is conceptually related to need listings but deferred for the first slice unless product scope changes. |
+| Need listing | A future intentionally shared request derived from or created for a supply need; deferred from the standalone mobile pilot. |
+| Availability listing | A future intentionally shared offer of a material, item, equipment access, or resource. This is conceptually related to need listings but deferred unless product scope changes. |
 | Local farm network | A trusted or selected set of nearby participants with whom listings may eventually be shared; access mechanics are deferred. |
 | Sharing action | A deliberate user action that creates or publishes information for an audience beyond private farm use. |
 | Visibility | The audience to whom a particular record or published representation is available. |

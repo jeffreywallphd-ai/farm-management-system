@@ -3,7 +3,7 @@
 - Status: proposed
 - Last reviewed: 2026-05-28
 - Canonical for: private-by-default farm data, visibility classes, intentional sharing, shared representations, and sensitive content handling
-- Related ADRs: [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](../adr/ADR-0005-data-portability-and-recoverability.md)
+- Related ADRs: [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](../adr/ADR-0005-data-portability-and-recoverability.md), [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md)
 - Related docs: [Glossary](glossary.md), [Operational Event Catalog](operational-event-catalog.md), [Inventory and Reconciliation Rules](inventory-and-reconciliation-rules.md), [Sourcing and Local Network Model](sourcing-and-local-network-model.md), [AI-Assisted Capture and Confirmation Rules](ai-assisted-capture-and-confirmation-rules.md), [Identity, Privacy, and Sharing Architecture](../architecture/identity-privacy-and-sharing.md), [Server and Deployment Operating Model](../architecture/server-and-deployment-operating-model.md), [Backup, Restore, and Data Export Requirements](../operations/backup-restore-and-data-export-requirements.md), [Local Coordination and Sharing Validation Plan](../product/local-coordination-and-sharing-validation-plan.md)
 - Related tests: not yet implemented
 - Supersedes: none
@@ -22,6 +22,8 @@ It complements:
 This document is canonical for whether domain information is private, intentionally shareable, or out of scope for sharing. It does not choose authentication, authorization, database, transport, encryption, or storage mechanisms.
 
 These privacy rules apply consistently across hosted, local, cooperative, private-cloud, and technical self-hosted modes. Operating infrastructure is not the same as product-level permission to use or expose private farm data. Backups and exports may contain sensitive data and require later protection and handling rules.
+
+In the standalone mobile pilot, private operational records, internal supply needs, AI drafts, source captures, and local history remain device-local/private unless included in a user-controlled export or backup. The pilot does not expose internal needs outside the farm through platform publication.
 
 ## Core Privacy Concepts
 
@@ -47,7 +49,7 @@ These privacy rules apply consistently across hosted, local, cooperative, privat
 | --- | --- | --- | --- |
 | Private to farm | Visible only within authorized farm operational context | activities, counts, internal needs, source captures | Required/default |
 | Private to selected farm participants, later | Narrower internal access within a farm where needed | sensitive notes or captures | Conceptually recognized; detailed permissions deferred |
-| Shared with trusted local network | Visible only to permitted local-network participants | intentionally published need listing | Required concept for narrow sourcing workflow |
+| Shared with trusted local network | Visible only to permitted local-network participants | intentionally published need listing | Future server-connected concept; deferred from standalone mobile pilot |
 | Shared with selected external participants, later | Visible to specific invited farms or organizations | direct offer/request | Deferred unless product scope includes it |
 | Public, later if ever supported | Visible outside trusted relationships | public listing | Explicitly deferred; not assumed |
 
@@ -55,7 +57,7 @@ Private to farm is the default. Moving information to a wider visibility class r
 
 ## Data Classification
 
-| Information type | Default visibility | May be intentionally shared in first slice? | Constraints |
+| Information type | Default visibility | May be intentionally shared in standalone mobile pilot? | Constraints |
 | --- | --- | ---: | --- |
 | Farm identity/profile details | Private unless minimally needed for listing attribution | Limited details may be required later | Exact published identity deferred |
 | Farm member/worker details | Private | No | Do not expose through listings |
@@ -67,7 +69,7 @@ Private to farm is the default. Moving information to a wider visibility class r
 | Inventory discrepancies | Private | No | Sensitive operational information |
 | Equipment issues | Private | No | No automatic sharing |
 | Internal supply need | Private | No until transformed into listing | Separate from shared representation |
-| Shared need listing | Trusted-network visibility after publication | Yes | Contains only intentionally shared fields |
+| Shared need listing | Trusted-network visibility after publication | No | Future server-connected feature; contains only intentionally shared fields if later implemented |
 | Availability listing | Private until intentionally published; feature may be deferred | Not unless already included in scope | Does not expose total inventory |
 | Listing response | Limited to relevant parties/audience later | Conceptually yes | Detailed access deferred |
 | Audio source capture | Private/sensitive | No by default | Separate explicit permission required for any later sharing |
@@ -100,14 +102,14 @@ Rules:
 
 ## Shareable Listing Content Boundary
 
-For the narrow initial need-listing workflow:
+For a future need-listing workflow:
 
 | Listing field concept | First-slice posture |
 | --- | --- |
 | Needed item description | Include |
 | Desired quantity/unit, if user chooses to share | Include |
 | Desired timing | Include where useful |
-| General contact/response pathway | Minimal, later refined |
+| General contact/response pathway | Deferred from standalone mobile pilot |
 | Optional pickup/delivery/general-area note | Defer or include only if product docs require it |
 | Intended audience | Required concept; mechanics deferred |
 | Internal inventory count | Exclude |

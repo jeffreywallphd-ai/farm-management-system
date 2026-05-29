@@ -3,7 +3,7 @@
 - Status: proposed
 - Last reviewed: 2026-05-28
 - Canonical for: repository-wide behavioral verification strategy and required invariant testing categories
-- Related ADRs: [ADR-0001](../adr/ADR-0001-offline-first-field-operation.md), [ADR-0002](../adr/ADR-0002-history-preserving-idempotent-synchronization.md), [ADR-0003](../adr/ADR-0003-ai-interpretations-require-confirmation.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](../adr/ADR-0005-data-portability-and-recoverability.md)
+- Related ADRs: [ADR-0001](../adr/ADR-0001-offline-first-field-operation.md), [ADR-0002](../adr/ADR-0002-history-preserving-idempotent-synchronization.md), [ADR-0003](../adr/ADR-0003-ai-interpretations-require-confirmation.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](../adr/ADR-0005-data-portability-and-recoverability.md), [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md)
 - Related docs: [Field Workflows](../product/field-workflows.md), [Synchronization Architecture](../architecture/synchronization-architecture.md), [AI-Assisted Capture Boundaries](../architecture/ai-assisted-capture-boundaries.md), [Backup, Restore, and Data Export Requirements](../operations/backup-restore-and-data-export-requirements.md), [Change Impact Matrix](change-impact-matrix.md)
 - Related tests: not yet implemented
 - Supersedes: none
@@ -37,8 +37,9 @@ Future verification must include:
 
 - A supported activity can be entered and retained without connectivity.
 - Locally retained work remains available after app interruption/restart where implementation claims durability.
-- Pending synchronization state is distinguishable from synchronized state.
 - Supported field entry does not fail merely because the server is unavailable.
+- For the standalone pilot, local saved state and local history are understandable without implying server synchronization.
+- For later server-connected scope, pending synchronization state is distinguishable from synchronized state.
 
 ### Synchronization and Operational-Record Integrity
 
@@ -76,7 +77,7 @@ Future verification must include:
 
 Future verification must include once features exist:
 
-- Exports contain required farm-owned information.
+- Standalone mobile pilot exports/backups contain required farm-owned pilot information before meaningful farmer reliance.
 - Restore preserves operational meaning and visibility classification.
 - Backup/restore includes or explicitly excludes attachments according to documented policy.
 - Migrations preserve accepted invariants.
@@ -93,7 +94,7 @@ Given a worker has locally available farm context needed for entry
 And no server connection is available
 When the worker confirms a harvest record
 Then the harvest remains available locally
-And it is marked as awaiting synchronization
+And the app indicates that it is saved locally on this device
 And server unavailability does not erase the work
 ```
 

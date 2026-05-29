@@ -3,7 +3,7 @@
 - Status: proposed
 - Last reviewed: 2026-05-28
 - Canonical for: practical farm-field usability, accessibility posture, offline status clarity, and manual alternatives
-- Related ADRs: [ADR-0001](../adr/ADR-0001-offline-first-field-operation.md), [ADR-0003](../adr/ADR-0003-ai-interpretations-require-confirmation.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md)
+- Related ADRs: [ADR-0001](../adr/ADR-0001-offline-first-field-operation.md), [ADR-0003](../adr/ADR-0003-ai-interpretations-require-confirmation.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md)
 - Related docs: [Product Vision and Scope](../product/product-vision-and-scope.md), [Field Workflows](../product/field-workflows.md), [AI-Assisted Capture Validation Plan](../product/ai-assisted-capture-validation-plan.md), [Deployment and Data-Control Validation Plan](../product/deployment-and-data-control-validation-plan.md), [Naming and Domain Language Standards](naming-and-domain-language-standards.md)
 - Related tests: not yet implemented
 - Supersedes: none
@@ -21,6 +21,7 @@ Future user-facing implementation must prioritize:
 - Short, direct workflows for frequent activity recording.
 - Large and clear primary actions appropriate for mobile use.
 - Visible offline, synchronization, and publication state.
+- For the standalone pilot, visible local saved state, local history, and export/backup status or risk.
 - Minimal forced typing where practical.
 - Clear confirmation before AI-assisted records become facts.
 - Clear distinction between private internal records and externally shared information.
@@ -54,9 +55,10 @@ Future implementation must account for:
 Future interfaces must make clear:
 
 - Work has been saved locally.
-- Work awaits synchronization.
-- Synchronization has succeeded.
-- Publication is pending versus visible.
+- Work is device-local in the standalone pilot unless exported/backed up.
+- Work awaits synchronization in later server-connected versions only.
+- Synchronization has succeeded in later server-connected versions only.
+- Publication is pending versus visible in later server-connected versions only.
 - Something requires attention.
 - Network-dependent content may not be current while offline.
 

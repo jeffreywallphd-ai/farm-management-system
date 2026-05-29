@@ -4,8 +4,8 @@
 
 ## Current Product Documents
 
-- [Product Vision and Scope](product-vision-and-scope.md): central product statement, problem framing, intended users, product principles, initial product areas, and open questions.
-- [Initial Vertical Slice](initial-vertical-slice.md): first implementation target, included capabilities, explicit non-goals, success criteria, and deferred decisions.
+- [Product Vision and Scope](product-vision-and-scope.md): accepted product statement, problem framing, intended users, product principles, standalone mobile pilot posture, and open questions.
+- [Initial Vertical Slice](initial-vertical-slice.md): accepted standalone mobile pilot target, included capabilities, explicit non-goals, success criteria, and deferred server-connected decisions.
 - [Field Workflows](field-workflows.md): representative farmer-facing workflows that should guide later domain modeling, UX, offline behavior, and acceptance testing.
 - [User Research and Validation](user-research-and-validation.md): current evidence level, hypotheses, interview guide, observation targets, and assumption status mechanism.
 - [AI-Assisted Capture Validation Plan](ai-assisted-capture-validation-plan.md): product hypotheses, field-testing expectations, and gates for expanding assisted-capture scope.
@@ -21,6 +21,8 @@ Product documents must clearly distinguish:
 - Assumptions requiring validation.
 - Accepted release scope.
 - Deferred ideas.
+
+The current accepted implementation target is the standalone offline-first mobile pilot described in [Initial Vertical Slice](initial-vertical-slice.md) and [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md). Server synchronization, in-product need-listing publication, responses, and server deployment remain deferred.
 
 Technical architecture must not be justified solely by speculative product features. If a feature is not validated or accepted into scope, architecture documents and ADRs may reference it only as a possible future consideration, not as a binding requirement.
 

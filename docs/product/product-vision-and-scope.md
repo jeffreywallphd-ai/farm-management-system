@@ -1,79 +1,85 @@
 # Product Vision and Scope
 
-- Status: proposed
+- Status: accepted
 - Last reviewed: 2026-05-28
-- Canonical for: product vision, product principles, intended users, initial product areas, and product-scope boundaries
-- Related ADRs: [ADR-0001](../adr/ADR-0001-offline-first-field-operation.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](../adr/ADR-0005-data-portability-and-recoverability.md)
+- Canonical for: product vision, product principles, intended users, accepted standalone mobile pilot scope, and product-scope boundaries
+- Related ADRs: [ADR-0001](../adr/ADR-0001-offline-first-field-operation.md), [ADR-0003](../adr/ADR-0003-ai-interpretations-require-confirmation.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](../adr/ADR-0005-data-portability-and-recoverability.md), [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md)
 - Related docs: [Product README](README.md), [Initial Vertical Slice](initial-vertical-slice.md), [Field Workflows](field-workflows.md), [User Research and Validation](user-research-and-validation.md), [Local Coordination and Sharing Validation Plan](local-coordination-and-sharing-validation-plan.md), [Deployment and Data-Control Validation Plan](deployment-and-data-control-validation-plan.md), [Roadmap](roadmap.md)
 - Related tests: not yet implemented
 - Supersedes: none
 
 ## Product Statement
 
-This project is an open-source, mobile-capable farm operations platform for small farms that makes practical recordkeeping and local coordination easier in real working conditions, including locations with poor or unavailable connectivity.
+This project is an open-source, mobile-capable farm operations platform for small farms that makes practical recordkeeping easier in real working conditions, including places with poor or unavailable connectivity.
 
-The product should help farm owners, workers, and trusted local collaborators capture useful operational information with less friction than form-heavy tools, while keeping private farm operations under the farm's control.
+The first implemented farmer-testing pilot is a standalone offline-first mobile application. It should help farm owners and workers capture useful operational information during real work, review local activity history, test constrained AI-assisted draft workflows, and keep pilot data retrievable through practical export/backup before meaningful reliance.
+
+Local coordination and sourcing remain important motivating future problems. They should be validated through discovery and later server-connected work, not built into the initial standalone mobile pilot.
 
 ## Problem Statement
 
-Small farms may rely on fragmented tools such as memory, notebooks, spreadsheets, texts, phone calls, social media groups, or clunky software interfaces. These tools can work in isolation but make it difficult to see recent activity, track material use, or connect operational needs with local coordination.
+Small farms may rely on memory, notebooks, spreadsheets, texts, phone calls, social media groups, or clunky software interfaces. These tools can work in isolation but make it difficult to see recent activity, track material use, or recognize operational needs.
 
 Farm-management software can become burdensome when routine work must be translated into complex form entry. A tool that asks too much during real work in a field, greenhouse, barn, wash/pack space, or storage area is unlikely to become a reliable record.
 
-Sourcing inputs or coordinating with nearby farms can be informal, difficult to search, and disconnected from operational records. A low-material observation may not easily become a clear, intentional request to trusted local contacts.
+Connectivity constraints mean field work cannot depend on immediate access to a remote server. The first pilot therefore validates the mobile field experience before server synchronization, multi-device operation, or in-product local-network sharing are implemented.
 
-Connectivity constraints mean field work cannot depend on immediate access to a remote server. The product value is not merely "more farm features"; it is making accurate operational capture and useful local coordination fast enough to use during real farm work.
-
-These motivating observations are working assumptions to test until supported by systematic farmer interviews, workflow observation, or prototype use.
+Sourcing inputs or coordinating with nearby farms remains a motivating direction. During the mobile pilot, private internal supply-need notes may be captured for discovery if scoped, but they are not published through the platform.
 
 ## Intended Users
 
-| User group | Relevant needs |
-| --- | --- |
-| Small-farm owner/operator | Operational visibility, materials needs, low-burden records, data control |
-| Farm worker or family member | Very fast field entry, mobile usability, offline operation |
-| Trusted neighboring farm contact | Needs/offers communication and coordination |
-| Cooperative, food hub, or regional organizer, later | Shared sourcing or coordination across participating farms |
+| User group | Relevant needs | Pilot posture |
+| --- | --- | --- |
+| Small-farm owner/operator | Operational visibility, low-burden records, data control | Primary pilot user |
+| Farm worker or family member | Fast mobile entry, offline operation, understandable local history | Primary pilot user |
+| Trusted neighboring farm contact | Future needs/offers communication and coordination | Discovery subject, not in-product pilot participant |
+| Cooperative, food hub, or regional organizer | Later shared sourcing or coordination across participating farms | Future validation subject |
 
-The first release should primarily serve a single farm and its workers. Local coordination should be limited to a narrow initial workflow around intentionally shared material needs; offers remain deferred unless product scope is intentionally revised.
+The first pilot serves a single farm operating on a device-local mobile app. Multi-farm sharing, network participants, and response workflows are deferred.
 
 ## Product Principles
 
 1. **Field-first usability**: Recording work should be practical while standing in a greenhouse, barn, field, storage shed, or wash/pack space.
-2. **Offline capability is foundational**: Core field workflows must remain usable without live connectivity.
+2. **Standalone offline mobile first**: The first pilot must work without a live server and must clearly communicate local saved state.
 3. **Records should reflect farmer actions and observations**: The system should capture what happened in farm-understandable terms rather than expose unnecessary internal data complexity.
-4. **AI assistance must remain reviewable**: Future voice and camera features should reduce input burden without silently asserting unverified farm facts.
-5. **Private farm operations stay controlled by the farm**: Local coordination features must rely on intentional sharing, not automatic exposure of operational information.
-6. **Open-source and deployable in multiple settings**: The product should remain compatible with farms or organizations that need control over their own deployment and data.
-7. **Solve concrete workflows before broad platform ambitions**: The first release must validate useful farm activity recording and one coordination pathway rather than attempt every farm-management function.
-
-Hosted use and farmer-controlled operation are both compatible with the product direction. Deployment priority requires validation, and data control includes practical export and recovery expectations. Ordinary farmers should not be forced to administer infrastructure to use the product.
+4. **AI assistance must remain reviewable**: Voice and camera experiments may reduce entry burden, but they must remain drafts until the user confirms or corrects them.
+5. **Private farm operations stay controlled by the farm**: Pilot records, internal supply needs, source captures, and drafts are private by default.
+6. **Data must not be trapped casually**: Practical export/backup is required before farmers rely on the standalone mobile pilot for meaningful operational records.
+7. **Future server compatibility without premature server construction**: Local records and boundaries should not block later synchronization, but server implementation is deferred until evidence justifies it.
+8. **Solve concrete workflows before broad platform ambitions**: The pilot validates useful mobile recordkeeping and constrained assisted capture before marketplace, coordination, hosting, or server infrastructure work.
 
 ## Initial Product Areas
 
-| Product area | Why it matters | Initial release status |
+| Product area | Why it matters | Standalone mobile pilot posture |
 | --- | --- | --- |
-| Farm locations and basic tracked items | Needed to record activity meaningfully | Included in first slice |
-| Activity and observation recording | Core value proposition | Included in first slice |
-| Offline use and later synchronization | Required for realistic field operation | Included in first slice |
-| Voice-assisted activity drafts | Potential differentiator | Narrow proof in first slice |
-| Camera-assisted counting drafts | Potential differentiator | Narrow proof in first slice |
-| Material sourcing / local needs listing | Original motivating coordination issue | One narrow workflow in first slice |
-| Broader farm-to-farm communication | Valuable but may expand scope quickly | Limited/deferred |
-| Advanced planning, compliance, commerce, accounting, recommendations | Potential future areas | Explicitly deferred |
+| Basic farm setup, locations, and tracked items | Needed to record activity meaningfully | Included minimally |
+| Manual activity and observation recording | Core value proposition | Included narrowly |
+| Local activity history | Lets farmers see recent work and assess usefulness | Included |
+| Offline local retention | Required for realistic field operation | Included; technology deferred |
+| Clear local saved state | Prevents confusion about whether work exists | Included |
+| Practical export/backup | Prevents meaningful pilot data from being trapped on one device | Included before farmer reliance |
+| Voice-assisted activity draft | Potential friction reducer | Constrained experiment, preferably one workflow first |
+| Photo-assisted count draft | Potential friction reducer | Constrained experiment, preferably one item class first |
+| Private internal supply-need note | Helps discover sourcing value | Optional private pilot workflow |
+| Server synchronization and multi-device use | Future capability | Deferred from pilot |
+| Need-listing publication and responses | Future local coordination capability | Deferred from pilot |
+| Hosted/local/cooperative server operation | Future operating model direction | Deferred from pilot |
 
 ## Product Boundaries and Non-Goals
 
-The initial release is not a generic farm ERP, marketplace, social network, accounting system, compliance platform, or autonomous AI assistant. It should prove a narrow offline-capable activity recorder, limited AI-assisted draft workflows, and one intentionally shared local-sourcing pathway that keeps private operational records under farm control.
+The standalone mobile pilot is not a generic farm ERP, marketplace, social network, accounting system, compliance platform, server product, or autonomous AI assistant.
 
-The detailed first-slice inclusions and exclusions are defined in [Initial Vertical Slice](initial-vertical-slice.md).
+The pilot must not include server synchronization, multi-device farm access, hosted/local/cooperative server implementation, in-product shared need-listing publication, listing responses, public sharing, payments, or marketplace/social functionality unless product scope and ADRs are intentionally revised.
+
+The detailed first-pilot inclusions and exclusions are defined in [Initial Vertical Slice](initial-vertical-slice.md).
 
 ## Open Questions
 
-- Which activities are recorded most often today?
+- Which manual activities are frequent enough to deserve first-class support?
+- Which local history views help farmers during real work?
 - Which records are burdensome enough that voice entry would help?
-- Which categories of farm materials are most difficult to source locally?
-- What information would farmers share with neighboring farms?
-- Which camera-counting task would provide clear value and be feasible under real conditions?
-- What offline failures currently create frustration?
-- Would farms prefer hosted access, a simple local installation, cooperative hosting, or different options depending on circumstances?
+- Which constrained item category makes photo counting useful, if any?
+- What export/backup experience feels understandable and sufficient for pilot reliance?
+- Are farmers comfortable retaining source audio/photos, and under what policy?
+- Do private supply-need notes reveal enough interest to justify later server-connected sourcing?
+- Would farms prefer hosted access, a simple local installation, cooperative hosting, or another path after the mobile pilot proves value?

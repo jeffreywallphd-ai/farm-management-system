@@ -20,7 +20,7 @@ This model exists only to support:
 - Identifying where work occurred.
 - Identifying what crop, material, equipment, or countable item was involved.
 - Enabling later offline use and synchronization architecture.
-- Supporting one narrow sourcing workflow.
+- Supporting optional private supply-need discovery in the standalone mobile pilot.
 
 It does not attempt to model every kind of farm, livestock system, regulatory record, sales operation, or supply-chain process.
 
@@ -101,7 +101,7 @@ A material record should make it possible at the product level to associate:
 - A recognizable item name.
 - Relevant unit or units.
 - Quantity observations or use activities.
-- An optional supply need.
+- An optional private supply need.
 
 This document does not define costing, purchasing, vendor contracts, orders, or accounting.
 

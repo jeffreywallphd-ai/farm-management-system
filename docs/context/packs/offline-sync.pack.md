@@ -7,16 +7,16 @@
 
 ## Purpose
 
-Helps agents work on offline mobile behavior, local retention, synchronization, replay/retry, discrepancy handling, pending publication, restore/reconnect, and sync-related state.
+Helps agents work on offline mobile behavior, local retention, future-sync-compatible record identity/history, synchronization after later authorization, discrepancy handling, local recovery, restore/reconnect, and sync-related state.
 
 ## Use When
 
 - Local record retention or pending work.
-- Sync queue/outbox/inbox or equivalent.
+- Future sync queue/outbox/inbox or equivalent after authorization.
 - Retry, idempotency, or server acceptance.
 - Conflict/discrepancy behavior.
-- Offline status UI tied to synchronization.
-- Attachment synchronization.
+- Local saved-state UI and future synchronization status.
+- Attachment local retention or future synchronization.
 - Restore/reconnect behavior.
 - Publication timing while offline.
 
@@ -28,12 +28,13 @@ Helps agents work on offline mobile behavior, local retention, synchronization, 
 ## Core Guidance
 
 - Supported private field recording must work without server connectivity.
-- Confirmed work is retained locally before synchronization.
+- In the standalone pilot, confirmed work is retained locally and shown in local history without server synchronization.
+- Future server-connected synchronization becomes applicable only after later authorized scope.
 - Server acceptance must be idempotent.
 - Additive operational records should not overwrite each other.
 - Inventory discrepancies are preserved rather than silently overwritten.
-- Private sync is not external publication.
-- Offline publication requests remain pending until accepted.
+- Private future sync is not external publication.
+- Offline publication requests are not pilot scope; if later authorized, they remain pending until accepted.
 - Failures and attention-required states must remain visible.
 - Restore, upgrade, and reconnect behavior must avoid duplication or loss.
 
@@ -50,7 +51,7 @@ Local/server database, sync engine/protocol/library, API transport, background s
 
 ## Explicit Non-Goals / Overreach to Avoid
 
-Do not choose a sync technology, invent server APIs, implement last-write-wins for meaningful farm history, or treat local pending publication as shared visibility.
+Do not treat this pack as authorization to implement a server, sync protocol, cross-device synchronization, or publication state during the pilot. Do not choose a sync technology, invent server APIs, implement last-write-wins for meaningful farm history, or treat local pending publication as shared visibility.
 
 ## Canonical Source Documents and ADRs
 
@@ -73,7 +74,7 @@ Review offline/sync architecture and operations recovery docs when local retenti
 
 ## Required Verification Impact Review
 
-Future implementation must verify offline retention, restart durability, retry/idempotency, additive records, discrepancy preservation, rejected submissions, pending publication, attachment transfer failure, and restore/reconnect behavior.
+Future implementation must verify offline retention, restart durability, local history, export/backup safety, and discrepancy preservation for the standalone pilot. Later authorized sync work must verify retry/idempotency, additive records, rejected submissions, pending publication, attachment transfer failure, and restore/reconnect behavior.
 
 ## Prompt Assembly Notes
 

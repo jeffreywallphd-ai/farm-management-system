@@ -1,9 +1,9 @@
 # Decision Readiness Register
 
-- Status: proposed
+- Status: accepted
 - Last reviewed: 2026-05-28
 - Canonical for: current readiness classification of foundational product-technical decisions
-- Related ADRs: [ADR-0001](ADR-0001-offline-first-field-operation.md), [ADR-0002](ADR-0002-history-preserving-idempotent-synchronization.md), [ADR-0003](ADR-0003-ai-interpretations-require-confirmation.md), [ADR-0004](ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](ADR-0005-data-portability-and-recoverability.md), [ADR-0006](ADR-0006-deployment-mode-compatibility.md)
+- Related ADRs: [ADR-0001](ADR-0001-offline-first-field-operation.md), [ADR-0002](ADR-0002-history-preserving-idempotent-synchronization.md), [ADR-0003](ADR-0003-ai-interpretations-require-confirmation.md), [ADR-0004](ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](ADR-0005-data-portability-and-recoverability.md), [ADR-0006](ADR-0006-deployment-mode-compatibility.md), [ADR-0007](ADR-0007-standalone-mobile-pilot-before-server-connected-features.md)
 - Related docs: [Documentation Governance](../README.md), [Standards Index](../standards/README.md), [Change Impact Matrix](../standards/change-impact-matrix.md), [Initial Vertical Slice](../product/initial-vertical-slice.md), [Operational Event Catalog](../domain/operational-event-catalog.md), [Offline-First Mobile Architecture](../architecture/offline-first-mobile-architecture.md), [Synchronization Architecture](../architecture/synchronization-architecture.md), [AI-Assisted Capture Boundaries](../architecture/ai-assisted-capture-boundaries.md), [Identity, Privacy, and Sharing](../architecture/identity-privacy-and-sharing.md), [Server and Deployment Operating Model](../architecture/server-and-deployment-operating-model.md), [Backup, Restore, and Data Export Requirements](../operations/backup-restore-and-data-export-requirements.md)
 - Related tests: not yet implemented
 - Supersedes: none
@@ -34,12 +34,17 @@ This register identifies whether additional candidate decisions are accepted, pr
 | [ADR-0003](ADR-0003-ai-interpretations-require-confirmation.md) | AI draft-before-confirmation | Trust boundary | No unconfirmed AI operational effects |
 | [ADR-0004](ADR-0004-private-by-default-intentional-sharing.md) | Private-by-default and intentional shared representations | Privacy/adoption boundary | Listings cannot expose internal records automatically |
 | [ADR-0005](ADR-0005-data-portability-and-recoverability.md) | Data portability and recoverability | Open-source/data-control operating constraint | Backup/export/restore requirements must guide later design |
+| [ADR-0007](ADR-0007-standalone-mobile-pilot-before-server-connected-features.md) | Standalone mobile pilot before server-connected features | Product-owner sequencing decision after Review 1 | First implementation target is mobile-only local pilot; server sync/publication/deployment remain deferred |
 
 ## Proposed and Deferred Decisions
 
 | Topic | Current status | Why not accepted now | What is needed before decision |
 | --- | --- | --- | --- |
 | Deployment mode compatibility | [Proposed ADR](ADR-0006-deployment-mode-compatibility.md) | Direction is useful, but implementation burden and sequence remain uncertain | Validation plus technical planning |
+| Server synchronization implementation | Deferred pending mobile pilot evidence and ADR/product authorization | Current pilot is standalone mobile | Farmer discovery plus later architecture/ADR work |
+| Multi-device farm access | Deferred pending server-connected scope decision | Requires sync, identity, and server authority | Product validation and technical planning |
+| In-product need-listing publication | Deferred pending validation | No longer part of the standalone mobile pilot | Local coordination evidence plus product/ADR review |
+| Listing responses or farmer-to-farmer communication | Deferred pending validation | Would broaden coordination scope and require server/shared authority | Farmer validation and privacy/architecture review |
 | Deployment modes implementation sequence | Deferred pending validation | Farmer preferences and practical support burden unknown | Deployment validation evidence |
 | Simplified local-farm server priority | Deferred pending validation | Demand and operational feasibility unproven | Farmer interviews/prototype experience |
 | Local-network sync without internet | Deferred pending validation and technical evaluation | Adds topology/security/sync complexity | User need plus architecture evaluation |
@@ -49,7 +54,7 @@ This register identifies whether additional candidate decisions are accepted, pr
 | Identity/auth/security technology | Deferred pending technical evaluation | Privacy boundary defined; mechanism not selected | Security architecture work |
 | Voice/photo workflow expansion | Deferred pending validation | Initial experiments not yet evaluated | Prototype/user evidence |
 | Availability listings/messaging/group purchasing | Deferred pending validation | Coordination scope intentionally narrow | Farmer validation |
-| Need-listing scope as initial external coordination workflow | No separate ADR needed | Governed by product scope and ADR-0004 | Create ADR only if coordination scope changes materially |
+| Need-listing publication as initial external coordination workflow | Deferred pending validation | ADR-0007 removes publication from the standalone mobile pilot | Create or update ADR/product docs before implementation |
 
 ## Technology Selections Not Accepted by Current ADR Work
 
@@ -101,14 +106,16 @@ This register identifies whether additional candidate decisions are accepted, pr
 | Broad computer vision | Product non-goal / excluded from initial slice | [Initial Vertical Slice](../product/initial-vertical-slice.md), [AI-Assisted Capture Boundaries](../architecture/ai-assisted-capture-boundaries.md) |
 | Server federation | Product non-goal / excluded from initial slice | [Initial Vertical Slice](../product/initial-vertical-slice.md), [Server and Deployment Operating Model](../architecture/server-and-deployment-operating-model.md) |
 | Generalized workflow engine or premature microservices | Product non-goal / excluded from initial slice | [Initial Vertical Slice](../product/initial-vertical-slice.md) |
+| Server synchronization, multi-device farm access, and server acceptance status | Deferred from standalone mobile pilot | [ADR-0007](ADR-0007-standalone-mobile-pilot-before-server-connected-features.md), [Initial Vertical Slice](../product/initial-vertical-slice.md) |
+| In-product need-listing publication and listing responses | Deferred from standalone mobile pilot | [ADR-0007](ADR-0007-standalone-mobile-pilot-before-server-connected-features.md), [Local Coordination and Sharing Validation Plan](../product/local-coordination-and-sharing-validation-plan.md) |
 
 ## Required Next Decision Work
 
 Later prompts should:
 
-- Create context packs once canonical and ADR guidance is stable.
 - Perform documentation consistency review.
 - Conduct technology-selection ADR work only after the foundational documentation set is accepted/reviewed and implementation planning begins.
+- Use existing context packs and prompt routing when preparing future implementation or ADR work.
 
 Repository-wide standards and change-impact rules now exist in [Standards Documentation](../standards/README.md). They operationalize accepted ADR constraints without accepting deferred technology or product-priority decisions.
 

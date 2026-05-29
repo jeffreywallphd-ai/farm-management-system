@@ -30,8 +30,11 @@ Helps agents work on user-facing mobile workflows involving activity entry, fiel
 - Interactions occur during real farm work with limited attention, poor connectivity, glare, gloves, dirt, wet hands, noise, and physical movement.
 - Frequent workflows must be fast and understandable.
 - Farmer language governs user-facing concepts.
-- Offline, saved, sync, publication, and attention status must be distinguishable.
-- Assisted capture must have manual alternatives.
+- Local saved state and local history must be understandable in the standalone pilot.
+- Export/backup usability is part of pilot data trust before meaningful reliance.
+- Sync, publication, and attention states apply later only when server-connected scope is authorized.
+- Manual entry and constrained AI draft experiments must have manual alternatives.
+- Real farmer pilot testing should guide expansion.
 - This pack does not authorize a mobile framework or final UI system.
 
 ## Non-Negotiable Constraints

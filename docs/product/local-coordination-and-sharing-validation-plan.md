@@ -3,7 +3,7 @@
 - Status: proposed
 - Last reviewed: 2026-05-28
 - Canonical for: product hypotheses, validation gates, and farmer research expectations for local sourcing, controlled sharing, listing audiences, and privacy expectations
-- Related ADRs: [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [Decision Readiness Register](../adr/decision-readiness-register.md)
+- Related ADRs: [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md), [Decision Readiness Register](../adr/decision-readiness-register.md)
 - Related docs: [Product Vision and Scope](product-vision-and-scope.md), [Initial Vertical Slice](initial-vertical-slice.md), [Field Workflows](field-workflows.md), [User Research and Validation](user-research-and-validation.md), [Sourcing and Local Network Model](../domain/sourcing-and-local-network-model.md), [Privacy, Visibility, and Sharing Rules](../domain/privacy-visibility-and-sharing-rules.md), [Identity, Privacy, and Sharing Architecture](../architecture/identity-privacy-and-sharing.md)
 - Related tests: not yet implemented
 - Supersedes: none
@@ -18,11 +18,11 @@ It prevents the project from assuming that farmers want broad networking, public
 
 Raw-material sourcing and communication with nearby farmers were initial motivating concerns.
 
-A narrow need-listing workflow appears potentially valuable.
+A narrow need-listing workflow appears potentially valuable, but it is no longer part of the standalone mobile pilot implementation.
 
 The preferred sharing audience, acceptable disclosed fields, communication mechanism, trust model, and hosting implications still require validation in this repository.
 
-The product should test controlled sharing before attempting a broad marketplace or social-network model.
+The standalone mobile pilot may capture private internal supply-need notes for discovery. Controlled sharing, publication, and responses remain future server-connected hypotheses to validate before implementation.
 
 ## Validation Principles
 
@@ -38,7 +38,7 @@ The product should test controlled sharing before attempting a broad marketplace
 
 | Hypothesis | Why it matters | Validation approach | Decision affected |
 | --- | --- | --- | --- |
-| Farmers experience recurring difficulty sourcing specific materials locally | Determines whether need listings solve a real problem | Interviews and recent-example collection | First-slice sourcing workflow |
+| Farmers experience recurring difficulty sourcing specific materials locally | Determines whether need listings solve a real problem | Interviews, recent-example collection, and optional private need-note pilot feedback | Future server-connected sourcing workflow |
 | Farmers would share selected needs with trusted nearby farms | Determines sharing audience | Present sample listing scenarios | Visibility model |
 | Farmers would not want internal inventory quantities or usage history exposed | Determines privacy rules | Compare listing vs internal-record examples | Publication boundary |
 | A simple request/response pathway is sufficient initially | Prevents overbuilding messaging | Ask how they currently respond | Coordination scope |

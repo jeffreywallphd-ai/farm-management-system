@@ -3,7 +3,7 @@
 - Status: proposed
 - Last reviewed: 2026-05-28
 - Canonical for: product evidence level, validation hypotheses, farmer interview guide, observation targets, and assumption status tracking
-- Related ADRs: none yet
+- Related ADRs: [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md)
 - Related docs: [Product Vision and Scope](product-vision-and-scope.md), [Initial Vertical Slice](initial-vertical-slice.md), [Field Workflows](field-workflows.md), [Local Coordination and Sharing Validation Plan](local-coordination-and-sharing-validation-plan.md), [Deployment and Data-Control Validation Plan](deployment-and-data-control-validation-plan.md), [Roadmap](roadmap.md)
 - Related tests: not yet implemented
 - Supersedes: none
@@ -11,6 +11,12 @@
 ## Purpose
 
 This document separates observed motivation from untested assumptions and defines a concrete validation plan before large-scale implementation.
+
+## Corrected Pilot Discovery Posture
+
+The standalone offline-first mobile pilot is now the primary near-term discovery method. Research should observe whether farmers can use the mobile app during real work, whether local activity history is useful, whether local saved-state language is understandable, and whether practical export/backup expectations are clear enough before meaningful reliance.
+
+Server synchronization, hosted/local server operation, in-product need-listing publication, shared responses, and broader network behavior remain future validation topics. Research may ask about those needs, but the current pilot does not implement them.
 
 ## Current Evidence Level
 
@@ -32,8 +38,8 @@ This evidence is enough to motivate a narrow first product slice. It is not enou
 | Offline entry is essential during actual work | Determines core product constraint | Ask about locations/connectivity; observe workflow | Offline requirements |
 | Voice entry is useful in dirty/hands-busy conditions | Determines whether to invest in voice capture | Show mock flow or prototype | Voice experiment |
 | Photo counting is valuable for specific standardized items | Determines vision scope | Identify repeated counting tasks; test photos | Camera experiment |
-| Farmers will share selected needs/offers but not internal inventory | Determines privacy/listing model | Interview with concrete examples | Local-network scope |
-| Farmers prefer simple hosted service, local server, or both | Determines deployment prioritization | Interviews and willingness assessment | Deployment roadmap |
+| Farmers may want future sharing of selected needs/offers but not internal inventory | Determines whether server-connected coordination is justified later | Interview with concrete examples and optional private need-note pilot feedback | Future local-network scope |
+| Farmers prefer simple hosted service, local server, standalone mobile export, or another path | Determines later deployment prioritization | Interviews and mobile pilot feedback | Deployment roadmap |
 
 ## Interview Guide
 

@@ -12,7 +12,7 @@ Helps agents evaluate or introduce dependencies, external services, providers, r
 ## Use When
 
 - Adding a package.
-- Selecting server/mobile/database/sync/storage technology.
+- Selecting mobile/local persistence/export/backup, server, database, sync, or storage technology.
 - Adding an AI/model provider or runtime.
 - Adding identity, cloud, analytics, notification, storage, backup, CI, security, or deployment tooling with operational implications.
 - Performing technology-selection ADR work.
@@ -39,7 +39,7 @@ Helps agents evaluate or introduce dependencies, external services, providers, r
 
 ## Decisions Still Deferred
 
-Server language, mobile framework, web framework, local/server persistence, sync protocol/vendor, storage backend, AI model/runtime/provider, identity/auth/security, deployment packaging, cloud provider, observability stack, test tooling, export format, and migration tooling remain deferred unless later ADRs accept them.
+Mobile framework, local persistence, export/backup format, server language, web framework, server persistence, sync protocol/vendor, storage backend, AI model/runtime/provider, identity/auth/security, deployment packaging, cloud provider, observability stack, test tooling, and migration tooling remain deferred unless later ADRs accept them.
 
 ## Explicit Non-Goals / Overreach to Avoid
 

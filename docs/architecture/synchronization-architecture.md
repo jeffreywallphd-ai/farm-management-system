@@ -3,7 +3,7 @@
 - Status: proposed
 - Last reviewed: 2026-05-28
 - Canonical for: conceptual synchronization lifecycle, idempotency, server/mobile authority boundaries, conflict classification, and sync status concepts
-- Related ADRs: [ADR-0001](../adr/ADR-0001-offline-first-field-operation.md), [ADR-0002](../adr/ADR-0002-history-preserving-idempotent-synchronization.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](../adr/ADR-0005-data-portability-and-recoverability.md)
+- Related ADRs: [ADR-0001](../adr/ADR-0001-offline-first-field-operation.md), [ADR-0002](../adr/ADR-0002-history-preserving-idempotent-synchronization.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](../adr/ADR-0005-data-portability-and-recoverability.md), [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md)
 - Related docs: [System Overview](system-overview.md), [Offline-First Mobile Architecture](offline-first-mobile-architecture.md), [Persistence and Attachment Storage](persistence-and-attachment-storage.md), [AI-Assisted Capture Boundaries](ai-assisted-capture-boundaries.md), [Identity, Privacy, and Sharing](identity-privacy-and-sharing.md), [Server and Deployment Operating Model](server-and-deployment-operating-model.md), [Operational Event Catalog](../domain/operational-event-catalog.md), [Inventory and Reconciliation Rules](../domain/inventory-and-reconciliation-rules.md), [Sourcing and Local Network Model](../domain/sourcing-and-local-network-model.md)
 - Related tests: not yet implemented
 - Supersedes: none
@@ -13,6 +13,12 @@
 This document defines the conceptual synchronization architecture for confirmed records, reference data, attachments, and intentionally shared actions.
 
 It constrains later implementation while remaining independent of final language, database, protocol, and synchronization-library choices.
+
+## Relationship to the Standalone Mobile Pilot
+
+Synchronization is future server-connected architecture. The standalone mobile pilot does not authorize a sync protocol, outbox/inbox, server acceptance path, server storage, cross-device distribution, publication state, or synchronization-status UI.
+
+Pilot implementation should still preserve local record identity, history, discrepancy meaning, privacy classification, provenance, and attachment association so later synchronization is feasible.
 
 ## Synchronization Purpose
 
@@ -171,7 +177,7 @@ Initial posture:
 - External publication, reservation, acceptance, or commitment requires shared-authority validation.
 - The UI must not imply a cross-farm commitment has been confirmed merely because an offline action was recorded locally.
 
-Only the need-listing publication case is in or near the first slice. Other cases are later implications, not included features.
+Need-listing publication is deferred from the standalone mobile pilot. These cases are later implications, not pilot features.
 
 ## Record Correction and Supersession Implications
 
@@ -214,11 +220,11 @@ Later implementation must ensure:
 
 | Scenario | Required architectural outcome |
 | --- | --- |
-| Worker records harvest without reception | Record retained locally and marked awaiting synchronization |
+| Worker records harvest without reception in a future server-connected version | Record retained locally and marked awaiting synchronization |
 | Connectivity returns and harvest is submitted twice due to retry | Server accepts once without duplicate operational effect |
 | Worker records material use offline; another device records a count | Both valid records preserved; possible discrepancy surfaced later |
 | Worker records equipment issue offline | Observation retained and synchronized later without requiring network at capture time |
-| Worker prepares a need listing offline | Listing remains pending publication until synchronized/accepted; private records are not exposed automatically |
+| Worker prepares a need listing offline in later server-connected scope | Listing remains pending publication until synchronized/accepted; private records are not exposed automatically |
 | User captures photo supporting a count draft offline | Draft/photo may be retained; no operational count effect until user confirms |
 | User confirms photo-assisted count offline | Confirmed inventory observation follows normal local-retain-and-sync lifecycle |
 | Server rejects submitted action due to validation or permission issue | Local work/status remains visible and requires attention; not silently deleted |

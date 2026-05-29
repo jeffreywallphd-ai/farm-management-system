@@ -3,7 +3,7 @@
 - Status: proposed
 - Last reviewed: 2026-05-28
 - Canonical for: operations-facing deployment mode comparison, intended user burden, and deployment-mode invariants
-- Related ADRs: [ADR-0001](../adr/ADR-0001-offline-first-field-operation.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](../adr/ADR-0005-data-portability-and-recoverability.md), [ADR-0006](../adr/ADR-0006-deployment-mode-compatibility.md)
+- Related ADRs: [ADR-0001](../adr/ADR-0001-offline-first-field-operation.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](../adr/ADR-0005-data-portability-and-recoverability.md), [ADR-0006](../adr/ADR-0006-deployment-mode-compatibility.md), [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md)
 - Related docs: [Operations README](README.md), [Server and Deployment Operating Model](../architecture/server-and-deployment-operating-model.md), [Local Farm Server Experience](local-farm-server-experience.md), [Backup, Restore, and Data Export Requirements](backup-restore-and-data-export-requirements.md), [Deployment and Data-Control Validation Plan](../product/deployment-and-data-control-validation-plan.md)
 - Related tests: not yet implemented
 - Supersedes: none
@@ -30,7 +30,7 @@ The product should not require every farm to make the same infrastructure choice
 | Cooperative/regional hosting | Trusted organization | Participation and farm-specific settings | Required | Networks coordinating selected shared needs |
 | Private cloud | Farm group/organization | Infrastructure administration or contracted support | Required | Organizations needing controlled hosting |
 
-Release 1 implementation priority is not finalized by this document.
+The first implemented pilot is standalone mobile and does not include any server deployment mode. Release priority for hosted, local, technical self-hosted, cooperative, or private-cloud server operation is deferred.
 
 ## Ordinary Farmer Experience Requirement
 
@@ -49,7 +49,7 @@ Release 1 implementation priority is not finalized by this document.
 | Export pathway | Required eventually | Required eventually | Required eventually | Required eventually |
 | Backup/restore responsibility clear | Operator obligation later | Farm-guided tooling later | Admin documentation later | Operator/admin obligation later |
 | Sensitive attachments protected | Required | Required | Required | Required |
-| Farmer must administer Docker/database directly | No | No in simplified mode | Possibly, if selected later | Not ordinary participant responsibility |
+| Farmer must administer developer infrastructure directly | No | No in simplified mode | Possibly, if selected later | Not ordinary participant responsibility |
 
 ## Deployment Modes Not Yet Promised
 

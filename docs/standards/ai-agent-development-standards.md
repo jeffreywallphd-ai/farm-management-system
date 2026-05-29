@@ -3,7 +3,7 @@
 - Status: proposed
 - Last reviewed: 2026-05-28
 - Canonical for: safe automated development behavior, source routing, scope control, and change reporting
-- Related ADRs: [ADR-0001](../adr/ADR-0001-offline-first-field-operation.md), [ADR-0002](../adr/ADR-0002-history-preserving-idempotent-synchronization.md), [ADR-0003](../adr/ADR-0003-ai-interpretations-require-confirmation.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](../adr/ADR-0005-data-portability-and-recoverability.md)
+- Related ADRs: [ADR-0001](../adr/ADR-0001-offline-first-field-operation.md), [ADR-0002](../adr/ADR-0002-history-preserving-idempotent-synchronization.md), [ADR-0003](../adr/ADR-0003-ai-interpretations-require-confirmation.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](../adr/ADR-0005-data-portability-and-recoverability.md), [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md)
 - Related docs: [Agent Instructions](../../AGENTS.md), [Documentation Governance](../README.md), [Prompt Routing](../context/prompt-routing.md), [Decision Readiness Register](../adr/decision-readiness-register.md), [Change Impact Matrix](change-impact-matrix.md)
 - Related tests: not yet implemented
 - Supersedes: none
@@ -35,6 +35,7 @@ For non-trivial future tasks, agents must:
 Agents must not:
 
 - Expand the initial product slice without explicit instruction and canonical updates.
+- Treat server synchronization, multi-device operation, in-product publication, responses, hosted/local/cooperative server operation, or broader network functionality as current pilot scope.
 - Implement deferred features because they appear logically adjacent.
 - Select deferred technology without task authority and ADR/documentation treatment.
 - Introduce generalized frameworks or abstractions to anticipate hypothetical future needs.
@@ -51,8 +52,9 @@ Agents must not:
 
 | Task type | Agent obligations |
 | --- | --- |
-| Offline/mobile record work | Read offline/sync ADRs/docs; test local retention and pending state once code exists |
-| Synchronization work | Preserve idempotency/history/discrepancy rules; add regression scenarios |
+| Standalone mobile pilot work | Read ADR-0007, product slice, offline architecture, and operations export/backup docs; preserve local retention, local history, and export/backup expectations |
+| Offline/mobile record work | Read offline/sync ADRs/docs; test local retention and saved state once code exists |
+| Synchronization work | Confirm later authorization first; preserve idempotency/history/discrepancy rules; add regression scenarios |
 | AI-assisted feature work | Preserve draft-confirmation boundary; no silent effects/publication |
 | Privacy/sharing work | Use limited shared representations; no private-data leakage |
 | Attachment/capture work | Treat content as sensitive; review retention/access/sync impact |

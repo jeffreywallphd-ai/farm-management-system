@@ -36,7 +36,7 @@ Product scope is currently defined by:
 - [Deployment and Data-Control Validation Plan](product/deployment-and-data-control-validation-plan.md)
 - [Product Roadmap](product/roadmap.md)
 
-These documents are proposed product guidance and should be refined as farmer validation evidence is gathered.
+The accepted implementation-driving product documents identify the current first target as a standalone offline-first mobile pilot. Validation plans remain proposed where they describe hypotheses and future research.
 
 Farm-domain behavior is currently defined by:
 
@@ -72,8 +72,9 @@ Foundational ADRs are currently defined by:
 - [ADR-0004: Farm Operational Data Is Private by Default and Sharing Is Intentional](adr/ADR-0004-private-by-default-intentional-sharing.md)
 - [ADR-0005: Data Portability and Recoverability Are Required Operating Constraints](adr/ADR-0005-data-portability-and-recoverability.md)
 - [ADR-0006: Keep Architecture Compatible With Multiple Server Operating Modes](adr/ADR-0006-deployment-mode-compatibility.md)
+- [ADR-0007: Standalone Mobile Pilot Precedes Server-Connected Features](adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md)
 
-Accepted ADRs govern the decisions they record. Proposed ADRs and deferred topics in the decision-readiness register must not be treated as accepted implementation authority.
+Accepted ADRs govern the decisions they record. ADR-0007 establishes the current implementation sequence: standalone mobile pilot first, with server synchronization, shared publication, and server deployment deferred. Proposed ADRs and deferred topics in the decision-readiness register must not be treated as accepted implementation authority.
 
 Operations requirements are currently defined by:
 

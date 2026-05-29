@@ -6,6 +6,8 @@ Standards operationalize accepted ADRs and canonical product, domain, architectu
 
 Later language/framework-specific standards may be added only after accepted technology decisions. Contributors and automated agents must use the [Change Impact Matrix](change-impact-matrix.md) when planning and reviewing meaningful behavior changes.
 
+Current implementation standards apply first to the standalone offline-first mobile pilot accepted in [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md). Server synchronization, in-product publication, and server deployment remain deferred unless later product/ADR work authorizes them.
+
 Task-specific context packs in [Context Documentation](../context/README.md) help assemble minimum-sufficient prompt context. Standards remain canonical for implementation/review obligations; packs only route and summarize.
 
 ## Current Standards Documents

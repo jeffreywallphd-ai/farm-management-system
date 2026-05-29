@@ -7,11 +7,12 @@
 
 ## Purpose
 
-Helps agents work on farm-private data, visibility, need listings, local-network publication, responses, attachments, access, identity, external sharing, and privacy-sensitive exports/diagnostics.
+Helps agents work on farm-private data, local pilot records/captures, future visibility/listings/local-network publication, responses, attachments, access, identity, external sharing, and privacy-sensitive exports/diagnostics.
 
 ## Use When
 
-- Listing publication or withdrawal.
+- Local pilot records, private supply needs, source captures, or exports/backups.
+- Future listing publication or withdrawal.
 - Sharing audience or local-network behavior.
 - Identity/access concepts.
 - Attachment or source-capture access.
@@ -27,9 +28,11 @@ Helps agents work on farm-private data, visibility, need listings, local-network
 ## Core Guidance
 
 - Farm operational data is private by default.
+- Privacy applies immediately to locally stored pilot records, local history, private supply needs, source captures, and exports/backups.
 - Local-network participation does not expose private records.
 - A supply need is not a shared listing.
 - A shared listing is an intentionally published limited representation.
+- External publication/listing behavior is future server-connected scope.
 - Internal counts, usage history, captures, drafts, and provenance are not exposed automatically.
 - Synchronization is not publication.
 - Pending offline publication is not active external visibility.
@@ -48,7 +51,7 @@ Authentication, roles, invitation mechanics, public visibility, messaging, moder
 
 ## Explicit Non-Goals / Overreach to Avoid
 
-Do not create public marketplace behavior, automatic shortage publication, broad social networking, unrestricted operator access, or implicit attachment/capture sharing.
+Do not implement sharing functionality merely because privacy rules define how it must work later. Do not create public marketplace behavior, automatic shortage publication, broad social networking, unrestricted operator access, or implicit attachment/capture sharing.
 
 ## Canonical Source Documents and ADRs
 

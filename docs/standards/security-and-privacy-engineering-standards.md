@@ -3,7 +3,7 @@
 - Status: proposed
 - Last reviewed: 2026-05-28
 - Canonical for: repository-wide private-by-default engineering obligations and sensitive-data review requirements
-- Related ADRs: [ADR-0003](../adr/ADR-0003-ai-interpretations-require-confirmation.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](../adr/ADR-0005-data-portability-and-recoverability.md)
+- Related ADRs: [ADR-0003](../adr/ADR-0003-ai-interpretations-require-confirmation.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](../adr/ADR-0005-data-portability-and-recoverability.md), [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md)
 - Related docs: [Privacy, Visibility, and Sharing Rules](../domain/privacy-visibility-and-sharing-rules.md), [Identity, Privacy, and Sharing](../architecture/identity-privacy-and-sharing.md), [Persistence and Attachment Storage](../architecture/persistence-and-attachment-storage.md), [Backup, Restore, and Data Export Requirements](../operations/backup-restore-and-data-export-requirements.md), [Dependency and Supply Chain Standards](dependency-and-supply-chain-standards.md)
 - Related tests: not yet implemented
 - Supersedes: none
@@ -12,7 +12,7 @@
 
 Privacy and security are behavioral requirements of the product, not deployment add-ons. Implementation must protect private farm operations, sensitive captures, sharing intent, exports, backups, and operational administration.
 
-Hosted, local, cooperative, private-cloud, and technical self-hosted operating modes must preserve the same product-level private-by-default guarantees.
+The standalone mobile pilot must protect locally stored private records, sensitive captures, and export/backup artifacts. Later hosted, local, cooperative, private-cloud, and technical self-hosted operating modes must preserve the same product-level private-by-default guarantees.
 
 ## Data Classification Categories
 

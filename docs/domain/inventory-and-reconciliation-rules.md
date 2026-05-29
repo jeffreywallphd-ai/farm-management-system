@@ -101,8 +101,9 @@ Proposed first-slice product behavior:
 
 - Internal inventory quantity is private by default.
 - Recording a low quantity or discrepancy does not publish that information.
-- A need listing contains only information intentionally selected or entered for sharing.
-- A need listing does not automatically expose expected quantity, observed quantity, discrepancy, material-use history, source captures, or why the farm needs the material.
+- A private supply need recorded during the standalone mobile pilot does not publish inventory information.
+- A future need listing contains only information intentionally selected or entered for sharing after later server-connected scope is authorized.
+- A future need listing does not automatically expose expected quantity, observed quantity, discrepancy, material-use history, source captures, or why the farm needs the material.
 - An availability listing, when supported, may offer an intentionally selected amount without exposing the farm's total holdings.
 
 ## Questions Deferred for Later Work

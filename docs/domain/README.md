@@ -8,7 +8,7 @@
 - [Farm Structure and Tracked Items](farm-structure-and-tracked-items.md): farm, member, location, crop/planting, material/input, equipment, and countable-item concepts.
 - [Operational Event Catalog](operational-event-catalog.md): initial activities, observations, draft/confirmed record distinction, and correction principles.
 - [Inventory and Reconciliation Rules](inventory-and-reconciliation-rules.md): expected versus observed quantity, discrepancy handling, inventory effects, and shared-listing separation.
-- [Sourcing and Local Network Model](sourcing-and-local-network-model.md): supply needs, intentionally shared need listings, local farm network concepts, and first-slice sourcing boundaries.
+- [Sourcing and Local Network Model](sourcing-and-local-network-model.md): private supply needs, future intentionally shared need listings, local farm network concepts, and standalone-pilot sourcing boundaries.
 - [AI-Assisted Capture and Confirmation Rules](ai-assisted-capture-and-confirmation-rules.md): meaning of AI-assisted drafts, confirmation, correction, provenance, and their relationship to operational records.
 - [Privacy, Visibility, and Sharing Rules](privacy-visibility-and-sharing-rules.md): private-by-default domain behavior, visibility classes, intentionally shared representations, and sensitive content rules.
 

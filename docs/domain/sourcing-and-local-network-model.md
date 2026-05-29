@@ -2,8 +2,8 @@
 
 - Status: proposed
 - Last reviewed: 2026-05-28
-- Canonical for: supply needs, intentionally shared listings, local farm network concepts, and first-slice sourcing boundaries
-- Related ADRs: [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md)
+- Canonical for: private supply needs, future intentionally shared listings, local farm network concepts, and standalone-pilot sourcing boundaries
+- Related ADRs: [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md)
 - Related docs: [Glossary](glossary.md), [Operational Event Catalog](operational-event-catalog.md), [Inventory and Reconciliation Rules](inventory-and-reconciliation-rules.md), [Privacy, Visibility, and Sharing Rules](privacy-visibility-and-sharing-rules.md), [Identity, Privacy, and Sharing Architecture](../architecture/identity-privacy-and-sharing.md), [Local Coordination and Sharing Validation Plan](../product/local-coordination-and-sharing-validation-plan.md), [Product Vision and Scope](../product/product-vision-and-scope.md), [Initial Vertical Slice](../product/initial-vertical-slice.md), [Field Workflows](../product/field-workflows.md)
 - Related tests: not yet implemented
 - Supersedes: none
@@ -16,32 +16,32 @@ It establishes intentional sharing without designing a social network, marketpla
 
 ## Domain Purpose
 
-The platform may help farms express selected needs or availability to trusted local contacts, particularly where sourcing materials informally is difficult or inefficient.
+The platform may later help farms express selected needs or availability to trusted local contacts, particularly where sourcing materials informally is difficult or inefficient.
 
-The first slice is limited to testing one narrow workflow: converting a farm-recognized material need into an intentionally shared need listing.
+The standalone mobile pilot is limited to private device-local supply-need capture if useful for discovery. Converting a farm-recognized material need into an intentionally shared need listing is deferred server-connected functionality.
 
 ## Internal Supply Need Versus Shared Need Listing
 
 A **supply need** is a private farm recognition that a material or resource is needed.
 
-A **need listing** is an intentionally shared representation of selected information about that need.
+A **need listing** is a future intentionally shared representation of selected information about that need.
 
 Key invariant:
 
-> A supply need does not become visible outside the farm unless a user intentionally creates or publishes a shared listing.
+> A supply need does not become visible outside the farm in the standalone mobile pilot. Later publication requires an explicit server-connected sharing workflow and product/ADR authorization.
 
 ## Need Listing
 
-Minimum conceptual content:
+Minimum future conceptual content:
 
 - Description of what is needed.
 - Requested quantity/unit if the farm chooses to provide it.
 - Desired timing.
 - Optional pickup, delivery, or geographic note later.
 - Intended audience/visibility, governed by [Privacy, Visibility, and Sharing Rules](privacy-visibility-and-sharing-rules.md).
-- A basic path for another farm to respond.
+- A basic path for another farm to respond, if later product scope includes it.
 
-A listing must not automatically expose:
+A future listing must not automatically expose:
 
 - Underlying inventory count.
 - Full material-use history.
@@ -60,7 +60,7 @@ Availability listings are a closely related later function:
 - The farm controls the amount offered; the listing is not a view into total holdings or private inventory history.
 - Whether availability listings are included in a release must follow canonical product scope.
 
-Canonical product scope includes need listings in the first slice and treats offers/availability as related but deferred. Availability listings are therefore deferred unless product scope is intentionally revised.
+Canonical product scope no longer includes need listings in the standalone mobile pilot. Need listings, availability listings, and responses are deferred unless product scope and ADRs are intentionally revised.
 
 ## Local Farm Network
 
@@ -74,14 +74,14 @@ Membership in a local farm network does not grant access to private farm operati
 
 ## Publication and Synchronization Boundary
 
-Listing publication, withdrawal, response, and fulfillment behavior must follow privacy/visibility and synchronization rules.
+Listing publication, withdrawal, response, and fulfillment behavior are future server-connected concerns and must follow privacy/visibility and synchronization rules if implemented later.
 
-- A listing may be drafted or a publication request may be created while offline if product scope supports it.
+- A listing may be drafted or a publication request may be created while offline only if later product scope supports it.
 - A pending offline publication request is not externally visible until synchronized and accepted by the appropriate server boundary.
 - Withdrawing or closing a listing must distinguish local intent from synchronized shared state.
 - A shared listing contains only intentionally selected shareable fields, not the internal records that motivated it.
 - Source captures, AI drafts, and private attachments are not listing content by default.
-- The first-slice sourcing scope remains a narrow need-listing workflow, not a marketplace, order system, payment system, or general social network.
+- The standalone pilot sourcing scope is private need recognition only if scoped, not a marketplace, order system, payment system, publication workflow, response workflow, or general social network.
 
 ## Response and Resolution
 
@@ -93,12 +93,12 @@ This document does not define ordering, contracting, payment, shipping, logistic
 
 ## First-Slice Boundary
 
-| Capability | First-slice status |
+| Capability | Standalone mobile pilot status |
 | --- | --- |
-| Recognize a private material/supply need | Included narrowly |
-| Convert selected need information into a shared listing | Included narrowly |
+| Recognize a private material/supply need | Optional private discovery workflow |
+| Convert selected need information into a shared listing | Deferred server-connected functionality |
 | Prevent automatic disclosure of private operational data | Required |
-| Allow minimal response/contact pathway | Minimal/prototype only; may be deferred if product testing does not require it |
+| Allow minimal response/contact pathway | Deferred |
 | Publish offers/availability | Deferred unless product scope is intentionally revised |
 | Shared ordering or bulk purchasing | Deferred |
 | Payments | Excluded |
