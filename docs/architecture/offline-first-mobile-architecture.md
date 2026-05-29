@@ -5,7 +5,7 @@
 - Canonical for: standalone mobile pilot offline behavior, local retained work, draft lifecycle, local saved-state boundaries, and future-sync compatibility
 - Related ADRs: [ADR-0001](../adr/ADR-0001-offline-first-field-operation.md), [ADR-0002](../adr/ADR-0002-history-preserving-idempotent-synchronization.md), [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md), [ADR-0008](../adr/ADR-0008-mobile-pilot-1-application-stack.md), [ADR-0009](../adr/ADR-0009-mobile-pilot-1-local-persistence.md), [ADR-0010](../adr/ADR-0010-mobile-pilot-1-export-and-recovery-copy.md), [ADR-0011](../adr/ADR-0011-mobile-pilot-1-runtime-boundary-validation.md)
 - Related docs: [System Overview](system-overview.md), [Synchronization Architecture](synchronization-architecture.md), [Persistence and Attachment Storage](persistence-and-attachment-storage.md), [AI-Assisted Capture Boundaries](ai-assisted-capture-boundaries.md), [Identity, Privacy, and Sharing](identity-privacy-and-sharing.md), [Server and Deployment Operating Model](server-and-deployment-operating-model.md), [Initial Vertical Slice](../product/initial-vertical-slice.md), [Mobile Pilot 1 Implementation Scope](../product/mobile-pilot-1-implementation-scope.md), [Field Workflows](../product/field-workflows.md), [Mobile Pilot 1 Operational Records](../domain/mobile-pilot-1-operational-records.md), [Mobile Pilot Data-Safety Requirements](../operations/mobile-pilot-data-safety-requirements.md)
-- Related tests: not yet implemented
+- Related tests: [Reference use-case tests](../../apps/mobile/src/application/use-cases/referenceUseCases.test.ts), [Reference validation tests](../../apps/mobile/src/domain/validation/referenceValidation.test.ts), [Phase 1 manual smoke test](../../apps/mobile/src/testing/phase-1-manual-smoke-test.md)
 - Supersedes: none
 
 ## Purpose
@@ -24,7 +24,7 @@ The first pilot must work without a live server. A worker must be able to record
 
 | Workflow | Mobile Pilot 1 posture | Pilot result |
 | --- | ---: | --- |
-| Minimal local setup/reference context | Required | Farm context available on device |
+| Minimal local setup/reference context | Required; implemented in Phase 1 | Farm context available on device |
 | Manual harvest | Required | Confirmed record retained locally |
 | Manual material use | Required | Confirmed record retained locally |
 | Manual inventory count | Required | Confirmed observation retained locally |

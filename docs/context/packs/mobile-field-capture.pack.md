@@ -31,7 +31,8 @@ Helps agents work on user-facing mobile workflows involving activity entry, fiel
 - Frequent workflows must be fast and understandable.
 - Farmer language governs user-facing concepts.
 - Mobile Pilot 1 covers manual entry for harvest, material use, and inventory count plus export/backup usability.
-- The app shell and folder structure exist under `apps/mobile`; Mobile Pilot 1 workflow screens are not implemented yet.
+- Phase 1 setup/reference screens exist under `apps/mobile`; operational-record workflow screens are not implemented yet.
+- Future mobile screens should reuse the established earthy theme tokens and small UI component foundation.
 - ADR-0008 accepts Expo, React Native, TypeScript, development builds, and EAS/internal distribution for Mobile Pilot 1.
 - Voice/photo capture is Mobile Pilot 2 or later and must not be pulled into a first implementation prompt.
 - Local saved state and local history must be understandable in the standalone pilot.
@@ -49,7 +50,7 @@ Helps agents work on user-facing mobile workflows involving activity entry, fiel
 
 ## Decisions Still Deferred
 
-UI toolkit, visual design system, exact screen flows, offline AI requirement, and accessibility tooling remain deferred. ADR-0008 selects the Mobile Pilot 1 framework only.
+UI toolkit beyond the current small in-app component foundation, offline AI requirement, and accessibility tooling remain deferred. ADR-0008 selects the Mobile Pilot 1 framework only.
 
 ## Explicit Non-Goals / Overreach to Avoid
 

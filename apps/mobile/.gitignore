@@ -3,6 +3,7 @@ node_modules/
 .expo-home/
 .expo/
 dist/
+.test-build/
 android/
 ios/
 expo-env.d.ts

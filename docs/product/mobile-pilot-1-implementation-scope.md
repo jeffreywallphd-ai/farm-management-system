@@ -5,14 +5,16 @@
 - Canonical for: exact first buildable standalone mobile pilot increment before AI experiments or server-connected features
 - Related ADRs: [ADR-0001](../adr/ADR-0001-offline-first-field-operation.md), [ADR-0002](../adr/ADR-0002-history-preserving-idempotent-synchronization.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](../adr/ADR-0005-data-portability-and-recoverability.md), [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md), [ADR-0008](../adr/ADR-0008-mobile-pilot-1-application-stack.md), [ADR-0009](../adr/ADR-0009-mobile-pilot-1-local-persistence.md), [ADR-0010](../adr/ADR-0010-mobile-pilot-1-export-and-recovery-copy.md), [ADR-0011](../adr/ADR-0011-mobile-pilot-1-runtime-boundary-validation.md)
 - Related docs: [Initial Vertical Slice](initial-vertical-slice.md), [Field Workflows](field-workflows.md), [Roadmap](roadmap.md), [Mobile Pilot 1 Operational Records](../domain/mobile-pilot-1-operational-records.md), [Mobile Pilot Data-Safety Requirements](../operations/mobile-pilot-data-safety-requirements.md), [Offline-First Mobile Architecture](../architecture/offline-first-mobile-architecture.md), [Mobile App README](../../apps/mobile/README.md)
-- Related tests: not yet implemented
+- Related tests: [Reference use-case tests](../../apps/mobile/src/application/use-cases/referenceUseCases.test.ts), [Reference validation tests](../../apps/mobile/src/domain/validation/referenceValidation.test.ts), [Phase 1 manual smoke test](../../apps/mobile/src/testing/phase-1-manual-smoke-test.md)
 - Supersedes: none
 
 ## Scope Statement
 
 > Mobile Pilot 1 is the first buildable farmer-testing increment of the accepted standalone mobile pilot. It validates device-local offline recording, local history, and farmer-controlled export/backup using the smallest useful manual operational-record set. It does not include AI-assisted capture, server synchronization, external sharing, multi-device access, or deployment-mode implementation.
 
-The Mobile Pilot 1 implementation stack is now selected in ADR-0008 through ADR-0011. The initial folder/file structure exists under `apps/mobile`, but workflow behavior, persistence behavior, export behavior, runtime schemas, and tests are not yet implemented.
+The Mobile Pilot 1 implementation stack is selected in ADR-0008 through ADR-0011. Phase 1 setup/reference behavior now exists under `apps/mobile`: one local farm profile, farm locations, tracked crops, tracked materials, tracked countable items, SQLite-backed local persistence, Zod validation, and a reusable earthy UI foundation.
+
+Operational-record workflows, local activity history, and export/recovery-copy generation are still not implemented.
 
 ## Included Mobile Pilot 1 Capabilities
 
