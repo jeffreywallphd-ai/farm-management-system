@@ -3,7 +3,7 @@
 - Status: accepted
 - Last reviewed: 2026-05-28
 - Canonical for: product vision, product principles, intended users, accepted standalone mobile pilot scope, and product-scope boundaries
-- Related ADRs: [ADR-0001](../adr/ADR-0001-offline-first-field-operation.md), [ADR-0003](../adr/ADR-0003-ai-interpretations-require-confirmation.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](../adr/ADR-0005-data-portability-and-recoverability.md), [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md)
+- Related ADRs: [ADR-0001](../adr/ADR-0001-offline-first-field-operation.md), [ADR-0003](../adr/ADR-0003-ai-interpretations-require-confirmation.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](../adr/ADR-0005-data-portability-and-recoverability.md), [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md), [ADR-0008](../adr/ADR-0008-mobile-pilot-1-application-stack.md), [ADR-0009](../adr/ADR-0009-mobile-pilot-1-local-persistence.md), [ADR-0010](../adr/ADR-0010-mobile-pilot-1-export-and-recovery-copy.md)
 - Related docs: [Product README](README.md), [Initial Vertical Slice](initial-vertical-slice.md), [Mobile Pilot 1 Implementation Scope](mobile-pilot-1-implementation-scope.md), [Field Workflows](field-workflows.md), [User Research and Validation](user-research-and-validation.md), [Local Coordination and Sharing Validation Plan](local-coordination-and-sharing-validation-plan.md), [Deployment and Data-Control Validation Plan](deployment-and-data-control-validation-plan.md), [Roadmap](roadmap.md)
 - Related tests: not yet implemented
 - Supersedes: none
@@ -55,9 +55,9 @@ The first pilot serves a single farm operating on a device-local mobile app. Mul
 | Basic farm setup, locations, and tracked items | Needed to record activity meaningfully | Included minimally |
 | Manual activity and observation recording | Core value proposition | Included narrowly |
 | Local activity history | Lets farmers see recent work and assess usefulness | Included |
-| Offline local retention | Required for realistic field operation | Included; technology deferred |
+| Offline local retention | Required for realistic field operation | Included; Mobile Pilot 1 mechanism selected in ADR-0009 |
 | Clear local saved state | Prevents confusion about whether work exists | Included |
-| Practical export/backup | Prevents meaningful pilot data from being trapped on one device | Included before farmer reliance |
+| Practical export/backup | Prevents meaningful pilot data from being trapped on one device | Included before farmer reliance; Mobile Pilot 1 mechanism selected in ADR-0010 |
 | Voice-assisted activity draft | Potential friction reducer | Constrained experiment, preferably one workflow first |
 | Photo-assisted count draft | Potential friction reducer | Constrained experiment, preferably one item class first |
 | Private internal supply-need note | Helps discover sourcing value | Optional private pilot workflow |

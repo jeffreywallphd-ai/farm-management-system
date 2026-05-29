@@ -39,6 +39,10 @@ This is an open-source small-farm support platform. The active implementation ta
 - [ADR-0004](../../adr/ADR-0004-private-by-default-intentional-sharing.md): farm operational data and sensitive captures are private by default; shared listings require intentional limited publication.
 - [ADR-0005](../../adr/ADR-0005-data-portability-and-recoverability.md): practical data portability and recoverability are foundational operating constraints.
 - [ADR-0007](../../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md): the first implemented pilot is standalone mobile; server connection and in-product shared publication are deferred.
+- [ADR-0008](../../adr/ADR-0008-mobile-pilot-1-application-stack.md): Mobile Pilot 1 uses Expo, React Native, TypeScript, development builds, and EAS/internal distribution.
+- [ADR-0009](../../adr/ADR-0009-mobile-pilot-1-local-persistence.md): Mobile Pilot 1 uses `expo-sqlite` behind repositories/adapters, hand-written migrations, and no ORM.
+- [ADR-0010](../../adr/ADR-0010-mobile-pilot-1-export-and-recovery-copy.md): Mobile Pilot 1 uses local versioned JSON export/recovery copy through Expo FileSystem and Expo Sharing.
+- [ADR-0011](../../adr/ADR-0011-mobile-pilot-1-runtime-boundary-validation.md): Mobile Pilot 1 uses Zod for runtime boundary validation.
 
 ## Current Pilot Sequencing
 
@@ -50,6 +54,8 @@ This is an open-source small-farm support platform. The active implementation ta
 ## Decisions Still Deferred
 
 This pack does not authorize selection of implementation language/framework, database/storage/synchronization technology, AI model/runtime, identity/security mechanism, deployment packaging, first production deployment mode, local-server shipping timeline, server synchronization, need-listing publication, or scope expansion beyond the documented standalone mobile pilot.
+
+Exception: ADR-0008 through ADR-0011 accept only the Mobile Pilot 1 app stack, local persistence, export/recovery-copy mechanism, and runtime boundary validation. Future server, sync, AI, authentication, and deployment technology remain deferred.
 
 Use the [Decision Readiness Register](../../adr/decision-readiness-register.md) before touching deferred decisions.
 
@@ -84,6 +90,7 @@ This pack identifies the baseline. It does not remove the requirement to read ac
 - `docs/product/mobile-pilot-1-implementation-scope.md`: exact current implementation scope.
 - `docs/domain/mobile-pilot-1-operational-records.md`: accepted Pilot 1 record meanings.
 - `docs/operations/mobile-pilot-data-safety-requirements.md`: accepted Pilot 1 data-safety requirements.
+- `apps/mobile/README.md`: current Mobile Pilot 1 app structure and stack notes.
 - `docs/context/prompt-routing.md`: task classification and pack assembly.
 
 ## Required Standards

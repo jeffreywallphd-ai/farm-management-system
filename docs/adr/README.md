@@ -46,6 +46,10 @@ Accepted ADRs are binding architecture guidance for the decisions they record. P
 | [ADR-0005](ADR-0005-data-portability-and-recoverability.md) | accepted | Data portability, backup, restore, migration safety, and recoverability are operating-model constraints |
 | [ADR-0006](ADR-0006-deployment-mode-compatibility.md) | proposed | Architecture should remain compatible with multiple server operating modes, pending validation and planning |
 | [ADR-0007](ADR-0007-standalone-mobile-pilot-before-server-connected-features.md) | accepted | The first implemented pilot is standalone offline-first mobile before server-connected features |
+| [ADR-0008](ADR-0008-mobile-pilot-1-application-stack.md) | accepted | Mobile Pilot 1 uses Expo, React Native, TypeScript, development builds, and EAS/internal distribution |
+| [ADR-0009](ADR-0009-mobile-pilot-1-local-persistence.md) | accepted | Mobile Pilot 1 uses `expo-sqlite` behind local repositories/adapters with hand-written migrations and no ORM |
+| [ADR-0010](ADR-0010-mobile-pilot-1-export-and-recovery-copy.md) | accepted | Mobile Pilot 1 uses local versioned JSON export/recovery copy through Expo FileSystem and Expo Sharing |
+| [ADR-0011](ADR-0011-mobile-pilot-1-runtime-boundary-validation.md) | accepted | Mobile Pilot 1 uses Zod for runtime validation at input, persistence, and export/import boundaries |
 
 ## ADR Rules
 
@@ -76,6 +80,8 @@ Accepted ADRs are binding architecture guidance for the decisions they record. P
 [ADR-0007](ADR-0007-standalone-mobile-pilot-before-server-connected-features.md) is the accepted implementation-sequencing decision. The current implementation target is a standalone offline-first mobile pilot.
 
 Server synchronization, multi-device operation, in-product need-listing publication, responses/messaging, hosted/local/cooperative server implementation, and broader network functionality are deferred from the pilot. Future server compatibility remains required, but it does not authorize building a server now.
+
+[ADR-0008](ADR-0008-mobile-pilot-1-application-stack.md) through [ADR-0011](ADR-0011-mobile-pilot-1-runtime-boundary-validation.md) select the Mobile Pilot 1 app stack, local persistence, export/recovery-copy mechanism, and runtime boundary validation. They do not select future server language, server framework, server database, synchronization protocol, AI runtime, authentication, cloud provider, or deployment technology.
 
 Use `docs/adr/template.md` for new ADRs.
 

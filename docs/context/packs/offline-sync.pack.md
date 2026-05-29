@@ -48,7 +48,7 @@ Helps agents work on offline mobile behavior, local retention, future-sync-compa
 
 ## Decisions Still Deferred
 
-Local/server database, sync engine/protocol/library, API transport, background scheduling, identifier implementation, conflict-resolution UI, and offline reference-data creation remain deferred.
+Server database, sync engine/protocol/library, API transport, background scheduling, identifier implementation, conflict-resolution UI, offline reference-data creation, and persistence choices beyond ADR-0009 remain deferred.
 
 ## Explicit Non-Goals / Overreach to Avoid
 

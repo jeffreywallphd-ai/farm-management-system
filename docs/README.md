@@ -75,8 +75,14 @@ Foundational ADRs are currently defined by:
 - [ADR-0005: Data Portability and Recoverability Are Required Operating Constraints](adr/ADR-0005-data-portability-and-recoverability.md)
 - [ADR-0006: Keep Architecture Compatible With Multiple Server Operating Modes](adr/ADR-0006-deployment-mode-compatibility.md)
 - [ADR-0007: Standalone Mobile Pilot Precedes Server-Connected Features](adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md)
+- [ADR-0008: Mobile Pilot 1 Application Stack](adr/ADR-0008-mobile-pilot-1-application-stack.md)
+- [ADR-0009: Mobile Pilot 1 Local Persistence](adr/ADR-0009-mobile-pilot-1-local-persistence.md)
+- [ADR-0010: Mobile Pilot 1 Export and Recovery-Copy Mechanism](adr/ADR-0010-mobile-pilot-1-export-and-recovery-copy.md)
+- [ADR-0011: Mobile Pilot 1 Runtime Boundary Validation](adr/ADR-0011-mobile-pilot-1-runtime-boundary-validation.md)
 
-Accepted ADRs govern the decisions they record. ADR-0007 establishes the current implementation sequence: standalone mobile pilot first, with server synchronization, shared publication, and server deployment deferred. Proposed ADRs and deferred topics in the decision-readiness register must not be treated as accepted implementation authority.
+Accepted ADRs govern the decisions they record. ADR-0007 establishes the current implementation sequence: standalone mobile pilot first, with server synchronization, shared publication, and server deployment deferred. ADR-0008 through ADR-0011 select only the Mobile Pilot 1 app stack, local persistence, export/recovery-copy mechanism, and runtime boundary validation. Proposed ADRs and deferred topics in the decision-readiness register must not be treated as accepted implementation authority.
+
+The initial Mobile Pilot 1 app structure now exists at [Mobile App README](../apps/mobile/README.md). It is scaffolding only; Mobile Pilot 1 workflow behavior, persistence behavior, export behavior, validation schemas, and tests are not yet implemented.
 
 Operations requirements are currently defined by:
 

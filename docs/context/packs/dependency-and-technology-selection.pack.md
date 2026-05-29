@@ -25,6 +25,7 @@ Helps agents evaluate or introduce dependencies, external services, providers, r
 ## Core Guidance
 
 - Dependency or technology selection must serve an approved current need.
+- ADR-0008 through ADR-0011 accept only the Mobile Pilot 1 app stack, local persistence, local export/recovery-copy mechanism, and runtime boundary validation.
 - Deferred technology choices cannot be selected casually during unrelated feature work.
 - Evaluate licensing, maintenance, vulnerabilities, offline impact, privacy/data transmission, deployment burden, portability, resource use, and replaceability.
 - Core open-source behavior must not depend on proprietary/source-restricted infrastructure without explicit decision treatment.
@@ -39,7 +40,7 @@ Helps agents evaluate or introduce dependencies, external services, providers, r
 
 ## Decisions Still Deferred
 
-Mobile framework, local persistence, export/backup format, server language, web framework, server persistence, sync protocol/vendor, storage backend, AI model/runtime/provider, identity/auth/security, deployment packaging, cloud provider, observability stack, test tooling, and migration tooling remain deferred unless later ADRs accept them.
+Server language, web framework, server persistence, sync protocol/vendor, storage backend, AI model/runtime/provider, identity/auth/security, deployment packaging, cloud provider, observability stack, test tooling, migration tooling, ORM adoption, cloud/server backup, and technologies beyond ADR-0008 through ADR-0011 remain deferred unless later ADRs accept them.
 
 ## Explicit Non-Goals / Overreach to Avoid
 
@@ -49,6 +50,10 @@ Do not smuggle technology selection into feature work. Do not add proprietary lo
 
 - `docs/adr/decision-readiness-register.md`: deferred technology and product-priority decisions.
 - `docs/adr/README.md`: ADR policy.
+- `docs/adr/ADR-0008-mobile-pilot-1-application-stack.md`: accepted Mobile Pilot 1 app stack.
+- `docs/adr/ADR-0009-mobile-pilot-1-local-persistence.md`: accepted Mobile Pilot 1 local persistence style.
+- `docs/adr/ADR-0010-mobile-pilot-1-export-and-recovery-copy.md`: accepted Mobile Pilot 1 export/recovery-copy mechanism.
+- `docs/adr/ADR-0011-mobile-pilot-1-runtime-boundary-validation.md`: accepted Mobile Pilot 1 runtime validation choice.
 - `docs/standards/dependency-and-supply-chain-standards.md`: dependency review factors.
 - `docs/standards/security-and-privacy-engineering-standards.md`: external-service data review.
 - `docs/architecture/server-and-deployment-operating-model.md`: deployment compatibility constraints.

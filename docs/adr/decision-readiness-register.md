@@ -3,7 +3,7 @@
 - Status: accepted
 - Last reviewed: 2026-05-28
 - Canonical for: current readiness classification of foundational product-technical decisions
-- Related ADRs: [ADR-0001](ADR-0001-offline-first-field-operation.md), [ADR-0002](ADR-0002-history-preserving-idempotent-synchronization.md), [ADR-0003](ADR-0003-ai-interpretations-require-confirmation.md), [ADR-0004](ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](ADR-0005-data-portability-and-recoverability.md), [ADR-0006](ADR-0006-deployment-mode-compatibility.md), [ADR-0007](ADR-0007-standalone-mobile-pilot-before-server-connected-features.md)
+- Related ADRs: [ADR-0001](ADR-0001-offline-first-field-operation.md), [ADR-0002](ADR-0002-history-preserving-idempotent-synchronization.md), [ADR-0003](ADR-0003-ai-interpretations-require-confirmation.md), [ADR-0004](ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](ADR-0005-data-portability-and-recoverability.md), [ADR-0006](ADR-0006-deployment-mode-compatibility.md), [ADR-0007](ADR-0007-standalone-mobile-pilot-before-server-connected-features.md), [ADR-0008](ADR-0008-mobile-pilot-1-application-stack.md), [ADR-0009](ADR-0009-mobile-pilot-1-local-persistence.md), [ADR-0010](ADR-0010-mobile-pilot-1-export-and-recovery-copy.md), [ADR-0011](ADR-0011-mobile-pilot-1-runtime-boundary-validation.md)
 - Related docs: [Documentation Governance](../README.md), [Standards Index](../standards/README.md), [Change Impact Matrix](../standards/change-impact-matrix.md), [Initial Vertical Slice](../product/initial-vertical-slice.md), [Operational Event Catalog](../domain/operational-event-catalog.md), [Offline-First Mobile Architecture](../architecture/offline-first-mobile-architecture.md), [Synchronization Architecture](../architecture/synchronization-architecture.md), [AI-Assisted Capture Boundaries](../architecture/ai-assisted-capture-boundaries.md), [Identity, Privacy, and Sharing](../architecture/identity-privacy-and-sharing.md), [Server and Deployment Operating Model](../architecture/server-and-deployment-operating-model.md), [Backup, Restore, and Data Export Requirements](../operations/backup-restore-and-data-export-requirements.md)
 - Related tests: not yet implemented
 - Supersedes: none
@@ -35,6 +35,10 @@ This register identifies whether additional candidate decisions are accepted, pr
 | [ADR-0004](ADR-0004-private-by-default-intentional-sharing.md) | Private-by-default and intentional shared representations | Privacy/adoption boundary | Listings cannot expose internal records automatically |
 | [ADR-0005](ADR-0005-data-portability-and-recoverability.md) | Data portability and recoverability | Open-source/data-control operating constraint | Backup/export/restore requirements must guide later design |
 | [ADR-0007](ADR-0007-standalone-mobile-pilot-before-server-connected-features.md) | Standalone mobile pilot before server-connected features | Product-owner sequencing decision after Review 1 | First implementation target is mobile-only local pilot; server sync/publication/deployment remain deferred |
+| [ADR-0008](ADR-0008-mobile-pilot-1-application-stack.md) | Mobile Pilot 1 application stack | Implementation planning now needs a concrete installed mobile app stack | Mobile Pilot 1 uses Expo, React Native, TypeScript, development builds, and EAS/internal distribution |
+| [ADR-0009](ADR-0009-mobile-pilot-1-local-persistence.md) | Mobile Pilot 1 local persistence | Local retention is required before meaningful farmer reliance | Mobile Pilot 1 uses `expo-sqlite` behind repositories/adapters, hand-written migrations, and no ORM |
+| [ADR-0010](ADR-0010-mobile-pilot-1-export-and-recovery-copy.md) | Mobile Pilot 1 export/recovery-copy mechanism | Pilot data must be retrievable without server/cloud decisions | Mobile Pilot 1 uses local versioned JSON export through Expo FileSystem and Expo Sharing |
+| [ADR-0011](ADR-0011-mobile-pilot-1-runtime-boundary-validation.md) | Mobile Pilot 1 runtime boundary validation | TypeScript alone cannot validate runtime data boundaries | Mobile Pilot 1 uses Zod for input, persistence, and export/import boundary validation |
 
 ## Proposed and Deferred Decisions
 
@@ -50,19 +54,21 @@ This register identifies whether additional candidate decisions are accepted, pr
 | Local-network sync without internet | Deferred pending validation and technical evaluation | Adds topology/security/sync complexity | User need plus architecture evaluation |
 | Offline AI interpretation requirement | Deferred pending validation and technical evaluation | Value versus implementation burden unresolved | Field testing plus technical options analysis |
 | Server language | Deferred pending technical evaluation | Constraint not required to establish product invariants | Comparative architecture ADR later |
-| Database/storage/sync technology | Deferred pending technical evaluation | Must follow accepted invariants | Technical evaluation and implementation plan |
+| Server database/storage/sync technology | Deferred pending technical evaluation | Must follow accepted invariants | Technical evaluation and implementation plan |
 | Identity/auth/security technology | Deferred pending technical evaluation | Privacy boundary defined; mechanism not selected | Security architecture work |
+| ORM adoption for Mobile Pilot 1 | Deferred pending technical evaluation and need | ADR-0009 chooses direct SQLite through adapters for the pilot | Superseding ADR if complexity justifies it |
+| Import/restore, cloud backup, or server backup | Deferred pending validation and technical evaluation | ADR-0010 chooses only local JSON export/recovery copy for the pilot | Data-safety evidence plus product/ADR work |
 | Voice/photo workflow expansion | Deferred pending validation | Initial experiments not yet evaluated | Prototype/user evidence |
 | Availability listings/messaging/group purchasing | Deferred pending validation | Coordination scope intentionally narrow | Farmer validation |
 | Need-listing publication as initial external coordination workflow | Deferred pending validation | ADR-0007 removes publication from the standalone mobile pilot | Create or update ADR/product docs before implementation |
 
-## Technology Selections Not Accepted by Current ADR Work
+## Technology Selections Still Not Accepted by Current ADR Work
 
 - Server programming language.
 - Server framework.
-- Mobile framework.
+- Additional mobile framework decisions beyond Mobile Pilot 1 Expo/React Native.
 - Web/office client framework.
-- Mobile local persistence technology.
+- Persistence technology beyond Mobile Pilot 1 `expo-sqlite`.
 - Server persistence technology.
 - Spatial/geographic database capability.
 - Attachment storage technology.
@@ -79,7 +85,7 @@ This register identifies whether additional candidate decisions are accepted, pr
 - Authentication mechanism.
 - Authorization-policy implementation.
 - Encryption and key management.
-- Backup/archive/export format.
+- Backup/archive/export formats beyond Mobile Pilot 1 versioned JSON recovery copy.
 - Upgrade and migration tooling.
 
 ## Product Prioritization Decisions Requiring Validation
@@ -113,8 +119,8 @@ This register identifies whether additional candidate decisions are accepted, pr
 
 Later prompts should:
 
-- Perform documentation consistency review.
-- Conduct technology-selection ADR work only after the foundational documentation set is accepted/reviewed and implementation planning begins.
+- Implement Mobile Pilot 1 behavior within the accepted stack and folder structure.
+- Create separate decision work before adopting ORM, server sync, AI capture, cloud backup, authentication, or deployment tooling.
 - Use existing context packs and prompt routing when preparing future implementation or ADR work.
 
 Repository-wide standards and change-impact rules now exist in [Standards Documentation](../standards/README.md). They operationalize accepted ADR constraints without accepting deferred technology or product-priority decisions.

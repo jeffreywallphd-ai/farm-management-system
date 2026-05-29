@@ -3,14 +3,16 @@
 - Status: accepted
 - Last reviewed: 2026-05-28
 - Canonical for: exact first buildable standalone mobile pilot increment before AI experiments or server-connected features
-- Related ADRs: [ADR-0001](../adr/ADR-0001-offline-first-field-operation.md), [ADR-0002](../adr/ADR-0002-history-preserving-idempotent-synchronization.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](../adr/ADR-0005-data-portability-and-recoverability.md), [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md)
-- Related docs: [Initial Vertical Slice](initial-vertical-slice.md), [Field Workflows](field-workflows.md), [Roadmap](roadmap.md), [Mobile Pilot 1 Operational Records](../domain/mobile-pilot-1-operational-records.md), [Mobile Pilot Data-Safety Requirements](../operations/mobile-pilot-data-safety-requirements.md), [Offline-First Mobile Architecture](../architecture/offline-first-mobile-architecture.md)
+- Related ADRs: [ADR-0001](../adr/ADR-0001-offline-first-field-operation.md), [ADR-0002](../adr/ADR-0002-history-preserving-idempotent-synchronization.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](../adr/ADR-0005-data-portability-and-recoverability.md), [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md), [ADR-0008](../adr/ADR-0008-mobile-pilot-1-application-stack.md), [ADR-0009](../adr/ADR-0009-mobile-pilot-1-local-persistence.md), [ADR-0010](../adr/ADR-0010-mobile-pilot-1-export-and-recovery-copy.md), [ADR-0011](../adr/ADR-0011-mobile-pilot-1-runtime-boundary-validation.md)
+- Related docs: [Initial Vertical Slice](initial-vertical-slice.md), [Field Workflows](field-workflows.md), [Roadmap](roadmap.md), [Mobile Pilot 1 Operational Records](../domain/mobile-pilot-1-operational-records.md), [Mobile Pilot Data-Safety Requirements](../operations/mobile-pilot-data-safety-requirements.md), [Offline-First Mobile Architecture](../architecture/offline-first-mobile-architecture.md), [Mobile App README](../../apps/mobile/README.md)
 - Related tests: not yet implemented
 - Supersedes: none
 
 ## Scope Statement
 
 > Mobile Pilot 1 is the first buildable farmer-testing increment of the accepted standalone mobile pilot. It validates device-local offline recording, local history, and farmer-controlled export/backup using the smallest useful manual operational-record set. It does not include AI-assisted capture, server synchronization, external sharing, multi-device access, or deployment-mode implementation.
+
+The Mobile Pilot 1 implementation stack is now selected in ADR-0008 through ADR-0011. The initial folder/file structure exists under `apps/mobile`, but workflow behavior, persistence behavior, export behavior, runtime schemas, and tests are not yet implemented.
 
 ## Included Mobile Pilot 1 Capabilities
 
@@ -55,7 +57,8 @@ Mobile Pilot 1 does not include:
 - Listing responses or farmer-to-farmer messaging.
 - Public marketplace, payments, orders, or social networking.
 - Autonomous AI.
-- Selection of mobile framework, local database, export format, AI runtime, server language, sync protocol, hosting, or deployment technology.
+- Server language, server framework, server database, synchronization technology, AI runtime, authentication, hosting, or deployment technology.
+- Technology choices beyond the Mobile Pilot 1 decisions recorded in ADR-0008 through ADR-0011.
 
 ## Why This Narrower Increment Is Required
 
@@ -73,4 +76,3 @@ Mobile Pilot 1 is ready for implementation planning only when:
 - Local data-safety and export/backup requirements are accepted.
 - Context routing points future agents to this document.
 - Implementation prompts cannot reasonably infer that deferred record types, AI experiments, or server features are part of Mobile Pilot 1.
-

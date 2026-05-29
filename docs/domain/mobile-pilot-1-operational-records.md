@@ -3,8 +3,8 @@
 - Status: accepted
 - Last reviewed: 2026-05-28
 - Canonical for: operational-record meanings implemented in Mobile Pilot 1
-- Related ADRs: [ADR-0001](../adr/ADR-0001-offline-first-field-operation.md), [ADR-0002](../adr/ADR-0002-history-preserving-idempotent-synchronization.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](../adr/ADR-0005-data-portability-and-recoverability.md), [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md)
-- Related docs: [Glossary](glossary.md), [Inventory and Reconciliation Rules](inventory-and-reconciliation-rules.md), [Initial Vertical Slice](../product/initial-vertical-slice.md), [Mobile Pilot 1 Implementation Scope](../product/mobile-pilot-1-implementation-scope.md), [Offline-First Mobile Architecture](../architecture/offline-first-mobile-architecture.md), [Mobile Pilot Data-Safety Requirements](../operations/mobile-pilot-data-safety-requirements.md)
+- Related ADRs: [ADR-0001](../adr/ADR-0001-offline-first-field-operation.md), [ADR-0002](../adr/ADR-0002-history-preserving-idempotent-synchronization.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](../adr/ADR-0005-data-portability-and-recoverability.md), [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md), [ADR-0009](../adr/ADR-0009-mobile-pilot-1-local-persistence.md), [ADR-0010](../adr/ADR-0010-mobile-pilot-1-export-and-recovery-copy.md), [ADR-0011](../adr/ADR-0011-mobile-pilot-1-runtime-boundary-validation.md)
+- Related docs: [Glossary](glossary.md), [Inventory and Reconciliation Rules](inventory-and-reconciliation-rules.md), [Initial Vertical Slice](../product/initial-vertical-slice.md), [Mobile Pilot 1 Implementation Scope](../product/mobile-pilot-1-implementation-scope.md), [Offline-First Mobile Architecture](../architecture/offline-first-mobile-architecture.md), [Mobile Pilot Data-Safety Requirements](../operations/mobile-pilot-data-safety-requirements.md), [Mobile App README](../../apps/mobile/README.md)
 - Related tests: not yet implemented
 - Supersedes: none
 
@@ -17,6 +17,8 @@ This document defines the accepted operational-record semantics for the first bu
 - `InventoryCountRecorded`
 
 The broader [Operational Event Catalog](operational-event-catalog.md) remains a proposed candidate catalog for later standalone-mobile and server-connected expansion. If the proposed catalog conflicts with this accepted document for Mobile Pilot 1 implementation, this document governs.
+
+The TypeScript domain files under `apps/mobile/src/domain` are implementation skeletons derived from this document. They do not replace this document as the source of operational-record meaning.
 
 ## Shared Rules
 
@@ -103,4 +105,3 @@ The following are not Mobile Pilot 1 implementation scope:
 | `NeedListingPublished` | Future server-connected functionality only |
 | `AvailabilityListingPublished` | Deferred future scope |
 | AI-assisted records/capture provenance | Mobile Pilot 2 or later; governed by ADR-0003 and later accepted scope |
-
