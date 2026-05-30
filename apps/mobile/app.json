@@ -10,7 +10,11 @@
       "supportsTablet": true
     },
     "android": {
-      "package": "com.farmmanagementsystem.mobilepilot"
+      "package": "com.farmmanagementsystem.mobilepilot",
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS"
+      ]
     },
     "plugins": [
       "expo-router",
@@ -32,6 +36,12 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "faf8c7b9-4747-4ed3-a818-0a0ab1672cff"
+      }
     }
   }
 }

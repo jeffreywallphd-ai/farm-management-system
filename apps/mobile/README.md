@@ -8,7 +8,7 @@ Phase 2 implements the first complete operational workflow: manual harvest recor
 
 Phase 3 completes the core manual Mobile Pilot 1 workflow set. Farmers can now record harvests, material use, and inventory counts, review those records in one local activity history, inspect read-only details, and create a local versioned JSON recovery copy for the implemented manual records and required reference data.
 
-ADR-0012 pivots the next farmer-shareable pilot direction toward quick voice/photo farm-event capture. The app now supports local voice memos with optional local photos for farm notes, local timeline/detail review, and a user-controlled media recovery package containing retained media. ADR-0013 accepts `whisper.rn`/`whisper.cpp` as the on-device transcription path for draft farm-note transcripts, but a local model file and Android development-build validation still must be completed before real transcription can be relied on.
+ADR-0012 pivots the next farmer-shareable pilot direction toward quick voice/photo farm-event capture. The app now supports local voice memos with optional local photos for farm notes, local timeline/detail review, and a user-controlled media recovery package containing retained media. ADR-0013 accepts `whisper.rn`/`whisper.cpp` as the on-device transcription path for draft farm-note transcripts. The app can download `ggml-tiny.en.bin` to local device storage and then transcribe saved voice memos offline in an internal Android development build.
 
 ## Accepted Stack
 
@@ -49,7 +49,7 @@ Canonical record meaning lives in [Mobile Pilot 1 Operational Records](../../doc
 - Local voice memo recording, microphone permission request, playback, optional photo attachment, and farm-note save flow.
 - Local farm-note timeline with type, place, and date filters plus read-only detail review with audio playback and photo previews.
 - Persistent `Farm Notes` header with a hamburger menu for local navigation between capture, timeline, setup, activity history, and recovery copy.
-- Saved farm-note detail includes a transcript-draft area and a `Transcribe voice memo` action using the `whisper.rn` adapter. It looks for `ggml-tiny.en.bin` in app document storage under `farm-note-transcription-models/` and shows a model-missing message when the model is absent.
+- Saved farm-note detail includes a transcript-draft area, local model download controls, and a `Transcribe voice memo` action using the `whisper.rn` adapter. It downloads `ggml-tiny.en.bin` from the accepted `ggerganov/whisper.cpp` Hugging Face model source into app document storage under `transcription-models/`.
 - ZIP media recovery package export containing manual JSON data, farm-note metadata, voice memo files, photo files, and transcript drafts when present.
 - Zod validation for setup/reference names, tracked item kinds, manual record inputs, and recovery-copy export payloads.
 - A reusable earthy mobile UI foundation for setup, manual record, history, and data-safety screens.
@@ -57,8 +57,8 @@ Canonical record meaning lives in [Mobile Pilot 1 Operational Records](../../doc
 ## Planned But Not Implemented Yet
 
 - Import or restore from a recovery copy.
-- Bundled or installed local Whisper model handling for farmer test builds. Expo Go is not sufficient for `whisper.rn` native-module transcription; a development build is required.
-- Physical-device pre-distribution review and internal farmer-test build preparation.
+- Strong cryptographic model verification. The app currently checks that the downloaded model exists and falls within the expected size range; SHA-256 verification remains a follow-up.
+- Physical-device pre-distribution review before inviting farmer testers.
 
 ## Pilot Unit Vocabulary
 
@@ -126,14 +126,40 @@ npm run typecheck
 npm test
 ```
 
-`npm run start` uses the accepted development-build posture. Expo Go is not the assumed farmer-testing environment. Actual EAS farmer distribution configuration remains a later task.
+`npm run start` uses the accepted development-build posture. Expo Go is not sufficient for testing `whisper.rn` transcription or other native-module behavior.
 
 ## Internal Android Build Preparation
 
-`eas.json` includes a `preview` profile for an internal Android APK build:
+`eas.json` includes two internal Android APK profiles:
 
 ```text
+npm run build:android:development
+npm run build:android:preview
+```
+
+Equivalent EAS commands:
+
+```text
+eas build --platform android --profile development
 eas build --platform android --profile preview
 ```
 
-Run the validation commands and physical-device smoke checklist before creating or sharing an internal build. This profile does not add web support, accounts, telemetry, server functionality, synchronization, AI, cloud backup, or app-store distribution.
+Use `development` for owner/developer testing with `expo-dev-client`. Use `preview` later for internal farmer/tester APKs when the app is ready for that audience. EAS login and project configuration are required on the machine that starts the build.
+
+After EAS finishes, open the EAS build URL on the Android phone and install the APK. Android may ask the user to allow installation from that browser or file source. This is internal distribution only; it is not Google Play or app-store submission.
+
+Whisper model binaries are not committed to git. Model files are ignored under `apps/mobile/assets/models/*.bin`, `apps/mobile/models/*.bin`, `apps/mobile/.models/`, and `apps/mobile/.transcription-models/`; runtime model files belong in app-controlled local storage on the device.
+
+Run the validation commands and physical-device smoke checklist before creating or sharing an internal build. This setup does not add web support, accounts, telemetry, server functionality, synchronization, cloud backup, or app-store distribution.
+
+## Local Transcription Model
+
+Saved farm notes with voice memos can download the local `Whisper tiny.en` model on first transcription use. The model source is:
+
+```text
+https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-tiny.en.bin
+```
+
+The app stores the model in app-controlled local storage at `transcription-models/ggml-tiny.en.bin`. The first download requires internet access and is about 78 MB. After the model is installed, transcription runs on the phone and can work offline. Audio and transcript text are not sent to a transcription server.
+
+Expo Go cannot run this native transcription path. Use the EAS `development` APK profile for transcription testing.

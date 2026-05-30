@@ -48,7 +48,7 @@ The assisted-capture experiment is Mobile Pilot 2 or later, not Mobile Pilot 1. 
 
 Later architecture may refine technical statuses, but it must preserve this trust distinction.
 
-ADR-0013 introduces a narrow local transcript draft for saved farm-note voice memos. A transcript draft is generated on the device when the local model path is available, remains associated with the source audio, and is a review/search aid only. It is not a structured harvest, material-use, inventory-count, listing, or supply-need record.
+ADR-0013 introduces a narrow local transcript draft for saved farm-note voice memos. A transcript draft is generated on the device after the local `Whisper tiny.en` model is installed, remains associated with the source audio, and is a review/search aid only. It is not a structured harvest, material-use, inventory-count, listing, or supply-need record.
 
 ## Manual Entry Versus AI-Assisted Entry
 

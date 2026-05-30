@@ -17,7 +17,9 @@ Mobile Pilot 1 now supports local voice/photo farm notes. Farmers need an easier
 
 Farm-note transcription will use `whisper.rn` / `whisper.cpp` for on-device transcription when the native module and local model are available.
 
-Initial model target is a small English Whisper model, preferably `tiny.en`; `base.en` may be evaluated only after device performance testing.
+Initial model target is `ggml-tiny.en.bin` from the `ggerganov/whisper.cpp` Hugging Face model repository. `base.en` may be evaluated only after device performance testing.
+
+The app may download the approved model file to app-controlled local storage after user-visible prompting. The first download requires internet access; transcription should work offline after the model is installed. Model binaries must not be committed to git.
 
 Transcription is initiated manually from a saved farm note. The output is stored locally as a generated draft transcript associated with the farm note and source voice memo attachment. Original audio remains the source of truth.
 
@@ -27,6 +29,7 @@ No audio or transcript is sent to an external server. This decision does not aut
 
 - Transcription requires native-module validation in a development/prebuild Android build, not Expo Go.
 - A missing model must produce a clear unavailable state.
+- Model download and integrity behavior must be visible and recoverable. Current implementation verifies file existence and expected size range; SHA-256 verification remains a follow-up if an approved checksum source or hashing implementation is added.
 - Transcripts must be labeled as generated drafts/review aids.
 - Recovery export must preserve transcript metadata/text without replacing original audio.
 

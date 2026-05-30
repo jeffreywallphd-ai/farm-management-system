@@ -18,7 +18,7 @@ Farm places are the implemented farmer-facing form of local location data. Each 
 
 Phase 3 now implements the complete manual Mobile Pilot 1 core: manual `HarvestRecorded`, `MaterialUseRecorded`, and `InventoryCountRecorded` creation; unified local activity history/detail; and a versioned JSON recovery-copy export for farm setup/reference data and all implemented manual records.
 
-ADR-0012 pivots the farmer-testable implementation direction toward voice/photo-first farm-event capture. The app now has the first model/persistence foundation for local farm-event metadata and attachment references, plus local voice memo recording/playback, optional local photo attachments, farm-note save flow, local timeline/detail review, persistent local navigation, and a user-controlled ZIP recovery package containing metadata plus retained media. ADR-0013 adds local transcript-draft storage and UI for saved voice memos through a `whisper.rn` adapter; actual Whisper inference still requires a local model file and development-build validation. Import/restore, structured AI interpretation, server-connected behavior, farmer distribution configuration, and later candidate workflows are still not implemented.
+ADR-0012 pivots the farmer-testable implementation direction toward voice/photo-first farm-event capture. The app now has the first model/persistence foundation for local farm-event metadata and attachment references, plus local voice memo recording/playback, optional local photo attachments, farm-note save flow, local timeline/detail review, persistent local navigation, and a user-controlled ZIP recovery package containing metadata plus retained media. ADR-0013 adds local transcript-draft storage and UI for saved voice memos through a `whisper.rn` adapter, with an approved `ggml-tiny.en.bin` model download into local app storage. Import/restore, structured AI interpretation, server-connected behavior, farmer distribution configuration, and later candidate workflows are still not implemented.
 
 ## Included Mobile Pilot 1 Capabilities
 
@@ -35,7 +35,7 @@ ADR-0012 pivots the farmer-testable implementation direction toward voice/photo-
 | Farm-event metadata and attachment-reference model | Implemented |
 | Voice memo farm-event capture | Basic local recording/playback/save implemented |
 | Optional photo attachments for farm events | Implemented for local farm notes |
-| Saved-note transcript drafts | Local persistence/UI/export path implemented; real on-device inference requires native/model completion |
+| Saved-note transcript drafts | Local persistence/UI/export path and on-device model download implemented; physical-device development-build validation still required |
 | Local farm-event timeline | Implemented |
 | Local activity history for included records | Included |
 | Clear locally saved/device-local status | Included |

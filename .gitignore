@@ -27,6 +27,12 @@ go.work.sum
 # env file
 .env
 
+# Mobile pilot local transcription models
+apps/mobile/assets/models/*.bin
+apps/mobile/models/*.bin
+apps/mobile/.models/
+apps/mobile/.transcription-models/
+
 # Editor/IDE
 # .idea/
 # .vscode/

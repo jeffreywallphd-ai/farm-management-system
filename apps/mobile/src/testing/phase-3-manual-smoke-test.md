@@ -38,29 +38,32 @@ Use this checklist on a physical Android test device before farmer distribution 
 34. Close and relaunch the app while offline.
 35. Open the same previous note again and confirm the voice memo still plays and both photos still appear.
 36. If a photo file has been removed from the device, confirm the UI says `Photo unavailable on this device.`
-37. Tap `Transcribe voice memo`.
-38. If this test build does not include the local Whisper model, confirm the app says `Transcription model is not installed in this test build.` and the original audio still plays.
-39. If this test build includes the local Whisper model, confirm airplane mode remains enabled, progress appears, a `Transcript draft` appears, and the transcript persists after relaunch.
-40. Confirm transcript wording says generated/draft/local and does not imply a confirmed farm record.
-41. Confirm the screen does not claim cloud transcription, structured AI interpretation, upload, or sharing.
-42. Record a harvest using a nested farm place.
-43. Record material use using a farm-place path.
-44. Record an inventory count of `0`.
-45. Record another inventory count greater than zero.
-46. Confirm blank inventory count is rejected.
-47. Confirm all save confirmations communicate device-local storage.
-48. Open unified local activity history.
-49. Confirm all three manual record types appear.
-50. Confirm newest-first ordering.
-51. Open each manual record type's detail view.
-52. Confirm values, labels, and private/local wording are understandable.
-53. Create a recovery copy.
-54. Confirm native share/save behavior opens.
-55. Inspect JSON where practical and confirm it includes farm, locations with kind/parent relationships, tracked items, harvest records, material-use records, inventory-count records, and export/schema metadata.
-56. Create a media recovery package and confirm native share/save behavior opens for a ZIP file.
-57. Inspect the package where practical and confirm it includes metadata plus saved voice memo files, photo files, and transcript drafts when present.
-58. Confirm export messaging states that data is private and not uploaded automatically.
-59. Cancel or fail a share action and confirm locally retained records remain unchanged.
-60. Confirm no UI suggests synchronization, server connection, accounts, cloud backup, structured AI extraction, listing publication, or messaging.
-61. Confirm touch targets, validation messages, contrast, recording controls, playback, photo controls, transcript states, timeline filters, header/menu, and form behavior are workable on a physical device.
-62. Record any usability concerns before distribution preparation.
+37. Confirm the local transcription model panel appears near the voice memo.
+38. With no model installed, confirm the app offers `Download transcription model` and explains the model stays on the phone.
+39. Download the model over Wi-Fi and confirm progress appears.
+40. After download succeeds, enable airplane mode and tap `Transcribe voice memo`.
+41. Confirm a `Transcript draft` appears and persists after relaunch.
+42. If the model is missing, corrupt, or the app is not a development build, confirm the app shows a clear unavailable/repair state and the original audio still plays.
+43. Confirm transcript wording says generated/draft/local and does not imply a confirmed farm record.
+44. Confirm the screen does not claim cloud transcription, structured AI interpretation, upload, or sharing.
+45. Record a harvest using a nested farm place.
+46. Record material use using a farm-place path.
+47. Record an inventory count of `0`.
+48. Record another inventory count greater than zero.
+49. Confirm blank inventory count is rejected.
+50. Confirm all save confirmations communicate device-local storage.
+51. Open unified local activity history.
+52. Confirm all three manual record types appear.
+53. Confirm newest-first ordering.
+54. Open each manual record type's detail view.
+55. Confirm values, labels, and private/local wording are understandable.
+56. Create a recovery copy.
+57. Confirm native share/save behavior opens.
+58. Inspect JSON where practical and confirm it includes farm, locations with kind/parent relationships, tracked items, harvest records, material-use records, inventory-count records, and export/schema metadata.
+59. Create a media recovery package and confirm native share/save behavior opens for a ZIP file.
+60. Inspect the package where practical and confirm it includes metadata plus saved voice memo files, photo files, and transcript drafts when present.
+61. Confirm export messaging states that data is private and not uploaded automatically.
+62. Cancel or fail a share action and confirm locally retained records remain unchanged.
+63. Confirm no UI suggests synchronization, server connection, accounts, cloud backup, structured AI extraction, listing publication, or messaging.
+64. Confirm touch targets, validation messages, contrast, recording controls, playback, photo controls, transcript states, timeline filters, header/menu, and form behavior are workable on a physical device.
+65. Record any usability concerns before distribution preparation.

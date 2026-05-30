@@ -10,12 +10,14 @@ import { listLocations } from "../../application/use-cases/list-locations/listLo
 import { getFarmEventDetail } from "../../application/use-cases/view-farm-events/GetFarmEventDetail";
 import { getFarmNoteTranscript } from "../../application/use-cases/transcribe-farm-note/GetFarmNoteTranscript";
 import { localIdGenerator } from "../../infrastructure/system/idGenerator";
+import { ExpoWhisperModelRepository } from "../../infrastructure/transcription/ExpoWhisperModelRepository";
 import { WhisperRnVoiceMemoTranscriptionService } from "../../infrastructure/transcription/WhisperRnVoiceMemoTranscriptionService";
 import { FarmEventDetailScreen } from "../../ui/screens/FarmEventDetailScreen";
 import type { FarmNoteTranscript } from "../../domain/events/FarmNoteTranscript";
 
 type ReadyDatabase = Extract<ReturnType<typeof useDatabase>, { status: "ready" }>;
-const transcriptionService = new WhisperRnVoiceMemoTranscriptionService();
+const transcriptionModelRepository = new ExpoWhisperModelRepository();
+const transcriptionService = new WhisperRnVoiceMemoTranscriptionService({ modelRepository: transcriptionModelRepository });
 
 export default function FarmEventDetailRoute() {
   return (
@@ -78,6 +80,7 @@ function FarmEventDetailRouteContent({
       locations={locations}
       onTranscriptChanged={setTranscript}
       transcript={transcript}
+      transcriptionModelRepository={transcriptionModelRepository}
       transcriptionRepository={database.farmNoteTranscriptRepository}
       transcriptionService={transcriptionService}
     />

@@ -4,6 +4,7 @@ import { z } from "zod";
 
 import type { Farm } from "../../domain/farm/Farm";
 import type { FarmLocation } from "../../domain/farm/FarmLocation";
+import { WHISPER_TINY_EN_MODEL } from "../../domain/transcription/WhisperModel";
 import type { FarmEventRepository } from "../ports/FarmEventRepository";
 import type { ExportRepository, MobilePilotExportFile } from "../ports/ExportRepository";
 import type {
@@ -16,6 +17,7 @@ import { InMemoryFarmReferenceRepository } from "../../testing/fakes/InMemoryFar
 import { InMemoryFarmNoteTranscriptRepository } from "../../testing/fakes/InMemoryFarmNoteTranscriptRepository";
 import { InMemoryLocalRecordRepository } from "../../testing/fakes/InMemoryLocalRecordRepository";
 import { serializeFarmEventRecoveryPackageManifest } from "../../infrastructure/export/FarmEventRecoveryPackageExporter";
+import { WhisperRnVoiceMemoTranscriptionService } from "../../infrastructure/transcription/WhisperRnVoiceMemoTranscriptionService";
 import { createFarmEventRecoveryPackage } from "./export-mobile-pilot-data/CreateFarmEventRecoveryPackage";
 import { recordFarmEvent } from "./record-farm-event/RecordFarmEvent";
 import { recordVoiceMemoFarmEvent } from "./record-voice-memo-farm-event/RecordVoiceMemoFarmEvent";
@@ -491,6 +493,28 @@ test("retrying transcription updates the existing draft instead of creating dupl
   assert.equal(second.status, "completed");
   assert.equal(second.text, "Second try worked.");
   assert.equal((await transcriptRepository.listTranscriptsForExport(farm.id)).length, 1);
+});
+
+test("whisper adapter reports model-missing state before loading native transcription", async () => {
+  const service = new WhisperRnVoiceMemoTranscriptionService({
+    modelRepository: {
+      async getModelStatus() {
+        return { status: "notInstalled", model: WHISPER_TINY_EN_MODEL };
+      },
+      async getInstalledModelUri() {
+        throw new TranscriptionModelUnavailableError();
+      },
+      async downloadModel() {
+        return { status: "notInstalled", model: WHISPER_TINY_EN_MODEL };
+      },
+      async removeModel() {},
+    },
+  });
+
+  await assert.rejects(
+    () => service.transcribe({ localAudioUri: "file:///documents/voice.m4a" }),
+    TranscriptionModelUnavailableError,
+  );
 });
 
 class SequenceIds {

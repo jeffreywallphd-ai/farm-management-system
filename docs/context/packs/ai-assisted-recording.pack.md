@@ -29,7 +29,7 @@ Helps agents work on voice-assisted entry, transcription, intent extraction, pho
 
 - Source capture, inference, draft, confirmation, and confirmed operational record are distinct.
 - ADR-0012 authorizes local voice/photo source capture for farm events without authorizing structured AI interpretation.
-- ADR-0013 authorizes manually requested on-device transcript drafts for saved farm-note voice memos using `whisper.rn`/`whisper.cpp`, with original audio as source of truth.
+- ADR-0013 authorizes manually requested on-device transcript drafts for saved farm-note voice memos using `whisper.rn`/`whisper.cpp`, with original audio as source of truth. The app may download the approved `tiny.en` model to local app storage; audio is still not sent to a server.
 - No inference has operational, inventory, publication, messaging, or external-sharing effect before explicit confirmation.
 - Confirmed AI-assisted records follow ordinary operational-record and privacy rules.
 - Voice/photo are capture methods, not farm event types.

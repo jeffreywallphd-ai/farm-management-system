@@ -41,7 +41,7 @@ The mobile app now presents record locations as farmer-facing farm places. Farm 
 - Problem or trigger: something worth remembering happens, but a structured form would interrupt the work.
 - Desired user action: tap `Record farm note`, speak a short memo, optionally attach photos, add light context if useful, and save.
 - Expected pilot outcome: the event is saved locally, appears in a local timeline, remains private/device-local, and is included in a recovery package.
-- Implementation note: this workflow captures source audio/photos for later review. A saved note may later have a local generated transcript draft when the development build includes the on-device Whisper model path. The transcript does not infer fields, count objects, create operational records automatically, upload data, or synchronize.
+- Implementation note: this workflow captures source audio/photos for later review. A saved note can download the local `Whisper tiny.en` model and generate a transcript draft on device. The first model download requires internet, but later transcription can work offline. The transcript does not infer fields, count objects, create operational records automatically, upload data, or synchronize.
 - Why it matters: this tests whether farmers capture useful information more readily when the capture flow matches field conditions.
 - Online/offline relevance: capture and local review must remain usable without reception.
 - Future server note: server storage, synchronization, and shared visibility remain deferred.

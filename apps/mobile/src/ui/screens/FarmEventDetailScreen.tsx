@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { useAudioPlayer, useAudioPlayerStatus } from "expo-audio";
 
@@ -8,6 +8,10 @@ import type { FarmLocation } from "../../domain/farm/FarmLocation";
 import type { FarmEventRepository, FarmEventView } from "../../application/ports/FarmEventRepository";
 import type { FarmNoteTranscriptRepository } from "../../application/ports/FarmNoteTranscriptRepository";
 import type { IdGenerator } from "../../application/ports/IdGenerator";
+import type {
+  TranscriptionModelRepository,
+  TranscriptionModelStatus,
+} from "../../application/ports/TranscriptionModelRepository";
 import type { VoiceMemoTranscriptionService } from "../../application/ports/VoiceMemoTranscriptionService";
 import { transcribeFarmNoteVoiceMemo } from "../../application/use-cases/transcribe-farm-note/TranscribeFarmNoteVoiceMemo";
 import { systemClock } from "../../infrastructure/system/clock";
@@ -32,6 +36,7 @@ export function FarmEventDetailScreen({
   locations,
   onTranscriptChanged,
   transcript,
+  transcriptionModelRepository,
   transcriptionRepository,
   transcriptionService,
 }: {
@@ -42,15 +47,46 @@ export function FarmEventDetailScreen({
   locations: FarmLocation[];
   onTranscriptChanged: (transcript: FarmNoteTranscript) => void;
   transcript: FarmNoteTranscript | null;
+  transcriptionModelRepository: TranscriptionModelRepository;
   transcriptionRepository: FarmNoteTranscriptRepository;
   transcriptionService: VoiceMemoTranscriptionService;
 }) {
   const [isTranscribing, setIsTranscribing] = useState(false);
+  const [modelStatus, setModelStatus] = useState<TranscriptionModelStatus | null>(null);
+  const [isDownloadingModel, setIsDownloadingModel] = useState(false);
+  const [downloadProgress, setDownloadProgress] = useState<number | null>(null);
+  const [modelError, setModelError] = useState<string | null>(null);
   const voiceMemo = event?.attachments.find((attachment) => attachment.kind === "voiceMemo");
   const photos = event?.attachments.filter((attachment) => attachment.kind === "photo") ?? [];
   const placePath = buildFarmPlacePath(locations, event?.event.placeId);
   const player = useAudioPlayer(voiceMemo?.localUri);
   const playerStatus = useAudioPlayerStatus(player);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadModelStatus() {
+      if (!voiceMemo) {
+        setModelStatus(null);
+        return;
+      }
+
+      const nextStatus = await transcriptionModelRepository.getModelStatus();
+      if (isMounted) {
+        setModelStatus(nextStatus);
+      }
+    }
+
+    loadModelStatus().catch(() => {
+      if (isMounted) {
+        setModelError("Transcription model status could not be checked on this device.");
+      }
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [transcriptionModelRepository, voiceMemo]);
 
   function handlePlayPause() {
     if (playerStatus.playing) {
@@ -63,7 +99,7 @@ export function FarmEventDetailScreen({
   }
 
   async function handleTranscribe() {
-    if (!event || !voiceMemo) {
+    if (!event || !voiceMemo || modelStatus?.status !== "installed") {
       return;
     }
 
@@ -82,6 +118,23 @@ export function FarmEventDetailScreen({
       onTranscriptChanged(nextTranscript);
     } finally {
       setIsTranscribing(false);
+    }
+  }
+
+  async function handleDownloadModel() {
+    setIsDownloadingModel(true);
+    setDownloadProgress(0);
+    setModelError(null);
+
+    try {
+      const nextStatus = await transcriptionModelRepository.downloadModel((progress) => {
+        setDownloadProgress(progress);
+      });
+      setModelStatus(nextStatus);
+    } catch {
+      setModelError("The transcription model could not be downloaded. Check your connection and try again.");
+    } finally {
+      setIsDownloadingModel(false);
     }
   }
 
@@ -119,7 +172,7 @@ export function FarmEventDetailScreen({
                 <Text style={styles.muted}>{formatDuration(voiceMemo.durationMs)}</Text>
                 <Button label={playerStatus.playing ? "Pause playback" : "Play memo"} onPress={handlePlayPause} />
                 <Button
-                  disabled={isTranscribing}
+                  disabled={isTranscribing || modelStatus?.status !== "installed"}
                   label={isTranscribing ? "Transcribing..." : transcript ? "Retry transcription" : "Transcribe voice memo"}
                   onPress={handleTranscribe}
                   variant="secondary"
@@ -130,6 +183,21 @@ export function FarmEventDetailScreen({
               <EmptyState text="No voice memo is attached to this farm note." />
             )}
           </Card>
+          {voiceMemo ? (
+            <Card>
+              <SectionHeading
+                detail="Download once, then use offline. Audio is not uploaded."
+                title="Local transcription model"
+              />
+              <TranscriptionModelStatusView
+                downloadProgress={downloadProgress}
+                error={modelError}
+                isDownloading={isDownloadingModel}
+                onDownload={handleDownloadModel}
+                status={modelStatus}
+              />
+            </Card>
+          ) : null}
           <Card>
             <SectionHeading
               detail="Generated on this device from the saved voice memo. Check the audio if accuracy matters."
@@ -217,3 +285,52 @@ const styles = StyleSheet.create({
     lineHeight: 24,
   },
 });
+
+function TranscriptionModelStatusView({
+  downloadProgress,
+  error,
+  isDownloading,
+  onDownload,
+  status,
+}: {
+  downloadProgress: number | null;
+  error: string | null;
+  isDownloading: boolean;
+  onDownload: () => void;
+  status: TranscriptionModelStatus | null;
+}) {
+  if (!status) {
+    return <Text style={styles.muted}>Checking local transcription model...</Text>;
+  }
+
+  if (status.status === "installed") {
+    return (
+      <>
+        <Text style={styles.muted}>Transcription is available on this phone and works offline.</Text>
+        {error ? <Text style={styles.error}>{error}</Text> : null}
+      </>
+    );
+  }
+
+  return (
+    <>
+      <Text style={styles.muted}>
+        This downloads a small speech model to this phone so voice memos can be transcribed without sending audio to a server.
+      </Text>
+      <Text style={styles.muted}>Approximate download size: 78 MB.</Text>
+      {status.status === "invalid" ? <Text style={styles.error}>{status.reason}</Text> : null}
+      {error ? <Text style={styles.error}>{error}</Text> : null}
+      {isDownloading ? (
+        <Text style={styles.muted}>
+          Downloading{downloadProgress !== null ? ` ${Math.round(downloadProgress * 100)}%` : "..."}
+        </Text>
+      ) : null}
+      <Button
+        disabled={isDownloading}
+        label={status.status === "invalid" ? "Repair transcription model" : "Download transcription model"}
+        onPress={onDownload}
+        variant="secondary"
+      />
+    </>
+  );
+}
