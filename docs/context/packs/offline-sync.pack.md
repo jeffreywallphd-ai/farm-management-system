@@ -30,6 +30,7 @@ Helps agents work on offline mobile behavior, local retention, future-sync-compa
 - Supported private field recording must work without server connectivity.
 - In the standalone pilot, confirmed work is retained locally and shown in local history without server synchronization.
 - The current implemented operational workflows are manual harvest, material use, and inventory count.
+- ADR-0012 adds local voice/photo farm-event capture as the next farmer-shareable pilot direction; it remains local and private without server sync.
 - Mobile Pilot 1 work concerns local retention, local history, export/backup, record identity/history, and future-sync-compatible boundaries.
 - Future server-connected synchronization becomes applicable only after later authorized scope.
 - Server acceptance must be idempotent.
@@ -53,7 +54,7 @@ Server database, sync engine/protocol/library, API transport, background schedul
 
 ## Explicit Non-Goals / Overreach to Avoid
 
-Do not treat this pack as authorization to implement outbox behavior, server APIs, sync UI, server acceptance, a server, sync protocol, cross-device synchronization, or publication state during the pilot. Do not choose a sync technology, implement last-write-wins for meaningful farm history, or treat local pending publication as shared visibility.
+Do not treat this pack as authorization to implement outbox behavior, server APIs, sync UI, server acceptance, a server, sync protocol, cross-device synchronization, AI interpretation, or publication state during the pilot. Do not choose a sync technology, implement last-write-wins for meaningful farm history, or treat local pending publication as shared visibility.
 
 ## Canonical Source Documents and ADRs
 

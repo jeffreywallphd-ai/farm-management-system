@@ -30,13 +30,15 @@ Helps agents work on user-facing mobile workflows involving activity entry, fiel
 - Interactions occur during real farm work with limited attention, poor connectivity, glare, gloves, dirt, wet hands, noise, and physical movement.
 - Frequent workflows must be fast and understandable.
 - Farmer language governs user-facing concepts.
-- Mobile Pilot 1 covers manual entry for harvest, material use, and inventory count plus export/backup usability.
+- Mobile Pilot 1 has an implemented manual foundation for harvest, material use, and inventory count plus export/backup usability.
+- ADR-0012 accepts the next farmer-shareable pilot direction: quick local voice memo and optional photo farm-event capture.
 - Phase 1 setup/reference screens exist under `apps/mobile`; Phase 2 adds manual harvest entry; Phase 3 adds manual material use, inventory count, unified local activity history/detail, and expanded recovery-copy export.
 - The implemented manual record screens cover exactly `HarvestRecorded`, `MaterialUseRecorded`, and `InventoryCountRecorded`.
+- The next capture screens should emphasize one primary `Record farm note` action, local save, optional light context, and later timeline review.
 - Record forms should present farm-place paths such as `Field 1 > Bed 1` when nested places exist, avoiding generic or technical location wording.
 - Future mobile screens should reuse the established earthy theme tokens and small UI component foundation.
 - ADR-0008 accepts Expo, React Native, TypeScript, development builds, and EAS/internal distribution for Mobile Pilot 1.
-- Voice/photo capture is Mobile Pilot 2 or later and must not be pulled into a first implementation prompt.
+- AI transcription, photo-count inference, or structured interpretation of captures remains later scope and must not be pulled into the local capture implementation.
 - Local saved state and local history must be understandable in the standalone pilot.
 - Export/backup usability is part of pilot data trust before meaningful reliance.
 - Sync, publication, and attention states apply later only when server-connected scope is authorized.

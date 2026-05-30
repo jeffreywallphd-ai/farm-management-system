@@ -27,10 +27,12 @@ Helps agents handle product scope, farmer workflows, farm terminology, tracked i
 ## Core Guidance
 
 - First-slice scope is a narrow standalone mobile pilot.
-- Mobile Pilot 1 implements only `HarvestRecorded`, `MaterialUseRecorded`, and `InventoryCountRecorded`.
+- The implemented Mobile Pilot 1 manual foundation includes `HarvestRecorded`, `MaterialUseRecorded`, and `InventoryCountRecorded`.
+- ADR-0012 accepts voice/photo-first farm-event capture as the next farmer-shareable pilot differentiator.
 - Phase 1 implements only the setup/reference data needed before those records: one local farm, farmer-facing farm places, crops, materials, and countable items.
 - Farm places are the Mobile Pilot 1 UI/domain term for local place references. They have a type and optional parent relationship, but do not imply GIS, maps, dimensions, planning, or spatial modeling.
 - Phase 3 implements the full manual Pilot 1 record set: `HarvestRecorded`, `MaterialUseRecorded`, and `InventoryCountRecorded`.
+- Capture-first farm events are not automatically structured operational records. Voice memos and photos are source captures until later reviewed or explicitly interpreted by separately authorized behavior.
 - TypeScript domain skeletons under `apps/mobile/src/domain` derive from the accepted Mobile Pilot 1 record document and must not become a competing source of domain truth.
 - Planting/transplanting, movement, equipment issue, and private supply-need records require later pilot scope authorization.
 - Use farmer-understandable terms from the glossary.
@@ -50,7 +52,7 @@ Helps agents handle product scope, farmer workflows, farm terminology, tracked i
 
 ## Decisions Still Deferred
 
-New record types, need-listing publication, availability listings, messaging, group purchasing, equipment sharing, and broader coordination require validation and canonical scope updates.
+AI transcription/interpretation, new operational record types, need-listing publication, availability listings, messaging, group purchasing, equipment sharing, and broader coordination require validation and canonical scope updates.
 
 ## Explicit Non-Goals / Overreach to Avoid
 

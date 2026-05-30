@@ -29,6 +29,7 @@ Helps agents work on farm-private data, local pilot records/captures, future vis
 
 - Farm operational data is private by default.
 - Privacy applies immediately to locally stored pilot records, local history, private supply needs, source captures, and exports/backups.
+- ADR-0012 voice/photo farm-event captures are private, device-local source captures unless the farmer deliberately exports a recovery package.
 - Local-network participation does not expose private records.
 - A supply need is not a shared listing.
 - A shared listing is an intentionally published limited representation.

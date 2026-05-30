@@ -16,9 +16,11 @@ This document defines a product-validation plan for determining whether voice-as
 
 Voice assistance and photo counting are promising concepts motivated by the need to reduce cumbersome field data entry.
 
+ADR-0012 now accepts a prior capture-first pilot step: farmers should first be able to save local voice memos and optional photos as farm-event captures without AI interpretation. This validation plan governs later transcription, extraction, photo counting, and draft confirmation work after capture behavior has been observed.
+
 Their actual usefulness, error tolerance, preferred workflows, offline requirements, and privacy acceptability have not yet been sufficiently validated with farmers/workers in this repository.
 
-These features must remain controlled draft-and-confirm experiments in the standalone mobile pilot until evidence supports expansion.
+AI interpretation features must remain controlled draft-and-confirm experiments until capture-first evidence supports expansion.
 
 During the pilot, confirmed AI-assisted records remain local/private unless exported or backed up by the user. Any future sharing, publication, server inference, model provider, synchronization, or capture transfer remains a separate later decision.
 

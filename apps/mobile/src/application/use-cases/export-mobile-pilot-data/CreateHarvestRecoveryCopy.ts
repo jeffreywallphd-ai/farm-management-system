@@ -25,6 +25,28 @@ export async function createMobilePilotRecoveryCopy(
     throw new Error("Farm setup could not be found for this recovery copy.");
   }
 
+  const payload = await buildMobilePilotRecoveryCopyPayload(input, dependencies);
+  const contents = serializeRecoveryCopy(payload);
+  const fileName = formatRecoveryCopyFileName(dependencies.clock.now());
+  const file = await dependencies.exportRepository.writeRecoveryCopy({ fileName, contents });
+  await dependencies.exportRepository.shareRecoveryCopy(file);
+  return file;
+}
+
+export async function buildMobilePilotRecoveryCopyPayload(
+  input: { farmId: FarmId },
+  dependencies: {
+    clock: Clock;
+    farmReferenceRepository: FarmReferenceRepository;
+    localRecordRepository: LocalRecordRepository;
+  },
+): Promise<MobilePilotRecoveryCopy> {
+  const farm = await dependencies.farmReferenceRepository.getFarm();
+
+  if (!farm || farm.id !== input.farmId) {
+    throw new Error("Farm setup could not be found for this recovery copy.");
+  }
+
   const [locations, trackedItems, harvestRecords, materialUseRecords, inventoryCountRecords] = await Promise.all([
     dependencies.farmReferenceRepository.listLocations(input.farmId),
     dependencies.farmReferenceRepository.listTrackedItems(input.farmId),
@@ -34,7 +56,7 @@ export async function createMobilePilotRecoveryCopy(
   ]);
 
   const createdAt = dependencies.clock.now().toISOString();
-  const payload: MobilePilotRecoveryCopy = {
+  return {
     exportVersion: MOBILE_PILOT_RECOVERY_COPY_EXPORT_VERSION,
     createdAt,
     appDataSchemaVersion: MOBILE_PILOT_APP_DATA_SCHEMA_VERSION,
@@ -45,12 +67,6 @@ export async function createMobilePilotRecoveryCopy(
     materialUseRecords,
     inventoryCountRecords,
   };
-
-  const contents = serializeRecoveryCopy(payload);
-  const fileName = formatRecoveryCopyFileName(dependencies.clock.now());
-  const file = await dependencies.exportRepository.writeRecoveryCopy({ fileName, contents });
-  await dependencies.exportRepository.shareRecoveryCopy(file);
-  return file;
 }
 
 export const createHarvestRecoveryCopy = createMobilePilotRecoveryCopy;

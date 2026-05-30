@@ -28,9 +28,11 @@ Helps agents work on voice-assisted entry, transcription, intent extraction, pho
 ## Core Guidance
 
 - Source capture, inference, draft, confirmation, and confirmed operational record are distinct.
+- ADR-0012 authorizes local voice/photo source capture for farm events without authorizing AI interpretation.
 - No inference has operational, inventory, publication, messaging, or external-sharing effect before explicit confirmation.
 - Confirmed AI-assisted records follow ordinary operational-record and privacy rules.
 - Voice/photo are capture methods, not farm event types.
+- A capture-first farm event may contain audio/photo attachments and light context without becoming an AI draft or a structured operational record.
 - Ambiguous or failed interpretation must allow correction, manual completion, retry, or discard.
 - Source audio/photos and provenance are private by default.
 - Captured data is not automatically authorized for training or external provider transmission.
@@ -44,7 +46,7 @@ Helps agents work on voice-assisted entry, transcription, intent extraction, pho
 
 ## Decisions Still Deferred
 
-Inference model/runtime, on-device versus server inference, external provider, offline inference requirement, confidence thresholds, model-training pipeline, and capture retention/consent implementation remain deferred.
+Inference model/runtime, on-device versus server inference, external provider, offline inference requirement, confidence thresholds, model-training pipeline, and model-training consent implementation remain deferred. Basic local capture retention is accepted only for the ADR-0012 capture-first pilot.
 
 ## Explicit Non-Goals / Overreach to Avoid
 

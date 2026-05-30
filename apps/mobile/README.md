@@ -8,12 +8,16 @@ Phase 2 implements the first complete operational workflow: manual harvest recor
 
 Phase 3 completes the core manual Mobile Pilot 1 workflow set. Farmers can now record harvests, material use, and inventory counts, review those records in one local activity history, inspect read-only details, and create a local versioned JSON recovery copy for the implemented manual records and required reference data.
 
+ADR-0012 pivots the next farmer-shareable pilot direction toward quick voice/photo farm-event capture. The app now supports local voice memos with optional local photos for farm notes, local timeline/detail review, and a user-controlled media recovery package containing retained media. This work does not authorize AI transcription, computer vision, server upload, synchronization, accounts, cloud backup, analytics, or sharing.
+
 ## Accepted Stack
 
 - Expo + React Native + TypeScript: [ADR-0008](../../docs/adr/ADR-0008-mobile-pilot-1-application-stack.md)
 - Local persistence with `expo-sqlite` behind adapters/repositories: [ADR-0009](../../docs/adr/ADR-0009-mobile-pilot-1-local-persistence.md)
 - Versioned JSON export/recovery copy through Expo FileSystem and Expo Sharing: [ADR-0010](../../docs/adr/ADR-0010-mobile-pilot-1-export-and-recovery-copy.md)
 - Runtime boundary validation with Zod: [ADR-0011](../../docs/adr/ADR-0011-mobile-pilot-1-runtime-boundary-validation.md)
+- Local voice memo recording with `expo-audio`: [ADR-0012](../../docs/adr/ADR-0012-voice-photo-first-farm-event-capture-pilot.md)
+- Optional farm-note photo attachments with `expo-image-picker`: [ADR-0012](../../docs/adr/ADR-0012-voice-photo-first-farm-event-capture-pilot.md)
 
 Package versions are pinned in `package.json`, and `package-lock.json` records the app-local dependency resolution.
 
@@ -40,6 +44,10 @@ Canonical record meaning lives in [Mobile Pilot 1 Operational Records](../../doc
 - Manual `InventoryCountRecorded` creation using an existing material or countable item and optional location.
 - Unified local activity history and read-only detail views for all three implemented manual records.
 - Local JSON recovery-copy file generation and device-native share/save flow for implemented manual records and required reference data, including farm-place type and parent relationships.
+- Farm-event capture metadata and local attachment-reference persistence foundation for ADR-0012 voice/photo work.
+- Local voice memo recording, microphone permission request, playback, optional photo attachment, and farm-note save flow.
+- Local farm-note timeline with type, place, and date filters plus read-only detail review with audio playback and photo previews.
+- ZIP media recovery package export containing manual JSON data, farm-note metadata, voice memo files, and photo files.
 - Zod validation for setup/reference names, tracked item kinds, manual record inputs, and recovery-copy export payloads.
 - A reusable earthy mobile UI foundation for setup, manual record, history, and data-safety screens.
 
@@ -115,3 +123,13 @@ npm test
 ```
 
 `npm run start` uses the accepted development-build posture. Expo Go is not the assumed farmer-testing environment. Actual EAS farmer distribution configuration remains a later task.
+
+## Internal Android Build Preparation
+
+`eas.json` includes a `preview` profile for an internal Android APK build:
+
+```text
+eas build --platform android --profile preview
+```
+
+Run the validation commands and physical-device smoke checklist before creating or sharing an internal build. This profile does not add web support, accounts, telemetry, server functionality, synchronization, AI, cloud backup, or app-store distribution.

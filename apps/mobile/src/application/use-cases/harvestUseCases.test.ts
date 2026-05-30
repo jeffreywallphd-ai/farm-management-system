@@ -195,6 +195,19 @@ class CapturingExportRepository implements ExportRepository {
     };
   }
 
+  async writeRecoveryPackage(input: {
+    fileName: string;
+    metadataContents: string;
+    mediaFiles: { sourceUri: string; packagePath: string }[];
+  }): Promise<MobilePilotExportFile> {
+    this.contents = input.metadataContents;
+    return {
+      uri: `memory://${input.fileName}`,
+      fileName: input.fileName,
+      mimeType: "application/zip",
+    };
+  }
+
   async shareRecoveryCopy(file: MobilePilotExportFile): Promise<void> {
     this.sharedFile = file;
   }

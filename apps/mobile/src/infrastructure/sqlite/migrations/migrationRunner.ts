@@ -5,6 +5,7 @@ import { createHarvestRecords } from "./0002_create_harvest_records";
 import { createMaterialUseAndInventoryCountRecords } from "./0003_create_material_use_and_inventory_count_records";
 import { expandManualRecordUnits } from "./0004_expand_manual_record_units";
 import { addFarmPlaceHierarchy } from "./0005_add_farm_place_hierarchy";
+import { createFarmEvents } from "./0006_create_farm_events";
 
 export interface Migration {
   version: number;
@@ -18,6 +19,7 @@ const migrations: Migration[] = [
   createMaterialUseAndInventoryCountRecords,
   expandManualRecordUnits,
   addFarmPlaceHierarchy,
+  createFarmEvents,
 ];
 
 export async function runMigrations(database: SQLiteDatabase): Promise<void> {

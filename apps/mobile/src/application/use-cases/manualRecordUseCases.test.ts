@@ -238,9 +238,19 @@ test("share failure does not alter locally saved manual records", async () => {
 
 class CapturingExportRepository implements ExportRepository {
   contents = "";
+  mediaFiles: { sourceUri: string; packagePath: string }[] = [];
   async writeRecoveryCopy(input: { fileName: string; contents: string }): Promise<MobilePilotExportFile> {
     this.contents = input.contents;
     return { uri: `memory://${input.fileName}`, fileName: input.fileName, mimeType: "application/json" };
+  }
+  async writeRecoveryPackage(input: {
+    fileName: string;
+    metadataContents: string;
+    mediaFiles: { sourceUri: string; packagePath: string }[];
+  }): Promise<MobilePilotExportFile> {
+    this.contents = input.metadataContents;
+    this.mediaFiles = input.mediaFiles;
+    return { uri: `memory://${input.fileName}`, fileName: input.fileName, mimeType: "application/zip" };
   }
   async shareRecoveryCopy(): Promise<void> {}
 }

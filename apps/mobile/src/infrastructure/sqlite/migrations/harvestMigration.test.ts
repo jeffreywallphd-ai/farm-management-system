@@ -5,6 +5,7 @@ import { createHarvestRecords } from "./0002_create_harvest_records";
 import { createMaterialUseAndInventoryCountRecords } from "./0003_create_material_use_and_inventory_count_records";
 import { expandManualRecordUnits } from "./0004_expand_manual_record_units";
 import { addFarmPlaceHierarchy } from "./0005_add_farm_place_hierarchy";
+import { createFarmEvents } from "./0006_create_farm_events";
 
 test("harvest migration creates only harvest record storage", () => {
   const sql = createHarvestRecords.statements.join("\n");
@@ -44,4 +45,21 @@ test("phase 3 migrations add material use, inventory counts, and expanded pilot 
   assert.match(sql, /'tray'/);
   assert.doesNotMatch(sql, /sync/i);
   assert.doesNotMatch(sql, /publication/i);
+});
+
+test("farm event migration creates local event metadata and attachment references only", () => {
+  const sql = createFarmEvents.statements.join("\n");
+
+  assert.equal(createFarmEvents.version, 6);
+  assert.match(sql, /CREATE TABLE IF NOT EXISTS farm_events/);
+  assert.match(sql, /CREATE TABLE IF NOT EXISTS farm_event_attachments/);
+  assert.match(sql, /event_type TEXT NOT NULL/);
+  assert.match(sql, /local_uri TEXT NOT NULL/);
+  assert.match(sql, /'voiceMemo'/);
+  assert.match(sql, /'photo'/);
+  assert.match(sql, /privacy TEXT NOT NULL CHECK \(privacy = 'privateToFarm'\)/);
+  assert.doesNotMatch(sql, /transcript/i);
+  assert.doesNotMatch(sql, /sync/i);
+  assert.doesNotMatch(sql, /publication/i);
+  assert.doesNotMatch(sql, /account/i);
 });

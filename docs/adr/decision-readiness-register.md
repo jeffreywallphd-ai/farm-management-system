@@ -3,7 +3,7 @@
 - Status: accepted
 - Last reviewed: 2026-05-28
 - Canonical for: current readiness classification of foundational product-technical decisions
-- Related ADRs: [ADR-0001](ADR-0001-offline-first-field-operation.md), [ADR-0002](ADR-0002-history-preserving-idempotent-synchronization.md), [ADR-0003](ADR-0003-ai-interpretations-require-confirmation.md), [ADR-0004](ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](ADR-0005-data-portability-and-recoverability.md), [ADR-0006](ADR-0006-deployment-mode-compatibility.md), [ADR-0007](ADR-0007-standalone-mobile-pilot-before-server-connected-features.md), [ADR-0008](ADR-0008-mobile-pilot-1-application-stack.md), [ADR-0009](ADR-0009-mobile-pilot-1-local-persistence.md), [ADR-0010](ADR-0010-mobile-pilot-1-export-and-recovery-copy.md), [ADR-0011](ADR-0011-mobile-pilot-1-runtime-boundary-validation.md)
+- Related ADRs: [ADR-0001](ADR-0001-offline-first-field-operation.md), [ADR-0002](ADR-0002-history-preserving-idempotent-synchronization.md), [ADR-0003](ADR-0003-ai-interpretations-require-confirmation.md), [ADR-0004](ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](ADR-0005-data-portability-and-recoverability.md), [ADR-0006](ADR-0006-deployment-mode-compatibility.md), [ADR-0007](ADR-0007-standalone-mobile-pilot-before-server-connected-features.md), [ADR-0008](ADR-0008-mobile-pilot-1-application-stack.md), [ADR-0009](ADR-0009-mobile-pilot-1-local-persistence.md), [ADR-0010](ADR-0010-mobile-pilot-1-export-and-recovery-copy.md), [ADR-0011](ADR-0011-mobile-pilot-1-runtime-boundary-validation.md), [ADR-0012](ADR-0012-voice-photo-first-farm-event-capture-pilot.md)
 - Related docs: [Documentation Governance](../README.md), [Standards Index](../standards/README.md), [Change Impact Matrix](../standards/change-impact-matrix.md), [Initial Vertical Slice](../product/initial-vertical-slice.md), [Operational Event Catalog](../domain/operational-event-catalog.md), [Offline-First Mobile Architecture](../architecture/offline-first-mobile-architecture.md), [Synchronization Architecture](../architecture/synchronization-architecture.md), [AI-Assisted Capture Boundaries](../architecture/ai-assisted-capture-boundaries.md), [Identity, Privacy, and Sharing](../architecture/identity-privacy-and-sharing.md), [Server and Deployment Operating Model](../architecture/server-and-deployment-operating-model.md), [Backup, Restore, and Data Export Requirements](../operations/backup-restore-and-data-export-requirements.md)
 - Related tests: not yet implemented
 - Supersedes: none
@@ -39,6 +39,7 @@ This register identifies whether additional candidate decisions are accepted, pr
 | [ADR-0009](ADR-0009-mobile-pilot-1-local-persistence.md) | Mobile Pilot 1 local persistence | Local retention is required before meaningful farmer reliance | Mobile Pilot 1 uses `expo-sqlite` behind repositories/adapters, hand-written migrations, and no ORM |
 | [ADR-0010](ADR-0010-mobile-pilot-1-export-and-recovery-copy.md) | Mobile Pilot 1 export/recovery-copy mechanism | Pilot data must be retrievable without server/cloud decisions | Mobile Pilot 1 uses local versioned JSON export through Expo FileSystem and Expo Sharing |
 | [ADR-0011](ADR-0011-mobile-pilot-1-runtime-boundary-validation.md) | Mobile Pilot 1 runtime boundary validation | TypeScript alone cannot validate runtime data boundaries | Mobile Pilot 1 uses Zod for input, persistence, and export boundary validation; import validation applies only if import/restore becomes accepted |
+| [ADR-0012](ADR-0012-voice-photo-first-farm-event-capture-pilot.md) | Voice/photo-first farm-event capture pilot | Manual forms are useful foundation but not the strongest farmer-test differentiator | Next farmer-shareable mobile pilot prioritizes local voice memo and optional photo farm-event capture before AI/server features |
 
 ## Proposed and Deferred Decisions
 
@@ -58,7 +59,8 @@ This register identifies whether additional candidate decisions are accepted, pr
 | Identity/auth/security technology | Deferred pending technical evaluation | Privacy boundary defined; mechanism not selected | Security architecture work |
 | ORM adoption for Mobile Pilot 1 | Deferred pending technical evaluation and need | ADR-0009 chooses direct SQLite through adapters for the pilot | Superseding ADR if complexity justifies it |
 | Import/restore, cloud backup, or server backup | Deferred pending validation and technical evaluation | ADR-0010 chooses only local JSON export/recovery copy for the pilot | Data-safety evidence plus product/ADR work |
-| Voice/photo workflow expansion | Deferred pending validation | Initial experiments not yet evaluated | Prototype/user evidence |
+| Voice/photo farm-event capture workflow | Accepted ADR for local capture-first pilot; implementation still pending | Direction accepted to test capture behavior before AI interpretation | Implement local event model, voice memo capture, optional photos, timeline, and recovery package within ADR-0012 constraints |
+| AI transcription, AI interpretation, or photo-count inference | Deferred pending validation and technical evaluation | Capture behavior must be tested before inference/model decisions | Farmer evidence plus later product/architecture/ADR work |
 | Availability listings/messaging/group purchasing | Deferred pending validation | Coordination scope intentionally narrow | Farmer validation |
 | Need-listing publication as initial external coordination workflow | Deferred pending validation | ADR-0007 removes publication from the standalone mobile pilot | Create or update ADR/product docs before implementation |
 
@@ -96,7 +98,7 @@ This register identifies whether additional candidate decisions are accepted, pr
 - Whether availability listings should follow need listings.
 - Whether in-product messaging is required early.
 - Whether group purchasing, equipment sharing, or transport coordination is valuable.
-- Whether voice capture is valuable enough beyond a constrained experiment.
+- Whether voice/photo capture proves valuable enough after the accepted local capture-first pilot.
 - Whether photo counting is useful enough for any selected item category.
 - Whether AI interpretation must operate fully offline.
 
@@ -119,7 +121,7 @@ This register identifies whether additional candidate decisions are accepted, pr
 
 Later prompts should:
 
-- Implement Mobile Pilot 1 behavior within the accepted stack and folder structure.
+- Implement the accepted voice/photo-first farm-event capture pilot within the existing mobile stack and local/privacy constraints.
 - Create separate decision work before adopting ORM, server sync, AI capture, cloud backup, authentication, or deployment tooling.
 - Use existing context packs and prompt routing when preparing future implementation or ADR work.
 

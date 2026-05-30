@@ -3,7 +3,7 @@
 - Status: accepted
 - Last reviewed: 2026-05-28
 - Canonical for: representative farmer-facing workflows that motivate the standalone mobile pilot
-- Related ADRs: [ADR-0001](../adr/ADR-0001-offline-first-field-operation.md), [ADR-0003](../adr/ADR-0003-ai-interpretations-require-confirmation.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md)
+- Related ADRs: [ADR-0001](../adr/ADR-0001-offline-first-field-operation.md), [ADR-0003](../adr/ADR-0003-ai-interpretations-require-confirmation.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md), [ADR-0012](../adr/ADR-0012-voice-photo-first-farm-event-capture-pilot.md)
 - Related docs: [Product Vision and Scope](product-vision-and-scope.md), [Initial Vertical Slice](initial-vertical-slice.md), [User Research and Validation](user-research-and-validation.md), [AI-Assisted Capture Validation Plan](ai-assisted-capture-validation-plan.md), [Local Coordination and Sharing Validation Plan](local-coordination-and-sharing-validation-plan.md), [Deployment and Data-Control Validation Plan](deployment-and-data-control-validation-plan.md)
 - Related tests: [Harvest use-case tests](../../apps/mobile/src/application/use-cases/harvestUseCases.test.ts), [Manual record use-case tests](../../apps/mobile/src/application/use-cases/manualRecordUseCases.test.ts), [Manual record validation tests](../../apps/mobile/src/domain/validation/manualRecordValidation.test.ts), [Phase 3 manual smoke test](../../apps/mobile/src/testing/phase-3-manual-smoke-test.md)
 - Supersedes: none
@@ -20,6 +20,7 @@ The mobile app now presents record locations as farmer-facing farm places. Farm 
 
 | Workflow | Status |
 | --- | --- |
+| Voice/photo farm-event capture | Mobile Pilot 1B accepted next implementation scope |
 | Manual harvest | Mobile Pilot 1 included |
 | Manual material use | Mobile Pilot 1 included |
 | Manual inventory count | Mobile Pilot 1 included |
@@ -27,11 +28,34 @@ The mobile app now presents record locations as farmer-facing farm places. Farm 
 | Item movement | Candidate later workflow |
 | Equipment issue | Candidate later workflow |
 | Private supply need | Candidate later discovery workflow |
-| Voice-assisted harvest draft | Mobile Pilot 2 experiment |
-| Photo-assisted count draft | Mobile Pilot 2 experiment |
+| Voice transcription or structured draft | Later experiment after capture-first evidence |
+| Photo-count inference draft | Later experiment after capture-first evidence |
 | Shared need publication | Future server-connected scope |
 
-## Workflow 1: Record a Harvest in the Field Without Reception
+## Workflow 1: Capture a Farm Event Note With Voice and Photos
+
+- Status: Mobile Pilot 1B accepted next implementation scope.
+- Actor: farm worker, family member, or owner/operator.
+- Physical/work context: field, greenhouse, tunnel, wash/pack area, storage area, barn, vehicle, or any place where work happens.
+- Problem or trigger: something worth remembering happens, but a structured form would interrupt the work.
+- Desired user action: tap `Record farm note`, speak a short memo, optionally attach photos, add light context if useful, and save.
+- Expected pilot outcome: the event is saved locally, appears in a local timeline, remains private/device-local, and is included in a recovery package.
+- Implementation note: this workflow captures source audio/photos for later review. It does not transcribe, infer fields, count objects, create operational records automatically, upload data, or synchronize.
+- Why it matters: this tests whether farmers capture useful information more readily when the capture flow matches field conditions.
+- Online/offline relevance: capture and local review must remain usable without reception.
+- Future server note: server storage, synchronization, and shared visibility remain deferred.
+
+### Scenario
+
+```markdown
+Given the worker is in the field without reliable reception
+When the worker records a quick farm note and optionally attaches photos
+Then the event is saved on the device
+And the event appears in the local timeline
+And the app does not imply transcription, cloud upload, or sharing
+```
+
+## Workflow 2: Record a Harvest in the Field Without Reception
 
 - Status: Mobile Pilot 1 included.
 - Actor: farm worker, family member, or owner/operator.
@@ -56,7 +80,7 @@ And the app indicates that the record is stored locally on this device
 And the worker does not need to re-enter the harvest because a server was unavailable
 ```
 
-## Workflow 2: Record Material Use During Work
+## Workflow 3: Record Material Use During Work
 
 - Status: Mobile Pilot 1 included.
 - Actor: worker applying or consuming a material/input.
@@ -68,7 +92,7 @@ And the worker does not need to re-enter the harvest because a server was unavai
 - Why it matters: material-use records are easy to omit after work is finished.
 - Future server note: later synchronization must preserve the confirmed local record without duplicate effects, but no server submission is part of the pilot.
 
-## Workflow 3: Move Items or Materials
+## Workflow 4: Move Items or Materials
 
 - Status: candidate later standalone-mobile workflow, not Mobile Pilot 1.
 - Actor: worker moving flats, crates, equipment, or materials between farm locations.
@@ -78,7 +102,7 @@ And the worker does not need to re-enter the harvest because a server was unavai
 - Expected pilot outcome: the movement is saved locally and can be reviewed in local activity history.
 - Why it matters: item locations often become unclear when records are postponed.
 
-## Workflow 4: Record an Inventory Count or Observation
+## Workflow 5: Record an Inventory Count or Observation
 
 - Status: Mobile Pilot 1 included.
 - Actor: owner/operator or worker checking materials or countable items.
@@ -89,7 +113,7 @@ And the worker does not need to re-enter the harvest because a server was unavai
 - Implementation note: Phase 3 implements inventory-count observations for materials and countable items. A count is saved as its own record and does not overwrite earlier history.
 - Why it matters: an inventory count is evidence of current reality, not a reason to erase prior history.
 
-## Workflow 5: Record an Equipment Issue
+## Workflow 6: Record an Equipment Issue
 
 - Status: candidate later standalone-mobile workflow, not Mobile Pilot 1.
 - Actor: worker noticing damaged, missing, unsafe, or maintenance-needed equipment.
@@ -99,9 +123,9 @@ And the worker does not need to re-enter the harvest because a server was unavai
 - Expected pilot outcome: the issue is saved locally and visible in local history.
 - Why it matters: equipment issues are easy to forget and can affect safety or scheduling.
 
-## Workflow 6: Voice-Assisted Harvest Draft
+## Workflow 7: Voice-Assisted Harvest Draft
 
-- Status: Mobile Pilot 2 experiment, not Mobile Pilot 1.
+- Status: later experiment after capture-first evidence, not part of the local capture-only workflow.
 - Actor: worker who wants faster entry while hands are occupied.
 - Physical/work context: noisy, bright, wet, dirty, or fast-moving farm work.
 - Problem or trigger: speaking may be faster than typing for a supported workflow.
@@ -110,9 +134,9 @@ And the worker does not need to re-enter the harvest because a server was unavai
 - Why it matters: voice capture is valuable only if it reduces burden without reducing trust.
 - Constraints: manual entry must remain available; unconfirmed drafts have no operational effect; source audio is private by default.
 
-## Workflow 7: Photo-Assisted Count Draft
+## Workflow 8: Photo-Assisted Count Draft
 
-- Status: Mobile Pilot 2 experiment, not Mobile Pilot 1.
+- Status: later experiment after capture-first evidence, not part of the local capture-only workflow.
 - Actor: worker counting a constrained item class such as seedling flats or harvest crates.
 - Physical/work context: greenhouse, wash/pack area, storage area, trailer, or barn.
 - Problem or trigger: manual counting or entry may be burdensome.
@@ -120,7 +144,7 @@ And the worker does not need to re-enter the harvest because a server was unavai
 - Expected pilot outcome: the photo count remains a draft until confirmed. A confirmed result becomes a local private inventory observation.
 - Constraints: arbitrary object recognition is not included; source photos are private by default; manual count entry must remain available.
 
-## Workflow 8: Record a Private Supply Need for Discovery
+## Workflow 9: Record a Private Supply Need for Discovery
 
 - Status: candidate later discovery workflow, not Mobile Pilot 1.
 - Actor: owner/operator or worker noticing that a material/input may be needed.

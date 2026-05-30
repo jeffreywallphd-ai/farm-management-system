@@ -19,7 +19,7 @@ Do not use as the only context for behavior-changing work; add relevant speciali
 
 ## Project Identity
 
-This is an open-source small-farm support platform. The active implementation target is Mobile Pilot 1: a standalone offline-first mobile increment for manual harvest, material-use, and inventory-count records, local history, and data control/recovery. The first slice remains intentionally narrow.
+This is an open-source small-farm support platform. The active implementation target is Mobile Pilot 1: a standalone offline-first mobile increment with an implemented manual-record foundation and an accepted next farmer-test direction focused on voice/photo farm-event capture, local timeline review, and data control/recovery. The first slice remains intentionally narrow.
 
 ## Core Guidance
 
@@ -43,13 +43,15 @@ This is an open-source small-farm support platform. The active implementation ta
 - [ADR-0009](../../adr/ADR-0009-mobile-pilot-1-local-persistence.md): Mobile Pilot 1 uses `expo-sqlite` behind repositories/adapters, hand-written migrations, and no ORM.
 - [ADR-0010](../../adr/ADR-0010-mobile-pilot-1-export-and-recovery-copy.md): Mobile Pilot 1 uses local versioned JSON export/recovery copy through Expo FileSystem and Expo Sharing.
 - [ADR-0011](../../adr/ADR-0011-mobile-pilot-1-runtime-boundary-validation.md): Mobile Pilot 1 uses Zod for runtime boundary validation.
+- [ADR-0012](../../adr/ADR-0012-voice-photo-first-farm-event-capture-pilot.md): The next farmer-shareable pilot prioritizes local voice/photo farm-event capture before AI interpretation or server-connected features.
 
 ## Current Pilot Sequencing
 
 - Local export/backup is required before meaningful farmer reliance.
-- Mobile Pilot 1 implements only `HarvestRecorded`, `MaterialUseRecorded`, and `InventoryCountRecorded`.
+- The implemented manual foundation includes `HarvestRecorded`, `MaterialUseRecorded`, and `InventoryCountRecorded`.
+- The next accepted farmer-shareable pilot adds local voice memo and optional photo farm-event capture without AI interpretation.
 - Later server compatibility must be preserved without implementing server infrastructure prematurely.
-- Private supply-need notes, voice/photo drafts, platform publication, and responses are not Mobile Pilot 1 scope.
+- Private supply-need notes, AI interpretation drafts, platform publication, and responses are not Mobile Pilot 1 scope.
 
 ## Decisions Still Deferred
 

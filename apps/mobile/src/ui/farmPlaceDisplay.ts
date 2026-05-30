@@ -66,6 +66,14 @@ export function buildFarmPlaceOptions(places: FarmLocation[]) {
   }));
 }
 
+export function buildFarmPlacePath(places: FarmLocation[], placeId?: FarmLocationId): string | undefined {
+  if (!placeId) {
+    return undefined;
+  }
+
+  return buildFarmPlaceDisplays(places).find((display) => display.place.id === placeId)?.path;
+}
+
 export function hasGrowingPlace(places: FarmLocation[]) {
   return places.some((place) =>
     ["field", "bed", "row", "greenhouse", "highTunnel", "greenhouseBed"].includes(place.kind),

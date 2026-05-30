@@ -1,15 +1,18 @@
 import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from "react";
 
 import type { FarmReferenceRepository } from "../../application/ports/FarmReferenceRepository";
+import type { FarmEventRepository } from "../../application/ports/FarmEventRepository";
 import type { LocalRecordRepository } from "../../application/ports/LocalRecordRepository";
 import { openMobilePilotDatabase } from "../../infrastructure/sqlite/database";
 import { SqliteFarmReferenceRepository } from "../../infrastructure/sqlite/repositories/SqliteFarmReferenceRepository";
+import { SqliteFarmEventRepository } from "../../infrastructure/sqlite/repositories/SqliteFarmEventRepository";
 import { SqliteHarvestRecordRepository } from "../../infrastructure/sqlite/repositories/SqliteHarvestRecordRepository";
 
 type DatabaseState =
   | { status: "loading" }
   | {
       status: "ready";
+      farmEventRepository: FarmEventRepository;
       farmReferenceRepository: FarmReferenceRepository;
       localRecordRepository: LocalRecordRepository;
     }
@@ -30,6 +33,7 @@ export function DatabaseProvider({ children }: { children: ReactNode }) {
         if (isMounted) {
           setState({
             status: "ready",
+            farmEventRepository: new SqliteFarmEventRepository(database),
             farmReferenceRepository: new SqliteFarmReferenceRepository(database),
             localRecordRepository: new SqliteHarvestRecordRepository(database),
           });
