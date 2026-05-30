@@ -6,7 +6,11 @@ import type { FarmEventRepository } from "../../ports/FarmEventRepository";
 import type { FarmNoteTranscriptRepository } from "../../ports/FarmNoteTranscriptRepository";
 import type { IdGenerator } from "../../ports/IdGenerator";
 import {
+  TranscriptionAudioUnavailableError,
+  TranscriptionModelLoadError,
   TranscriptionModelUnavailableError,
+  TranscriptionRuntimeError,
+  UnsupportedTranscriptionAudioError,
   type VoiceMemoTranscriptionService,
 } from "../../ports/VoiceMemoTranscriptionService";
 
@@ -55,12 +59,23 @@ export async function transcribeFarmNoteVoiceMemo(
       ...baseTranscript,
       status: "failed",
       modelName: "whisper-tiny.en",
-      errorSummary:
-        error instanceof TranscriptionModelUnavailableError
-          ? error.message
-          : "Transcript could not be generated on this device.",
+      errorSummary: userSafeTranscriptionErrorMessage(error),
     };
     await dependencies.transcriptionRepository.saveTranscript(transcript);
     return transcript;
   }
+}
+
+function userSafeTranscriptionErrorMessage(error: unknown): string {
+  if (
+    error instanceof TranscriptionModelUnavailableError ||
+    error instanceof TranscriptionModelLoadError ||
+    error instanceof TranscriptionAudioUnavailableError ||
+    error instanceof UnsupportedTranscriptionAudioError ||
+    error instanceof TranscriptionRuntimeError
+  ) {
+    return error.message;
+  }
+
+  return "Transcript could not be generated on this device.";
 }

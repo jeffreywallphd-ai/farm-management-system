@@ -17,20 +17,24 @@ export class ExpoPhotoAttachmentStorageRepository implements PhotoAttachmentStor
     const directoryUri = `${FileSystem.documentDirectory}${PHOTO_ATTACHMENT_DIRECTORY}/`;
     await FileSystem.makeDirectoryAsync(directoryUri, { intermediates: true });
 
-    const extension = extensionForMimeType(input.mimeType);
+    const extension = extensionForPhoto(input);
     const localUri = `${directoryUri}${sanitizeFileName(input.fileName)}.${extension}`;
     await FileSystem.copyAsync({
       from: input.temporaryUri,
       to: localUri,
     });
     const info = await FileSystem.getInfoAsync(localUri);
+    if (!info.exists || !info.size) {
+      await FileSystem.deleteAsync(localUri, { idempotent: true });
+      throw new Error("The selected photo could not be saved on this device.");
+    }
 
     return {
       localUri,
       width: input.width,
       height: input.height,
       mimeType: input.mimeType ?? "image/jpeg",
-      fileSizeBytes: info.exists ? info.size : undefined,
+      fileSizeBytes: info.size,
     };
   }
 
@@ -39,16 +43,37 @@ export class ExpoPhotoAttachmentStorageRepository implements PhotoAttachmentStor
   }
 }
 
-function extensionForMimeType(mimeType?: string): string {
-  if (mimeType === "image/png") {
+function extensionForPhoto(input: TemporaryPhotoAttachment & { fileName: string }): string {
+  const sourceExtension = extensionFromName(input.temporaryUri);
+  if (sourceExtension) {
+    return sourceExtension;
+  }
+
+  if (input.mimeType === "image/png") {
     return "png";
   }
 
-  if (mimeType === "image/heic" || mimeType === "image/heif") {
+  if (input.mimeType === "image/heic" || input.mimeType === "image/heif") {
     return "heic";
   }
 
-  return "jpg";
+  return extensionFromName(input.originalFileName) ?? "jpg";
+}
+
+function extensionFromName(value?: string): string | undefined {
+  const withoutQuery = value?.split("?")[0];
+  const match = withoutQuery?.match(/\.([a-zA-Z0-9]+)$/);
+  const extension = match?.[1]?.toLowerCase();
+
+  if (!extension || extension.length > 5) {
+    return undefined;
+  }
+
+  if (extension === "jpeg") {
+    return "jpg";
+  }
+
+  return extension;
 }
 
 function sanitizeFileName(value: string): string {

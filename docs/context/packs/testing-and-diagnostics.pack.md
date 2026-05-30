@@ -48,7 +48,7 @@ Test framework, CI platform, coverage tooling, browser/mobile automation, loggin
 
 ## Explicit Non-Goals / Overreach to Avoid
 
-Do not add tooling or CI in a docs-only task. Do not log full farm records, source captures, transcripts, credentials, exact sensitive quantities, or backup contents.
+Do not add tooling or CI in a docs-only task. Do not log full farm records, source captures, transcripts, credentials, exact sensitive quantities, raw media paths, or backup contents. For media/transcription defects, prefer safe categories such as missing file, model unavailable, unsupported audio, or native module unavailable.
 
 ## Canonical Source Documents and ADRs
 

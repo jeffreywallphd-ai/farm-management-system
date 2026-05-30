@@ -44,6 +44,7 @@ interface FormErrors {
 
 interface SelectedPhoto {
   uri: string;
+  originalFileName?: string;
   width?: number;
   height?: number;
   mimeType?: string;
@@ -184,6 +185,7 @@ export function RecordFarmEventScreen({
       ...current,
       ...result.assets.map((asset) => ({
         uri: asset.uri,
+        originalFileName: asset.fileName ?? undefined,
         width: asset.width,
         height: asset.height,
         mimeType: asset.mimeType,
@@ -222,6 +224,7 @@ export function RecordFarmEventScreen({
           durationMs: recordedDurationMs,
           temporaryPhotoAttachments: selectedPhotos.map((photo) => ({
             temporaryUri: photo.uri,
+            originalFileName: photo.originalFileName,
             width: photo.width,
             height: photo.height,
             mimeType: photo.mimeType,

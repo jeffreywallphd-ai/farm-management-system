@@ -1,5 +1,6 @@
 export interface TemporaryPhotoAttachment {
   temporaryUri: string;
+  originalFileName?: string;
   width?: number;
   height?: number;
   mimeType?: string;

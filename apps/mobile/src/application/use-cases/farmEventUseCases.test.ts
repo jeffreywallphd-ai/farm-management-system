@@ -11,13 +11,20 @@ import type {
   PhotoAttachmentStorageRepository,
   TemporaryPhotoAttachment,
 } from "../ports/PhotoAttachmentStorageRepository";
-import { TranscriptionModelUnavailableError } from "../ports/VoiceMemoTranscriptionService";
+import {
+  TranscriptionAudioUnavailableError,
+  TranscriptionModelLoadError,
+  TranscriptionModelUnavailableError,
+} from "../ports/VoiceMemoTranscriptionService";
 import { InMemoryFarmEventRepository } from "../../testing/fakes/InMemoryFarmEventRepository";
 import { InMemoryFarmReferenceRepository } from "../../testing/fakes/InMemoryFarmReferenceRepository";
 import { InMemoryFarmNoteTranscriptRepository } from "../../testing/fakes/InMemoryFarmNoteTranscriptRepository";
 import { InMemoryLocalRecordRepository } from "../../testing/fakes/InMemoryLocalRecordRepository";
 import { serializeFarmEventRecoveryPackageManifest } from "../../infrastructure/export/FarmEventRecoveryPackageExporter";
-import { WhisperRnVoiceMemoTranscriptionService } from "../../infrastructure/transcription/WhisperRnVoiceMemoTranscriptionService";
+import {
+  toNativeFilePath,
+  WhisperRnVoiceMemoTranscriptionService,
+} from "../../infrastructure/transcription/WhisperRnVoiceMemoTranscriptionService";
 import { createFarmEventRecoveryPackage } from "./export-mobile-pilot-data/CreateFarmEventRecoveryPackage";
 import { recordFarmEvent } from "./record-farm-event/RecordFarmEvent";
 import { recordVoiceMemoFarmEvent } from "./record-voice-memo-farm-event/RecordVoiceMemoFarmEvent";
@@ -199,6 +206,7 @@ test("voice memo farm event can include copied local photo attachments", async (
       temporaryPhotoAttachments: [
         {
           temporaryUri: "file:///cache/photo-1.jpg",
+          originalFileName: "greenhouse-photo.heic",
           width: 1200,
           height: 900,
           mimeType: "image/jpeg",
@@ -220,6 +228,49 @@ test("voice memo farm event can include copied local photo attachments", async (
   assert.equal(result.attachments[1].localUri, "file:///documents/photos/photo-file-1.jpg");
   assert.equal(result.attachments[1].width, 1200);
   assert.deepEqual(photoAttachmentStorageRepository.deletedUris, []);
+});
+
+test("photo attachment storage receives source photo metadata and does not persist picker cache URI", async () => {
+  const references = new InMemoryFarmReferenceRepository();
+  await references.createFarm(farm);
+  const eventRepository = new InMemoryFarmEventRepository({ locations: [] });
+  const voiceMemoStorageRepository = new FakeVoiceMemoStorageRepository();
+  const photoAttachmentStorageRepository = new FakePhotoAttachmentStorageRepository();
+
+  const result = await recordVoiceMemoFarmEvent(
+    {
+      farmId: farm.id,
+      eventType: "fieldObservation",
+      temporaryVoiceMemoUri: "file:///cache/temp-recording.m4a",
+      temporaryPhotoAttachments: [
+        {
+          temporaryUri: "file:///cache/ImagePicker/selected-photo",
+          originalFileName: "wash-pack.png",
+          width: 800,
+          height: 600,
+          mimeType: "image/png",
+        },
+      ],
+    },
+    {
+      clock: { now: () => new Date("2026-05-30T12:00:00.000Z") },
+      farmEventRepository: eventRepository,
+      farmReferenceRepository: references,
+      idGenerator: new SequenceIds(["voice-file-1", "photo-file-1", "event-1", "attachment-1", "attachment-2"]),
+      photoAttachmentStorageRepository,
+      voiceMemoStorageRepository,
+    },
+  );
+
+  assert.deepEqual(photoAttachmentStorageRepository.persistedInputs, [
+    {
+      fileName: "photo-file-1",
+      originalFileName: "wash-pack.png",
+      temporaryUri: "file:///cache/ImagePicker/selected-photo",
+    },
+  ]);
+  assert.equal(result.attachments[1].localUri, "file:///documents/photos/photo-file-1.png");
+  assert.notEqual(result.attachments[1].localUri, "file:///cache/ImagePicker/selected-photo");
 });
 
 test("voice memo farm event cleans up copied and temporary files when metadata save fails", async () => {
@@ -413,6 +464,52 @@ test("transcription reports model-missing state without deleting the voice memo"
   assert.equal(detail?.attachments[0].localUri, "file:///documents/voice.m4a");
 });
 
+test("transcription saves actionable failure messages for model and audio problems", async () => {
+  const references = new InMemoryFarmReferenceRepository();
+  await references.createFarm(farm);
+  const eventRepository = new InMemoryFarmEventRepository({ locations: [] });
+  const transcriptRepository = new InMemoryFarmNoteTranscriptRepository();
+
+  await recordFarmEvent(
+    {
+      farmId: farm.id,
+      attachments: [{ kind: "voiceMemo", localUri: "file:///documents/voice.m4a", mimeType: "audio/m4a" }],
+    },
+    {
+      clock: { now: () => new Date("2026-05-30T12:00:00.000Z") },
+      farmEventRepository: eventRepository,
+      farmReferenceRepository: references,
+      idGenerator: new SequenceIds(["event-1", "voice-attachment-1"]),
+    },
+  );
+
+  const modelFailure = await transcribeFarmNoteVoiceMemo(
+    { farmId: farm.id, farmEventId: "event-1" },
+    {
+      clock: { now: () => new Date("2026-05-30T12:05:00.000Z") },
+      farmEventRepository: eventRepository,
+      idGenerator: new SequenceIds(["transcript-1"]),
+      transcriptionRepository: transcriptRepository,
+      transcriptionService: new FailingTranscriptionService(new TranscriptionModelLoadError()),
+    },
+  );
+  const audioFailure = await transcribeFarmNoteVoiceMemo(
+    { farmId: farm.id, farmEventId: "event-1" },
+    {
+      clock: { now: () => new Date("2026-05-30T12:10:00.000Z") },
+      farmEventRepository: eventRepository,
+      idGenerator: new SequenceIds(["unused-transcript-id"]),
+      transcriptionRepository: transcriptRepository,
+      transcriptionService: new FailingTranscriptionService(new TranscriptionAudioUnavailableError()),
+    },
+  );
+
+  assert.equal(modelFailure.errorSummary, "The transcription model could not be opened. Try reinstalling the model.");
+  assert.equal(audioFailure.id, modelFailure.id);
+  assert.equal(audioFailure.errorSummary, "The saved voice memo file is unavailable on this device.");
+  assert.equal((await eventRepository.getFarmEventDetail(farm.id, "event-1"))?.attachments[0].localUri, "file:///documents/voice.m4a");
+});
+
 test("farm note without a voice memo cannot be transcribed", async () => {
   const references = new InMemoryFarmReferenceRepository();
   await references.createFarm(farm);
@@ -517,6 +614,15 @@ test("whisper adapter reports model-missing state before loading native transcri
   );
 });
 
+test("whisper adapter converts Expo file URIs to native paths for whisper.rn", () => {
+  assert.equal(
+    toNativeFilePath("file:///data/user/0/app/files/transcription-models/ggml-tiny.en.bin"),
+    "/data/user/0/app/files/transcription-models/ggml-tiny.en.bin",
+  );
+  assert.equal(toNativeFilePath("file:///data/user/0/app/files/farm%20memo.m4a"), "/data/user/0/app/files/farm memo.m4a");
+  assert.equal(toNativeFilePath("/data/user/0/app/files/farm memo.m4a"), "/data/user/0/app/files/farm memo.m4a");
+});
+
 class SequenceIds {
   private index = 0;
 
@@ -550,10 +656,16 @@ class FakeVoiceMemoStorageRepository {
 
 class FakePhotoAttachmentStorageRepository implements PhotoAttachmentStorageRepository {
   deletedUris: string[] = [];
+  persistedInputs: { fileName: string; originalFileName?: string; temporaryUri: string }[] = [];
 
   async persistPhotoAttachment(input: TemporaryPhotoAttachment & { fileName: string }) {
+    this.persistedInputs.push({
+      fileName: input.fileName,
+      originalFileName: input.originalFileName,
+      temporaryUri: input.temporaryUri,
+    });
     return {
-      localUri: `file:///documents/photos/${input.fileName}.jpg`,
+      localUri: `file:///documents/photos/${input.fileName}.${input.mimeType === "image/png" ? "png" : "jpg"}`,
       width: input.width,
       height: input.height,
       mimeType: input.mimeType,
@@ -586,6 +698,14 @@ class FakeTranscriptionService {
 class MissingModelTranscriptionService {
   async transcribe() {
     throw new TranscriptionModelUnavailableError();
+  }
+}
+
+class FailingTranscriptionService {
+  constructor(private readonly error: Error) {}
+
+  async transcribe() {
+    throw this.error;
   }
 }
 

@@ -12,7 +12,7 @@
 
 AI-assisted capture is a boundary capability that transforms user-provided source captures into reviewable drafts. It does not own or redefine the operational-record domain.
 
-Structured AI-assisted capture remains Mobile Pilot 2 or later, not Mobile Pilot 1. ADR-0013 accepts a narrower Mobile Pilot 1B review aid: manually requested on-device transcription of a saved farm-note voice memo into a local draft transcript after the local Whisper model has been installed. That transcript is not a confirmed operational record, does not extract structured facts, and does not authorize server inference, external provider transfer, synchronization of captures, publication, or model-provider APIs.
+Structured AI-assisted capture remains Mobile Pilot 2 or later, not Mobile Pilot 1. ADR-0013 accepts a narrower Mobile Pilot 1B review aid: manually requested on-device transcription of a saved farm-note voice memo into a local draft transcript after the local Whisper model has been installed. That transcript is not a confirmed operational record, does not extract structured facts, and does not authorize server inference, external provider transfer, synchronization of captures, publication, or model-provider APIs. Local transcription failures must preserve the original audio and report safe, actionable categories rather than exposing stack traces, private note text, transcript text, or raw media contents.
 
 ```text
 User Intentional Capture

@@ -43,7 +43,7 @@ Use this checklist on a physical Android test device before farmer distribution 
 39. Download the model over Wi-Fi and confirm progress appears.
 40. After download succeeds, enable airplane mode and tap `Transcribe voice memo`.
 41. Confirm a `Transcript draft` appears and persists after relaunch.
-42. If the model is missing, corrupt, or the app is not a development build, confirm the app shows a clear unavailable/repair state and the original audio still plays.
+42. If transcription fails, record the displayed local cause. Expected safe messages include missing model, internal development build required, model could not be opened, saved voice memo unavailable, unsupported voice memo format, or generic runtime failure. Confirm the original audio still plays.
 43. Confirm transcript wording says generated/draft/local and does not imply a confirmed farm record.
 44. Confirm the screen does not claim cloud transcription, structured AI interpretation, upload, or sharing.
 45. Record a harvest using a nested farm place.

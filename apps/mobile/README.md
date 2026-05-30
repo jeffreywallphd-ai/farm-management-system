@@ -47,9 +47,10 @@ Canonical record meaning lives in [Mobile Pilot 1 Operational Records](../../doc
 - Local JSON recovery-copy file generation and device-native share/save flow for implemented manual records and required reference data, including farm-place type and parent relationships.
 - Farm-event capture metadata and local attachment-reference persistence foundation for ADR-0012 voice/photo work.
 - Local voice memo recording, microphone permission request, playback, optional photo attachment, and farm-note save flow.
+- Photo attachments are copied from picker/camera cache into durable app-owned local storage before the farm note is saved; older notes whose temporary files are no longer present show a per-photo unavailable state instead of hiding the note.
 - Local farm-note timeline with type, place, and date filters plus read-only detail review with audio playback and photo previews.
 - Persistent `Farm Notes` header with a hamburger menu for local navigation between capture, timeline, setup, activity history, and recovery copy.
-- Saved farm-note detail includes a transcript-draft area, local model download controls, and a `Transcribe voice memo` action using the `whisper.rn` adapter. It downloads `ggml-tiny.en.bin` from the accepted `ggerganov/whisper.cpp` Hugging Face model source into app document storage under `transcription-models/`.
+- Saved farm-note detail includes a transcript-draft area, local model download controls, and a `Transcribe voice memo` action using the `whisper.rn` adapter. It downloads `ggml-tiny.en.bin` from the accepted `ggerganov/whisper.cpp` Hugging Face model source into app document storage under `transcription-models/`. If transcription fails, the app maps common local causes such as missing audio, model-open failure, unsupported audio format, or native-module unavailability to user-safe messages while preserving the original audio.
 - ZIP media recovery package export containing manual JSON data, farm-note metadata, voice memo files, photo files, and transcript drafts when present.
 - Zod validation for setup/reference names, tracked item kinds, manual record inputs, and recovery-copy export payloads.
 - A reusable earthy mobile UI foundation for setup, manual record, history, and data-safety screens.
@@ -163,3 +164,5 @@ https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-tiny.en.bin
 The app stores the model in app-controlled local storage at `transcription-models/ggml-tiny.en.bin`. The first download requires internet access and is about 78 MB. After the model is installed, transcription runs on the phone and can work offline. Audio and transcript text are not sent to a transcription server.
 
 Expo Go cannot run this native transcription path. Use the EAS `development` APK profile for transcription testing.
+
+The app passes app-stored `file://` URIs to normal playback and review UI, but converts them to native filesystem paths only at the `whisper.rn` adapter boundary. This keeps persisted attachment references stable while satisfying native transcription calls.

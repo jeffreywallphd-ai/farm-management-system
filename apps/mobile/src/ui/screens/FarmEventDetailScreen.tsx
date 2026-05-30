@@ -216,7 +216,10 @@ export function FarmEventDetailScreen({
             )}
           </Card>
           <Card>
-            <SectionHeading detail="Photos are local attachments for review." title="Photos" />
+            <SectionHeading
+              detail="Photos are local attachments for review. If a saved file is missing, this screen shows which photo is unavailable."
+              title={photos.length === 0 ? "Photos" : photos.length === 1 ? "1 photo" : `${photos.length} photos`}
+            />
             {photos.length ? (
               <View style={styles.photoGrid}>
                 {photos.map((photo) => (
