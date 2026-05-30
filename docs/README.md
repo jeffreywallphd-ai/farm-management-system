@@ -82,7 +82,7 @@ Foundational ADRs are currently defined by:
 
 Accepted ADRs govern the decisions they record. ADR-0007 establishes the current implementation sequence: standalone mobile pilot first, with server synchronization, shared publication, and server deployment deferred. ADR-0008 through ADR-0011 select only the Mobile Pilot 1 app stack, local persistence, export/recovery-copy mechanism, and runtime boundary validation. Proposed ADRs and deferred topics in the decision-readiness register must not be treated as accepted implementation authority.
 
-The initial Mobile Pilot 1 app structure now exists at [Mobile App README](../apps/mobile/README.md). It is scaffolding only; Mobile Pilot 1 workflow behavior, persistence behavior, export behavior, validation schemas, and tests are not yet implemented.
+The Mobile Pilot 1 app exists at [Mobile App README](../apps/mobile/README.md). The complete manual pilot core is implemented for local farm setup, manual harvest, material use, inventory count, unified local history, and recovery-copy export. AI, server synchronization, sharing/listings, authentication, cloud backup, restore/import, analytics, and distribution configuration remain deferred.
 
 Operations requirements are currently defined by:
 

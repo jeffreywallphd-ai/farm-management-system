@@ -6,8 +6,8 @@ import type { HarvestRecorded } from "../records/HarvestRecorded";
 import type { InventoryCountRecorded } from "../records/InventoryCountRecorded";
 import type { MaterialUseRecorded } from "../records/MaterialUseRecorded";
 
-export const MOBILE_PILOT_RECOVERY_COPY_EXPORT_VERSION = 2;
-export const MOBILE_PILOT_APP_DATA_SCHEMA_VERSION = 3;
+export const MOBILE_PILOT_RECOVERY_COPY_EXPORT_VERSION = 3;
+export const MOBILE_PILOT_APP_DATA_SCHEMA_VERSION = 4;
 
 export interface MobilePilotRecoveryCopy {
   exportVersion: typeof MOBILE_PILOT_RECOVERY_COPY_EXPORT_VERSION;

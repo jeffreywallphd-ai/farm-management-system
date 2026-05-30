@@ -24,7 +24,7 @@ function testDependencies() {
 async function seededReferences() {
   const deps = testDependencies();
   const farm = { id: "farm-1", name: "Green Hill Farm", createdAt: "2026-05-29T09:00:00.000Z" };
-  const location = { id: "location-1", farmId: farm.id, name: "North Field", createdAt: farm.createdAt };
+  const location = { id: "location-1", farmId: farm.id, name: "North Field", kind: "field" as const, createdAt: farm.createdAt };
   const crop = { id: "crop-1", farmId: farm.id, kind: "crop" as const, name: "Kale", createdAt: farm.createdAt };
   await deps.farmReferenceRepository.createFarm(farm);
   await deps.farmReferenceRepository.addLocation(location);
@@ -164,10 +164,11 @@ test("recovery copy export contains farm references and harvest records", async 
   assert.equal(file.fileName, "farm-pilot-recovery-copy-20260529T110000.json");
   assert.equal(exportRepository.sharedFile?.fileName, file.fileName);
   const payload = JSON.parse(exportRepository.contents);
-  assert.equal(payload.exportVersion, 2);
-  assert.equal(payload.appDataSchemaVersion, 3);
+  assert.equal(payload.exportVersion, 3);
+  assert.equal(payload.appDataSchemaVersion, 4);
   assert.equal(payload.farm.name, "Green Hill Farm");
   assert.equal(payload.locations[0].name, "North Field");
+  assert.equal(payload.locations[0].kind, "field");
   assert.equal(payload.trackedItems[0].name, "Kale");
   assert.equal(payload.harvestRecords[0].kind, "HarvestRecorded");
   assert.deepEqual(payload.materialUseRecords, []);

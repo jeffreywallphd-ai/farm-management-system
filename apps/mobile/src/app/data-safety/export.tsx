@@ -1,6 +1,6 @@
-import { FarmRouteGate } from "../../src/app/FarmRouteGate";
-import { ExpoRecoveryCopyShareAdapter } from "../../src/infrastructure/export/ExpoRecoveryCopyShareAdapter";
-import { RecoveryCopyExportScreen } from "../../src/ui/screens/RecoveryCopyExportScreen";
+import { FarmRouteGate } from "../../bootstrap/FarmRouteGate";
+import { ExpoRecoveryCopyShareAdapter } from "../../infrastructure/export/ExpoRecoveryCopyShareAdapter";
+import { RecoveryCopyExportScreen } from "../../ui/screens/RecoveryCopyExportScreen";
 
 const exportRepository = new ExpoRecoveryCopyShareAdapter();
 

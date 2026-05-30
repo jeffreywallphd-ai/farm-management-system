@@ -33,12 +33,52 @@ test("a location can be added and listed for its farm", async () => {
   const deps = dependencies();
   const farm = await setupFarm({ name: "Green Hill Farm" }, deps);
 
-  const location = await addLocation({ farmId: farm.id, name: " North Field " }, deps);
+  const location = await addLocation({ farmId: farm.id, name: " North Field ", kind: "field" }, deps);
   const locations = await listLocations(farm.id, deps.repository);
 
   assert.equal(location.farmId, farm.id);
   assert.equal(location.name, "North Field");
+  assert.equal(location.kind, "field");
   assert.deepEqual(locations, [location]);
+});
+
+test("farm places can be nested under saved parent places", async () => {
+  const deps = dependencies();
+  const farm = await setupFarm({ name: "Green Hill Farm" }, deps);
+
+  const field = await addLocation({ farmId: farm.id, name: "Field 1", kind: "field" }, deps);
+  const bed = await addLocation({ farmId: farm.id, name: "Bed 1", kind: "bed", parentId: field.id }, deps);
+  const row = await addLocation({ farmId: farm.id, name: "Row 1", kind: "row", parentId: bed.id }, deps);
+  const greenhouse = await addLocation({ farmId: farm.id, name: "Greenhouse 1", kind: "greenhouse" }, deps);
+  const bench = await addLocation({ farmId: farm.id, name: "Bench 1", kind: "bench", parentId: greenhouse.id }, deps);
+
+  assert.equal(row.parentId, bed.id);
+  assert.equal(bench.parentId, greenhouse.id);
+  assert.deepEqual(await listLocations(farm.id, deps.repository), [field, bed, row, greenhouse, bench]);
+});
+
+test("farm place parent must already exist in the same farm", async () => {
+  const deps = dependencies();
+  const farm = await setupFarm({ name: "Green Hill Farm" }, deps);
+
+  await assert.rejects(
+    () => addLocation({ farmId: farm.id, name: "Bed 1", kind: "bed", parentId: "missing" }, deps),
+    /Choose a saved parent place/,
+  );
+});
+
+test("farm place cannot be its own parent", async () => {
+  const deps = dependencies();
+  const farm = await setupFarm({ name: "Green Hill Farm" }, deps);
+
+  await assert.rejects(
+    () =>
+      addLocation(
+        { farmId: farm.id, name: "Bed 1", kind: "bed", parentId: "local-2" },
+        { ...deps, idGenerator: { newId: () => "local-2" } },
+      ),
+    /inside itself/,
+  );
 });
 
 test("tracked item lists return only matching farm and kind", async () => {

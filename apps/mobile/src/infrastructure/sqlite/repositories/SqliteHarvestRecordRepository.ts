@@ -30,6 +30,8 @@ interface HarvestRow {
   crop_name?: string;
   crop_created_at?: string;
   location_name?: string;
+  location_kind?: FarmLocation["kind"];
+  location_parent_id?: string | null;
   location_created_at?: string;
 }
 
@@ -47,6 +49,8 @@ interface MaterialUseRow {
   material_name?: string;
   material_created_at?: string;
   location_name?: string | null;
+  location_kind?: FarmLocation["kind"] | null;
+  location_parent_id?: string | null;
   location_created_at?: string | null;
 }
 
@@ -65,6 +69,8 @@ interface InventoryCountRow {
   item_name?: string;
   item_created_at?: string;
   location_name?: string | null;
+  location_kind?: FarmLocation["kind"] | null;
+  location_parent_id?: string | null;
   location_created_at?: string | null;
 }
 
@@ -353,6 +359,8 @@ const HARVEST_VIEW_SELECT = `SELECT
   crops.name AS crop_name,
   crops.created_at AS crop_created_at,
   locations.name AS location_name,
+  locations.kind AS location_kind,
+  locations.parent_id AS location_parent_id,
   locations.created_at AS location_created_at
 FROM harvest_records
 JOIN tracked_items crops ON crops.id = harvest_records.crop_id AND crops.kind = 'crop'
@@ -372,6 +380,8 @@ const MATERIAL_USE_VIEW_SELECT = `SELECT
   materials.name AS material_name,
   materials.created_at AS material_created_at,
   locations.name AS location_name,
+  locations.kind AS location_kind,
+  locations.parent_id AS location_parent_id,
   locations.created_at AS location_created_at
 FROM material_use_records
 JOIN tracked_items materials ON materials.id = material_use_records.material_id AND materials.kind = 'material'
@@ -392,6 +402,8 @@ const INVENTORY_COUNT_VIEW_SELECT = `SELECT
   items.name AS item_name,
   items.created_at AS item_created_at,
   locations.name AS location_name,
+  locations.kind AS location_kind,
+  locations.parent_id AS location_parent_id,
   locations.created_at AS location_created_at
 FROM inventory_count_records
 JOIN tracked_items items ON items.id = inventory_count_records.tracked_item_id AND items.kind IN ('material', 'countableItem')
@@ -496,18 +508,29 @@ function mapLocation(row: HarvestRow): FarmLocation {
     id: row.source_location_id,
     farmId: row.farm_id,
     name: row.location_name ?? "Location",
+    kind: row.location_kind ?? "other",
+    parentId: row.location_parent_id ?? undefined,
     createdAt: row.location_created_at ?? row.created_at,
   };
 }
 
 function mapOptionalLocation(
   id: string,
-  row: { farm_id: string; location_name?: string | null; location_created_at?: string | null; created_at: string },
+  row: {
+    farm_id: string;
+    location_name?: string | null;
+    location_kind?: FarmLocation["kind"] | null;
+    location_parent_id?: string | null;
+    location_created_at?: string | null;
+    created_at: string;
+  },
 ): FarmLocation {
   return {
     id,
     farmId: row.farm_id,
     name: row.location_name ?? "Location",
+    kind: row.location_kind ?? "other",
+    parentId: row.location_parent_id ?? undefined,
     createdAt: row.location_created_at ?? row.created_at,
   };
 }

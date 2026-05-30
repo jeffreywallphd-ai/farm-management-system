@@ -25,6 +25,7 @@ import { SelectField } from "../components/SelectField";
 import { SectionHeading } from "../components/SectionHeading";
 import { theme } from "../theme/theme";
 import { replaceRoute } from "../navigation";
+import { buildFarmPlaceOptions } from "../farmPlaceDisplay";
 import { mapZodIssues } from "./screenValidation";
 
 export function RecordInventoryCountScreen({
@@ -58,6 +59,7 @@ export function RecordInventoryCountScreen({
     }
     loadReferences();
   }, [farm.id, farmReferenceRepository]);
+  const placeOptions = buildFarmPlaceOptions(locations);
 
   async function handleSave() {
     setIsSaving(true);
@@ -91,7 +93,7 @@ export function RecordInventoryCountScreen({
           <SelectField error={errors.trackedItemId} label="Item" onChange={setTrackedItemId} options={items.map((item) => ({ label: item.name, value: item.id }))} value={trackedItemId} />
           <FormField error={errors.quantityText} keyboardType="decimal-pad" label="Observed count" onChangeText={setQuantityText} placeholder="0" value={quantityText} />
           <SelectField error={errors.unit} label="Unit" onChange={setUnit} options={PILOT_UNITS.map((pilotUnit) => ({ label: pilotUnit, value: pilotUnit }))} value={unit} />
-          <SelectField error={errors.locationId} label="Location" onChange={setLocationId} options={[{ label: "No location", value: "" }, ...locations.map((location) => ({ label: location.name, value: location.id }))]} value={locationId} />
+          <SelectField error={errors.locationId} label="Farm place" onChange={setLocationId} options={[{ label: "No place", value: "" }, ...placeOptions]} value={locationId} />
           <FormField error={errors.note} label="Note" multiline onChangeText={setNote} placeholder="Optional" value={note} />
           {errors.form ? <Text style={styles.error}>{errors.form}</Text> : null}
           <Button disabled={isSaving} label={isSaving ? "Saving..." : "Save count"} onPress={handleSave} />

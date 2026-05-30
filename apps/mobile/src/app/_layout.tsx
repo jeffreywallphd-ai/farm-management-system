@@ -2,7 +2,7 @@ import "expo-dev-client";
 
 import { Stack } from "expo-router";
 
-import { DatabaseProvider } from "../src/app/providers/DatabaseProvider";
+import { DatabaseProvider } from "../bootstrap/providers/DatabaseProvider";
 
 export default function RootLayout() {
   return (

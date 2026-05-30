@@ -1,7 +1,7 @@
 import type { SQLiteDatabase } from "expo-sqlite";
 
 import type { Farm, FarmId } from "../../../domain/farm/Farm";
-import type { FarmLocation } from "../../../domain/farm/FarmLocation";
+import type { FarmLocation, FarmPlaceKind } from "../../../domain/farm/FarmLocation";
 import type { TrackedItem, TrackedItemKind } from "../../../domain/farm/TrackedItem";
 import type { Unit } from "../../../domain/quantities/Unit";
 import type { FarmReferenceRepository } from "../../../application/ports/FarmReferenceRepository";
@@ -16,6 +16,8 @@ interface LocationRow {
   id: string;
   farm_id: string;
   name: string;
+  kind: FarmPlaceKind;
+  parent_id: string | null;
   created_at: string;
 }
 
@@ -48,14 +50,14 @@ export class SqliteFarmReferenceRepository implements FarmReferenceRepository {
 
   async addLocation(location: FarmLocation): Promise<void> {
     await this.database.runAsync(
-      "INSERT INTO farm_locations (id, farm_id, name, created_at) VALUES (?, ?, ?, ?);",
-      [location.id, location.farmId, location.name, location.createdAt],
+      "INSERT INTO farm_locations (id, farm_id, name, kind, parent_id, created_at) VALUES (?, ?, ?, ?, ?, ?);",
+      [location.id, location.farmId, location.name, location.kind, location.parentId ?? null, location.createdAt],
     );
   }
 
   async listLocations(farmId: FarmId): Promise<FarmLocation[]> {
     const rows = await this.database.getAllAsync<LocationRow>(
-      "SELECT id, farm_id, name, created_at FROM farm_locations WHERE farm_id = ? ORDER BY created_at ASC;",
+      "SELECT id, farm_id, name, kind, parent_id, created_at FROM farm_locations WHERE farm_id = ? ORDER BY created_at ASC;",
       [farmId],
     );
 
@@ -97,6 +99,8 @@ function mapLocation(row: LocationRow): FarmLocation {
     id: row.id,
     farmId: row.farm_id,
     name: row.name,
+    kind: row.kind,
+    parentId: row.parent_id ?? undefined,
     createdAt: row.created_at,
   };
 }

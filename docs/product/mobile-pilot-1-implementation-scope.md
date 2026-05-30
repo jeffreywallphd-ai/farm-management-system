@@ -12,7 +12,9 @@
 
 > Mobile Pilot 1 is the first buildable farmer-testing increment of the accepted standalone mobile pilot. It validates device-local offline recording, local history, and farmer-controlled export/backup using the smallest useful manual operational-record set. It does not include AI-assisted capture, server synchronization, external sharing, multi-device access, or deployment-mode implementation.
 
-The Mobile Pilot 1 implementation stack is selected in ADR-0008 through ADR-0011. Phase 1 setup/reference behavior now exists under `apps/mobile`: one local farm profile, farm locations, tracked crops, tracked materials, tracked countable items, SQLite-backed local persistence, Zod validation, and a reusable earthy UI foundation.
+The Mobile Pilot 1 implementation stack is selected in ADR-0008 through ADR-0011. Phase 1 setup/reference behavior now exists under `apps/mobile`: one local farm profile, farmer-facing farm places, tracked crops, tracked materials, tracked countable items, SQLite-backed local persistence, Zod validation, and a reusable earthy UI foundation.
+
+Farm places are the implemented farmer-facing form of local location data. Each farm place has a type, a name, and an optional parent place so the app can represent simple structures such as fields containing beds and rows, greenhouses containing benches, or wash/pack areas containing coolers. This is not a GIS, map, geometry, acreage, bed-dimension, or crop-planning feature.
 
 Phase 3 now implements the complete manual Mobile Pilot 1 core: manual `HarvestRecorded`, `MaterialUseRecorded`, and `InventoryCountRecorded` creation; unified local activity history/detail; and a versioned JSON recovery-copy export for farm setup/reference data and all implemented manual records.
 
@@ -25,7 +27,7 @@ Import/restore, AI-assisted capture, server-connected behavior, farmer distribut
 | Standalone mobile application behavior | Included |
 | Single device-local farm context | Included |
 | Minimal local farm setup | Included |
-| Minimal locations needed for records | Included |
+| Minimal farm places needed for records | Included |
 | Minimal tracked crops/materials/countable items needed for records | Included |
 | Manual harvest record | Included |
 | Manual material-use record | Included |

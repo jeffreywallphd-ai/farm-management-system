@@ -30,6 +30,8 @@ Each record must preserve enough meaning for current local use and future server
 
 The implemented Mobile Pilot 1 unit vocabulary is `lb`, `oz`, `kg`, `g`, `each`, `bunch`, `crate`, `bag`, `gal`, `L`, `flat`, and `tray`. Unit conversion, packaging equivalency, and authoritative inventory calculation are not implemented.
 
+Operational records refer to farm places by stable ID. The app displays those references with farmer-readable place paths, such as `Field 1 > Bed 2`, when parent/child farm-place structure exists. Farm-place hierarchy is still only a local setup aid and does not imply GIS, crop planning, or spatial geometry.
+
 Mobile Pilot 1 has no server acceptance, synchronization state, cross-device visibility, external sharing, or publication state. No record becomes shared externally.
 
 Basic correction for obvious entry mistakes may be supported if deliberately implemented. Correction must not silently erase meaningful recorded history or hide inventory discrepancy meaning. More advanced correction lineage, audit trail, adjustment records, and supersession workflows are deferred unless explicitly scoped later.
@@ -41,7 +43,7 @@ Plain-language meaning: a worker records that a quantity of a crop was harvested
 Minimum required fields:
 
 - Tracked crop reference by stable ID.
-- Source location.
+- Source farm place.
 - Quantity.
 - Unit.
 - Recorded/effective date and time.
@@ -68,7 +70,7 @@ Minimum required fields:
 - Quantity.
 - Unit.
 - Date and time.
-- Optional use location.
+- Optional use farm place.
 - Optional note.
 
 Mobile Pilot 1 behavior:
@@ -89,7 +91,7 @@ Minimum required fields:
 - Observed quantity.
 - Unit.
 - Date and time.
-- Optional location.
+- Optional farm place.
 - Optional note.
 
 Mobile Pilot 1 behavior:

@@ -14,6 +14,8 @@ This document describes representative real-world farmer workflows in plain oper
 
 The current pilot is standalone mobile. This document does not define database schemas, API contracts, synchronization mechanics, server behavior, or implementation architecture.
 
+The mobile app now presents record locations as farmer-facing farm places. Farm places can have a type and optional parent relationship, so record forms can show paths such as `Field 1 > Bed 2`, `Greenhouse 1 > Bench 1`, or `Wash/Pack > Cooler` without requiring GIS maps or crop-planning geometry.
+
 ## Workflow Status Summary
 
 | Workflow | Status |
@@ -34,7 +36,7 @@ The current pilot is standalone mobile. This document does not define database s
 - Status: Mobile Pilot 1 included.
 - Actor: farm worker, family member, or owner/operator.
 - Physical/work context: field, bed, greenhouse, tunnel, or other production area with poor or unavailable reception.
-- Problem or trigger: produce is harvested and the worker wants to record crop, quantity, unit, and location before details are forgotten.
+- Problem or trigger: produce is harvested and the worker wants to record crop, quantity, unit, and farm place before details are forgotten.
 - Desired user action: quickly record the harvest at or near the harvest location.
 - Expected pilot outcome: the harvest activity is saved locally, visible in local history, and clearly identified as stored on the device.
 - Implementation note: Phase 3 includes manual harvest entry in unified local activity history/detail and recovery-copy export for all implemented manual records.

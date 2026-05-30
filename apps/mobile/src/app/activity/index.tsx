@@ -1,5 +1,5 @@
-import { FarmRouteGate } from "../../src/app/FarmRouteGate";
-import { ActivityHistoryScreen } from "../../src/ui/screens/ActivityHistoryScreen";
+import { FarmRouteGate } from "../../bootstrap/FarmRouteGate";
+import { ActivityHistoryScreen } from "../../ui/screens/ActivityHistoryScreen";
 
 export default function ActivityHistoryRoute() {
   return (

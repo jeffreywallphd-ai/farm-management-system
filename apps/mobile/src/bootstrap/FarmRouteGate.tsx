@@ -1,11 +1,11 @@
 import { ReactNode, useEffect, useState } from "react";
 import { Text } from "react-native";
 
-import { useDatabase } from "./providers/DatabaseProvider";
 import type { Farm } from "../domain/farm/Farm";
 import { Card } from "../ui/components/Card";
 import { PageHeader } from "../ui/components/PageHeader";
 import { Screen } from "../ui/components/Screen";
+import { useDatabase } from "./providers/DatabaseProvider";
 
 export function FarmRouteGate({
   children,

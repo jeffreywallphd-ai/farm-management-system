@@ -24,7 +24,7 @@ Local and server environments may eventually have different storage implementati
 
 | Data category | Examples | Durability need | Initial sharing posture |
 | --- | --- | --- | --- |
-| Mobile Pilot 1 setup/reference information | farm context, locations, crops, materials, countable items needed for included records | Locally available enough for supported offline work; included in export/backup | Private/device-local |
+| Mobile Pilot 1 setup/reference information | farm context, farm places with type and optional parent relationship, crops, materials, countable items needed for included records | Locally available enough for supported offline work; included in export/backup | Private/device-local |
 | Mobile Pilot 1 confirmed operational records | harvest, material use, inventory count | Durable locally in the pilot; included in export/backup | Private by default |
 | Local activity history | recent included records and their basic correction/status meaning | Durable enough for pilot review and export/backup | Private/device-local |
 | Export/recovery-copy data | user-controlled copy of pilot data | Complete enough to understand Mobile Pilot 1 records | Private/sensitive |
@@ -42,9 +42,9 @@ Local and server environments may eventually have different storage implementati
 - Private and shared record categories must remain distinguishable.
 - Local storage, server storage, caching, exports, and later backups must preserve access classification.
 
-Phase 1 implements the first SQLite-backed local tables for Mobile Pilot 1 setup/reference information: farms, farm locations, and tracked items.
+Phase 1 implements the first SQLite-backed local tables for Mobile Pilot 1 setup/reference information: farms, farm places, and tracked items. Farm places are stored through the existing local location concept with a farmer-facing type and optional parent relationship.
 
-Phase 3 adds SQLite-backed local persistence for `HarvestRecorded`, `MaterialUseRecorded`, and `InventoryCountRecorded`, plus unified local activity history and a one-way versioned JSON recovery-copy export for farm setup/reference data and all implemented manual records. Import/restore, sync state, AI drafts, captures, publications, and authentication remain unimplemented.
+Phase 3 adds SQLite-backed local persistence for `HarvestRecorded`, `MaterialUseRecorded`, and `InventoryCountRecorded`, plus unified local activity history and a one-way versioned JSON recovery-copy export for farm setup/reference data and all implemented manual records. The recovery copy includes farm-place type and parent fields so nested place references can be interpreted later. Import/restore, sync state, AI drafts, captures, publications, and authentication remain unimplemented.
 
 Beyond the Mobile Pilot 1 `expo-sqlite` decision in ADR-0009, this document does not choose server-side relational tables, document stores, event stores, server storage libraries, or server database products.
 

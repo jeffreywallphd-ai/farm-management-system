@@ -30,9 +30,9 @@ A farm owns or controls its private operational records. A farm may have members
 
 Detailed membership roles, invitation policies, authentication, and permissions are deferred to later architecture and privacy work. A single-farm operational context is sufficient for the first slice.
 
-## Locations
+## Farm Places
 
-A location is a farmer-defined named place relevant to activities, observations, or tracked items. Examples include:
+A farm place is a farmer-defined named place relevant to activities, observations, or tracked items. The mobile app presents these as farm places rather than generic locations so farmers can start with recognizable structures. Examples include:
 
 - North Field.
 - Bed 4.
@@ -42,12 +42,30 @@ A location is a farmer-defined named place relevant to activities, observations,
 - Input Storage.
 - Wash/Pack Area.
 
-Practical location rules:
+Practical farm-place rules:
 
-- A location may be nested or related to another location, such as a bed within a field.
+- A farm place may be nested inside another farm place, such as a bed within a field or a cooler within a wash/pack area.
 - The first slice should not require mapping every location geometrically.
 - Geographic mapping may be useful later but is not required by this domain prompt.
 - A farmer should be able to use terminology matching their operation.
+
+Mobile Pilot 1 implements this small farm-place type vocabulary: `field`, `bed`, `row`, `greenhouse`, `highTunnel`, `greenhouseBed`, `bench`, `storageArea`, `washPack`, `cooler`, `freezer`, `barnShed`, and `other`.
+
+Each farm place may have an optional parent place. This supports simple hierarchies such as:
+
+```text
+Field 1
+  Bed 1
+    Row 1
+
+Greenhouse 1
+  Bench 1
+
+Wash/Pack
+  Cooler
+```
+
+Farm-place hierarchy is a local, private, device-only setup aid. It does not add GIS boundaries, GPS, acreage, bed dimensions, planting plans, row spacing, soil data, maps, or drag-and-drop spatial editing.
 
 ## Tracked Item Categories
 

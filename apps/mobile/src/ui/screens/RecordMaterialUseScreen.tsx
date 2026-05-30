@@ -25,6 +25,7 @@ import { SelectField } from "../components/SelectField";
 import { SectionHeading } from "../components/SectionHeading";
 import { theme } from "../theme/theme";
 import { replaceRoute } from "../navigation";
+import { buildFarmPlaceOptions } from "../farmPlaceDisplay";
 import { mapZodIssues } from "./screenValidation";
 
 export function RecordMaterialUseScreen({
@@ -58,6 +59,7 @@ export function RecordMaterialUseScreen({
     }
     loadReferences();
   }, [farm.id, farmReferenceRepository]);
+  const placeOptions = buildFarmPlaceOptions(locations);
 
   async function handleSave() {
     setIsSaving(true);
@@ -91,7 +93,7 @@ export function RecordMaterialUseScreen({
           <SelectField error={errors.materialId} label="Material" onChange={setMaterialId} options={materials.map((material) => ({ label: material.name, value: material.id }))} value={materialId} />
           <FormField error={errors.quantityText} keyboardType="decimal-pad" label="Amount" onChangeText={setQuantityText} placeholder="2" value={quantityText} />
           <SelectField error={errors.unit} label="Unit" onChange={setUnit} options={PILOT_UNITS.map((pilotUnit) => ({ label: pilotUnit, value: pilotUnit }))} value={unit} />
-          <SelectField label="Location" onChange={setUseLocationId} options={[{ label: "No location", value: "" }, ...locations.map((location) => ({ label: location.name, value: location.id }))]} value={useLocationId} error={errors.useLocationId} />
+          <SelectField label="Farm place" onChange={setUseLocationId} options={[{ label: "No place", value: "" }, ...placeOptions]} value={useLocationId} error={errors.useLocationId} />
           <FormField error={errors.note} label="Note" multiline onChangeText={setNote} placeholder="Optional" value={note} />
           {errors.form ? <Text style={styles.error}>{errors.form}</Text> : null}
           <Button disabled={isSaving} label={isSaving ? "Saving..." : "Save material use"} onPress={handleSave} />

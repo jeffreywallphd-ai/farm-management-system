@@ -19,7 +19,7 @@ Before a farmer relies on Mobile Pilot 1 for meaningful records:
 1. Confirmed Mobile Pilot 1 records must be durably retained locally according to the implemented persistence guarantees.
 2. The app must provide a practical user-controlled export or backup mechanism for:
    - Local farm setup needed to interpret records.
-   - Locations used by included records.
+   - Farm places used by included records, including place type and parent relationships needed to interpret nested paths.
    - Tracked crops, materials, and countable items used by included records, including the crop reference data needed to interpret `HarvestRecorded` records by stable crop ID.
    - `HarvestRecorded`.
    - `MaterialUseRecorded`.
@@ -37,6 +37,8 @@ Before a farmer relies on Mobile Pilot 1 for meaningful records:
 8. Crop rename, deletion, and history-snapshot behavior remain deferred until reference-editing behavior is explicitly scoped. Export/recovery-copy behavior must still preserve enough tracked crop information to interpret saved harvest records.
 
 Phase 3 implements a one-way versioned JSON recovery copy for the complete manual Mobile Pilot 1 core: local farm setup/reference data and saved `HarvestRecorded`, `MaterialUseRecorded`, and `InventoryCountRecorded` records. The recovery copy is generated locally and passed to the device-native share/save flow. Restore/import is still not implemented, so user-facing language must continue to say "recovery copy" or "export" rather than full backup/restore.
+
+Farm-place hierarchy in the recovery copy is data-safety context only. It helps interpret records such as `Field 1 > Bed 1 > Row 1` after export, but it does not imply restore/import, mapping, GIS, server backup, or cloud backup behavior.
 
 ## Scope Boundary
 

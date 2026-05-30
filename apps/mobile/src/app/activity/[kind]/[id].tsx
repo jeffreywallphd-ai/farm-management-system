@@ -1,8 +1,8 @@
 import { useLocalSearchParams } from "expo-router";
 
-import { FarmRouteGate } from "../../../src/app/FarmRouteGate";
-import type { OperationalRecordKind } from "../../../src/domain/records/OperationalRecord";
-import { ActivityDetailScreen } from "../../../src/ui/screens/ActivityDetailScreen";
+import { FarmRouteGate } from "../../../bootstrap/FarmRouteGate";
+import type { OperationalRecordKind } from "../../../domain/records/OperationalRecord";
+import { ActivityDetailScreen } from "../../../ui/screens/ActivityDetailScreen";
 
 const allowedKinds: OperationalRecordKind[] = [
   "HarvestRecorded",

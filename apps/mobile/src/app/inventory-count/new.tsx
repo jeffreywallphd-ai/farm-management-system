@@ -1,11 +1,11 @@
-import { FarmRouteGate } from "../../src/app/FarmRouteGate";
-import { RecordMaterialUseScreen } from "../../src/ui/screens/RecordMaterialUseScreen";
+import { FarmRouteGate } from "../../bootstrap/FarmRouteGate";
+import { RecordInventoryCountScreen } from "../../ui/screens/RecordInventoryCountScreen";
 
-export default function NewMaterialUseRoute() {
+export default function NewInventoryCountRoute() {
   return (
     <FarmRouteGate>
       {({ farm, database }) => (
-        <RecordMaterialUseScreen
+        <RecordInventoryCountScreen
           farm={farm}
           farmReferenceRepository={database.farmReferenceRepository}
           localRecordRepository={database.localRecordRepository}

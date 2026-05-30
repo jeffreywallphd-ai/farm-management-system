@@ -18,6 +18,22 @@ const locationSchema = z.object({
   id: z.string().min(1),
   farmId: z.string().min(1),
   name: z.string().min(1),
+  kind: z.enum([
+    "field",
+    "bed",
+    "row",
+    "greenhouse",
+    "highTunnel",
+    "greenhouseBed",
+    "bench",
+    "storageArea",
+    "washPack",
+    "cooler",
+    "freezer",
+    "barnShed",
+    "other",
+  ]),
+  parentId: z.string().optional(),
   createdAt: isoDateTimeString,
 });
 

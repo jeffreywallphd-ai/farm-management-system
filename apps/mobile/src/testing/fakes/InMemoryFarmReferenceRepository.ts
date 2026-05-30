@@ -17,6 +17,16 @@ export class InMemoryFarmReferenceRepository implements FarmReferenceRepository 
   }
 
   async addLocation(location: FarmLocation): Promise<void> {
+    if (location.parentId) {
+      const parent = this.locations.find(
+        (candidate) => candidate.id === location.parentId && candidate.farmId === location.farmId,
+      );
+
+      if (!parent) {
+        throw new Error("Choose a saved parent place or leave it as a top-level place.");
+      }
+    }
+
     this.locations.push(location);
   }
 

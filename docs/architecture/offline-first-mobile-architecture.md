@@ -25,7 +25,7 @@ The first pilot must work without a live server. A worker must be able to record
 | Workflow | Mobile Pilot 1 posture | Pilot result |
 | --- | ---: | --- |
 | Minimal local setup/reference context | Required; implemented in Phase 1 | Farm context available on device |
-| Manual harvest | Required; implemented in Phase 2 | Confirmed record retained locally |
+| Manual harvest | Required; implemented | Confirmed record retained locally |
 | Manual material use | Required; implemented in Phase 3 | Confirmed record retained locally |
 | Manual inventory count | Required; implemented in Phase 3 | Confirmed observation retained locally |
 | Local activity history | Required; unified manual history implemented in Phase 3 | Locally retained records are understandable |
@@ -42,6 +42,7 @@ The first pilot must work without a live server. A worker must be able to record
 The mobile pilot must be capable of retaining:
 
 - Local farm/reference context for Mobile Pilot 1 entry.
+- Farmer-facing farm places, including place type and optional parent relationship, so records can remain understandable without server access.
 - Locally confirmed `HarvestRecorded`, `MaterialUseRecorded`, and `InventoryCountRecorded` records.
 - Local activity history.
 - User corrections or follow-up records where supported.
@@ -84,7 +85,7 @@ Local design should preserve:
 
 - Stable local record identity or an equivalent future-map-able identity concept.
 - Timestamps/effective dates.
-- Farm/location/item references.
+- Farm/place/item references.
 - Quantity and unit meaning.
 - Draft versus confirmed state.
 - Provenance and source-capture association where retained.
@@ -111,3 +112,5 @@ Later UI work must preserve these implications:
 - Users should not have to understand synchronization internals to record normal pilot work.
 - Export/backup availability and limitations must be understandable before meaningful reliance.
 - Long offline periods must not make the application appear broken merely because server-dependent features are not part of the pilot.
+
+Farm-place hierarchy is retained locally as ordinary setup data. It does not create GIS, maps, GPS, planning, or spatial-analysis responsibilities for the offline mobile architecture.

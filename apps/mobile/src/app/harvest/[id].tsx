@@ -1,7 +1,7 @@
 import { useLocalSearchParams } from "expo-router";
 
-import { FarmRouteGate } from "../../src/app/FarmRouteGate";
-import { HarvestDetailScreen } from "../../src/ui/screens/HarvestDetailScreen";
+import { FarmRouteGate } from "../../bootstrap/FarmRouteGate";
+import { HarvestDetailScreen } from "../../ui/screens/HarvestDetailScreen";
 
 export default function HarvestDetailRoute() {
   const params = useLocalSearchParams<{ id?: string }>();

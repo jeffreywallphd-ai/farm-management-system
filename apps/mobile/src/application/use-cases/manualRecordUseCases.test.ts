@@ -16,7 +16,7 @@ async function seededManualPilot() {
   let nextId = 1;
   let nextHour = 10;
   const farm = { id: "farm-1", name: "Green Hill Farm", createdAt: "2026-05-29T09:00:00.000Z" };
-  const location = { id: "location-1", farmId: farm.id, name: "North Field", createdAt: farm.createdAt };
+  const location = { id: "location-1", farmId: farm.id, name: "North Field", kind: "field" as const, createdAt: farm.createdAt };
   const crop = { id: "crop-1", farmId: farm.id, kind: "crop" as const, name: "Kale", createdAt: farm.createdAt };
   const material = { id: "material-1", farmId: farm.id, kind: "material" as const, name: "Compost", createdAt: farm.createdAt };
   const countableItem = { id: "countable-1", farmId: farm.id, kind: "countableItem" as const, name: "Seedling trays", createdAt: farm.createdAt };
@@ -153,11 +153,12 @@ test("expanded recovery copy includes all implemented manual records", async () 
   await createMobilePilotRecoveryCopy({ farmId: deps.farm.id }, { ...deps, exportRepository });
   const payload = JSON.parse(exportRepository.contents);
 
-  assert.equal(payload.exportVersion, 2);
-  assert.equal(payload.appDataSchemaVersion, 3);
+  assert.equal(payload.exportVersion, 3);
+  assert.equal(payload.appDataSchemaVersion, 4);
   assert.equal(payload.harvestRecords.length, 1);
   assert.equal(payload.materialUseRecords.length, 1);
   assert.equal(payload.inventoryCountRecords.length, 1);
+  assert.equal(payload.locations[0].kind, "field");
   assert.equal(payload.syncState, undefined);
   assert.equal(payload.aiDrafts, undefined);
   assert.equal(payload.authentication, undefined);
@@ -169,9 +170,9 @@ test("expanded recovery copy rejects malformed manual record payloads", async ()
 
   assert.throws(() =>
     serializeRecoveryCopy({
-      exportVersion: 2,
+      exportVersion: 3,
       createdAt,
-      appDataSchemaVersion: 3,
+      appDataSchemaVersion: 4,
       farm: deps.farm,
       locations: [deps.location],
       trackedItems: [deps.crop, deps.material, deps.countableItem],

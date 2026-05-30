@@ -33,6 +33,7 @@ Helps agents work on user-facing mobile workflows involving activity entry, fiel
 - Mobile Pilot 1 covers manual entry for harvest, material use, and inventory count plus export/backup usability.
 - Phase 1 setup/reference screens exist under `apps/mobile`; Phase 2 adds manual harvest entry; Phase 3 adds manual material use, inventory count, unified local activity history/detail, and expanded recovery-copy export.
 - The implemented manual record screens cover exactly `HarvestRecorded`, `MaterialUseRecorded`, and `InventoryCountRecorded`.
+- Record forms should present farm-place paths such as `Field 1 > Bed 1` when nested places exist, avoiding generic or technical location wording.
 - Future mobile screens should reuse the established earthy theme tokens and small UI component foundation.
 - ADR-0008 accepts Expo, React Native, TypeScript, development builds, and EAS/internal distribution for Mobile Pilot 1.
 - Voice/photo capture is Mobile Pilot 2 or later and must not be pulled into a first implementation prompt.

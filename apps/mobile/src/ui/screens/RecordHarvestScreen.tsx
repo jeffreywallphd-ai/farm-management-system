@@ -25,6 +25,7 @@ import { SelectField } from "../components/SelectField";
 import { SectionHeading } from "../components/SectionHeading";
 import { theme } from "../theme/theme";
 import { replaceRoute } from "../navigation";
+import { buildFarmPlaceOptions } from "../farmPlaceDisplay";
 
 interface FormErrors {
   cropId?: string;
@@ -70,6 +71,7 @@ export function RecordHarvestScreen({
   }, [farm.id, farmReferenceRepository]);
 
   const missingReferences = crops.length === 0 || locations.length === 0;
+  const placeOptions = buildFarmPlaceOptions(locations);
 
   async function handleSave() {
     setIsSaving(true);
@@ -109,7 +111,7 @@ export function RecordHarvestScreen({
         <Card>
           <SectionHeading title="Finish setup first" />
           {crops.length === 0 ? <EmptyState text="Add a crop before recording a harvest." /> : null}
-          {locations.length === 0 ? <EmptyState text="Add a location before recording a harvest." /> : null}
+          {locations.length === 0 ? <EmptyState text="Add a farm place before recording a harvest." /> : null}
           <Button label="Back to farm setup" onPress={() => replaceRoute(router, "/")} variant="secondary" />
         </Card>
       ) : (
@@ -124,9 +126,9 @@ export function RecordHarvestScreen({
           />
           <SelectField
             error={errors.sourceLocationId}
-            label="Source location"
+            label="Harvest place"
             onChange={setSourceLocationId}
-            options={locations.map((location) => ({ label: location.name, value: location.id }))}
+            options={placeOptions}
             value={sourceLocationId}
           />
           <View style={styles.quantityRow}>

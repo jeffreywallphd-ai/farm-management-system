@@ -1,17 +1,17 @@
 import { useCallback, useEffect, useState } from "react";
 import { Text } from "react-native";
 
-import { useDatabase } from "./providers/DatabaseProvider";
+import { listLocations } from "../application/use-cases/list-locations/listLocations";
+import { listTrackedItems } from "../application/use-cases/list-tracked-items/listTrackedItems";
 import type { Farm } from "../domain/farm/Farm";
 import type { FarmLocation } from "../domain/farm/FarmLocation";
 import type { TrackedItem } from "../domain/farm/TrackedItem";
-import { listLocations } from "../application/use-cases/list-locations/listLocations";
-import { listTrackedItems } from "../application/use-cases/list-tracked-items/listTrackedItems";
 import { Card } from "../ui/components/Card";
 import { PageHeader } from "../ui/components/PageHeader";
 import { Screen } from "../ui/components/Screen";
 import { FarmDashboardScreen } from "../ui/screens/FarmDashboardScreen";
 import { FarmSetupScreen } from "../ui/screens/FarmSetupScreen";
+import { useDatabase } from "./providers/DatabaseProvider";
 
 export function AppBootstrap() {
   const database = useDatabase();
