@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { AppHeader } from "./AppHeader";
 import { theme } from "../theme/theme";
 
 export function Screen({ children }: { children: ReactNode }) {
@@ -11,6 +12,7 @@ export function Screen({ children }: { children: ReactNode }) {
       style={styles.keyboardAvoidingView}
     >
       <SafeAreaView style={styles.safeArea}>
+        <AppHeader />
         <ScrollView
           contentContainerStyle={styles.content}
           keyboardShouldPersistTaps="handled"

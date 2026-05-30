@@ -5,6 +5,7 @@ import {
 } from "../../../domain/export/FarmEventRecoveryPackage";
 import type { FarmId } from "../../../domain/farm/Farm";
 import type { FarmEventRepository } from "../../ports/FarmEventRepository";
+import type { FarmNoteTranscriptRepository } from "../../ports/FarmNoteTranscriptRepository";
 import type { Clock } from "../../ports/Clock";
 import type { ExportRepository, MobilePilotExportFile, RecoveryPackageMediaFile } from "../../ports/ExportRepository";
 import type { FarmReferenceRepository } from "../../ports/FarmReferenceRepository";
@@ -18,14 +19,16 @@ export async function createFarmEventRecoveryPackage(
     clock: Clock;
     exportRepository: ExportRepository;
     farmEventRepository: FarmEventRepository;
+    farmNoteTranscriptRepository: FarmNoteTranscriptRepository;
     farmReferenceRepository: FarmReferenceRepository;
     localRecordRepository: LocalRecordRepository;
   },
 ): Promise<MobilePilotExportFile> {
   const createdAt = dependencies.clock.now().toISOString();
-  const [manualRecoveryCopy, farmEvents] = await Promise.all([
+  const [manualRecoveryCopy, farmEvents, farmNoteTranscripts] = await Promise.all([
     buildMobilePilotRecoveryCopyPayload(input, dependencies),
     dependencies.farmEventRepository.listFarmEvents(input.farmId),
+    dependencies.farmNoteTranscriptRepository.listTranscriptsForExport(input.farmId),
   ]);
   const packageEvents = farmEvents.map((view) => ({
     ...view,
@@ -40,6 +43,7 @@ export async function createFarmEventRecoveryPackage(
     packageSchemaVersion: FARM_EVENT_RECOVERY_PACKAGE_SCHEMA_VERSION,
     manualRecoveryCopy,
     farmEvents: packageEvents,
+    farmNoteTranscripts,
     packageNotes: {
       privateData: true,
       userControlledExport: true,

@@ -10,12 +10,16 @@ import type {
   PhotoAttachmentStorageRepository,
   TemporaryPhotoAttachment,
 } from "../ports/PhotoAttachmentStorageRepository";
+import { TranscriptionModelUnavailableError } from "../ports/VoiceMemoTranscriptionService";
 import { InMemoryFarmEventRepository } from "../../testing/fakes/InMemoryFarmEventRepository";
 import { InMemoryFarmReferenceRepository } from "../../testing/fakes/InMemoryFarmReferenceRepository";
+import { InMemoryFarmNoteTranscriptRepository } from "../../testing/fakes/InMemoryFarmNoteTranscriptRepository";
 import { InMemoryLocalRecordRepository } from "../../testing/fakes/InMemoryLocalRecordRepository";
+import { serializeFarmEventRecoveryPackageManifest } from "../../infrastructure/export/FarmEventRecoveryPackageExporter";
 import { createFarmEventRecoveryPackage } from "./export-mobile-pilot-data/CreateFarmEventRecoveryPackage";
 import { recordFarmEvent } from "./record-farm-event/RecordFarmEvent";
 import { recordVoiceMemoFarmEvent } from "./record-voice-memo-farm-event/RecordVoiceMemoFarmEvent";
+import { transcribeFarmNoteVoiceMemo } from "./transcribe-farm-note/TranscribeFarmNoteVoiceMemo";
 import { getFarmEventDetail } from "./view-farm-events/GetFarmEventDetail";
 import { listFarmEvents } from "./view-farm-events/ListFarmEvents";
 
@@ -107,7 +111,7 @@ test("farm event history and detail return newest events with attachments and pl
   const dependencies = {
     farmEventRepository: eventRepository,
     farmReferenceRepository: references,
-    idGenerator: new SequenceIds(["event-old", "attachment-old", "event-new", "attachment-new"]),
+    idGenerator: new SequenceIds(["event-old", "attachment-old", "event-new", "attachment-new", "photo-attachment-new"]),
   };
 
   await recordFarmEvent(
@@ -126,7 +130,10 @@ test("farm event history and detail return newest events with attachments and pl
       farmId: farm.id,
       eventType: "harvest",
       placeId: field.id,
-      attachments: [{ kind: "voiceMemo", localUri: "file:///local/new.m4a" }],
+      attachments: [
+        { kind: "voiceMemo", localUri: "file:///local/new.m4a" },
+        { kind: "photo", localUri: "file:///local/new-photo.jpg", mimeType: "image/jpeg", width: 640, height: 480 },
+      ],
     },
     {
       ...dependencies,
@@ -144,7 +151,9 @@ test("farm event history and detail return newest events with attachments and pl
 
   const detail = await getFarmEventDetail(farm.id, "event-new", { farmEventRepository: eventRepository });
   assert.equal(detail?.event.eventType, "harvest");
-  assert.equal(detail?.attachments.length, 1);
+  assert.equal(detail?.attachments.length, 2);
+  assert.equal(detail?.attachments[1].kind, "photo");
+  assert.equal(detail?.attachments[1].localUri, "file:///local/new-photo.jpg");
 });
 
 test("voice memo farm event persists the copied local file reference and clears the temporary file", async () => {
@@ -252,6 +261,7 @@ test("farm event recovery package contains metadata plus voice and photo media r
   await references.createFarm(farm);
   await references.addLocation(field);
   const eventRepository = new InMemoryFarmEventRepository({ locations: [field] });
+  const transcriptRepository = new InMemoryFarmNoteTranscriptRepository();
   const localRecordRepository = new InMemoryLocalRecordRepository({ locations: [field], trackedItems: [] });
   const exportRepository = new CapturingExportRepository();
 
@@ -273,6 +283,19 @@ test("farm event recovery package contains metadata plus voice and photo media r
       idGenerator: new SequenceIds(["event-1", "voice-attachment-1", "photo-attachment-1"]),
     },
   );
+  await transcriptRepository.saveTranscript({
+    id: "transcript-1",
+    farmId: farm.id,
+    farmEventId: "event-1",
+    sourceAttachmentId: "voice-attachment-1",
+    text: "Photo shows row cover damage",
+    status: "completed",
+    modelName: "whisper-tiny.en",
+    generatedLocally: true,
+    createdAt: "2026-05-30T12:01:00.000Z",
+    updatedAt: "2026-05-30T12:02:00.000Z",
+    privacy: "privateToFarm",
+  });
 
   await createFarmEventRecoveryPackage(
     { farmId: farm.id },
@@ -280,16 +303,21 @@ test("farm event recovery package contains metadata plus voice and photo media r
       clock: { now: () => new Date("2026-05-30T13:00:00.000Z") },
       exportRepository,
       farmEventRepository: eventRepository,
+      farmNoteTranscriptRepository: transcriptRepository,
       farmReferenceRepository: references,
       localRecordRepository,
     },
   );
 
   const manifest = JSON.parse(exportRepository.contents);
-  assert.equal(manifest.packageVersion, 1);
+  assert.equal(manifest.packageVersion, 2);
+  assert.equal(manifest.packageSchemaVersion, 2);
   assert.equal(manifest.manualRecoveryCopy.farm.id, farm.id);
   assert.equal(manifest.farmEvents.length, 1);
   assert.equal(manifest.farmEvents[0].attachments.length, 2);
+  assert.equal(manifest.farmNoteTranscripts.length, 1);
+  assert.equal(manifest.farmNoteTranscripts[0].text, "Photo shows row cover damage");
+  assert.equal(manifest.farmNoteTranscripts[0].generatedLocally, true);
   assert.deepEqual(
     exportRepository.mediaFiles.map((file) => file.sourceUri),
     ["file:///documents/voice.m4a", "file:///documents/photo.jpg"],
@@ -297,6 +325,172 @@ test("farm event recovery package contains metadata plus voice and photo media r
   assert.equal(manifest.aiDrafts, undefined);
   assert.equal(manifest.syncState, undefined);
   assert.equal(manifest.authentication, undefined);
+
+  assert.throws(
+    () =>
+      serializeFarmEventRecoveryPackageManifest({
+        ...manifest,
+        farmNoteTranscripts: [{ ...manifest.farmNoteTranscripts[0], generatedLocally: false }],
+      }),
+    z.ZodError,
+  );
+});
+
+test("saved voice memo can be transcribed into a local draft transcript", async () => {
+  const references = new InMemoryFarmReferenceRepository();
+  await references.createFarm(farm);
+  const eventRepository = new InMemoryFarmEventRepository({ locations: [] });
+  const transcriptRepository = new InMemoryFarmNoteTranscriptRepository();
+
+  await recordFarmEvent(
+    {
+      farmId: farm.id,
+      attachments: [{ kind: "voiceMemo", localUri: "file:///documents/voice.m4a", mimeType: "audio/m4a" }],
+    },
+    {
+      clock: { now: () => new Date("2026-05-30T12:00:00.000Z") },
+      farmEventRepository: eventRepository,
+      farmReferenceRepository: references,
+      idGenerator: new SequenceIds(["event-1", "voice-attachment-1"]),
+    },
+  );
+
+  const transcript = await transcribeFarmNoteVoiceMemo(
+    { farmId: farm.id, farmEventId: "event-1" },
+    {
+      clock: { now: () => new Date("2026-05-30T12:05:00.000Z") },
+      farmEventRepository: eventRepository,
+      idGenerator: new SequenceIds(["transcript-1"]),
+      transcriptionRepository: transcriptRepository,
+      transcriptionService: new FakeTranscriptionService("Row cover needs repair."),
+    },
+  );
+
+  assert.equal(transcript.id, "transcript-1");
+  assert.equal(transcript.status, "completed");
+  assert.equal(transcript.text, "Row cover needs repair.");
+  assert.equal(transcript.modelName, "whisper-tiny.en");
+  assert.equal(transcript.generatedLocally, true);
+  assert.equal(transcript.privacy, "privateToFarm");
+  assert.equal((await transcriptRepository.getTranscript(farm.id, "event-1"))?.text, "Row cover needs repair.");
+});
+
+test("transcription reports model-missing state without deleting the voice memo", async () => {
+  const references = new InMemoryFarmReferenceRepository();
+  await references.createFarm(farm);
+  const eventRepository = new InMemoryFarmEventRepository({ locations: [] });
+  const transcriptRepository = new InMemoryFarmNoteTranscriptRepository();
+
+  await recordFarmEvent(
+    {
+      farmId: farm.id,
+      attachments: [{ kind: "voiceMemo", localUri: "file:///documents/voice.m4a", mimeType: "audio/m4a" }],
+    },
+    {
+      clock: { now: () => new Date("2026-05-30T12:00:00.000Z") },
+      farmEventRepository: eventRepository,
+      farmReferenceRepository: references,
+      idGenerator: new SequenceIds(["event-1", "voice-attachment-1"]),
+    },
+  );
+
+  const transcript = await transcribeFarmNoteVoiceMemo(
+    { farmId: farm.id, farmEventId: "event-1" },
+    {
+      clock: { now: () => new Date("2026-05-30T12:05:00.000Z") },
+      farmEventRepository: eventRepository,
+      idGenerator: new SequenceIds(["transcript-1"]),
+      transcriptionRepository: transcriptRepository,
+      transcriptionService: new MissingModelTranscriptionService(),
+    },
+  );
+
+  const detail = await eventRepository.getFarmEventDetail(farm.id, "event-1");
+  assert.equal(transcript.status, "failed");
+  assert.equal(transcript.errorSummary, "Transcription model is not installed in this test build.");
+  assert.equal(detail?.attachments[0].localUri, "file:///documents/voice.m4a");
+});
+
+test("farm note without a voice memo cannot be transcribed", async () => {
+  const references = new InMemoryFarmReferenceRepository();
+  await references.createFarm(farm);
+  const eventRepository = new InMemoryFarmEventRepository({ locations: [] });
+
+  await recordFarmEvent(
+    {
+      farmId: farm.id,
+      note: "Typed note only",
+      attachments: [],
+    },
+    {
+      clock: { now: () => new Date("2026-05-30T12:00:00.000Z") },
+      farmEventRepository: eventRepository,
+      farmReferenceRepository: references,
+      idGenerator: new SequenceIds(["event-1"]),
+    },
+  );
+
+  await assert.rejects(
+    () =>
+      transcribeFarmNoteVoiceMemo(
+        { farmId: farm.id, farmEventId: "event-1" },
+        {
+          clock: { now: () => new Date("2026-05-30T12:05:00.000Z") },
+          farmEventRepository: eventRepository,
+          idGenerator: new SequenceIds(["transcript-1"]),
+          transcriptionRepository: new InMemoryFarmNoteTranscriptRepository(),
+          transcriptionService: new FakeTranscriptionService("No audio."),
+        },
+      ),
+    /does not have a voice memo/,
+  );
+});
+
+test("retrying transcription updates the existing draft instead of creating duplicates", async () => {
+  const references = new InMemoryFarmReferenceRepository();
+  await references.createFarm(farm);
+  const eventRepository = new InMemoryFarmEventRepository({ locations: [] });
+  const transcriptRepository = new InMemoryFarmNoteTranscriptRepository();
+
+  await recordFarmEvent(
+    {
+      farmId: farm.id,
+      attachments: [{ kind: "voiceMemo", localUri: "file:///documents/voice.m4a", mimeType: "audio/m4a" }],
+    },
+    {
+      clock: { now: () => new Date("2026-05-30T12:00:00.000Z") },
+      farmEventRepository: eventRepository,
+      farmReferenceRepository: references,
+      idGenerator: new SequenceIds(["event-1", "voice-attachment-1"]),
+    },
+  );
+
+  const first = await transcribeFarmNoteVoiceMemo(
+    { farmId: farm.id, farmEventId: "event-1" },
+    {
+      clock: { now: () => new Date("2026-05-30T12:05:00.000Z") },
+      farmEventRepository: eventRepository,
+      idGenerator: new SequenceIds(["transcript-1"]),
+      transcriptionRepository: transcriptRepository,
+      transcriptionService: new MissingModelTranscriptionService(),
+    },
+  );
+  const second = await transcribeFarmNoteVoiceMemo(
+    { farmId: farm.id, farmEventId: "event-1" },
+    {
+      clock: { now: () => new Date("2026-05-30T12:10:00.000Z") },
+      farmEventRepository: eventRepository,
+      idGenerator: new SequenceIds(["unused-transcript-id"]),
+      transcriptionRepository: transcriptRepository,
+      transcriptionService: new FakeTranscriptionService("Second try worked."),
+    },
+  );
+
+  assert.equal(first.id, "transcript-1");
+  assert.equal(second.id, "transcript-1");
+  assert.equal(second.status, "completed");
+  assert.equal(second.text, "Second try worked.");
+  assert.equal((await transcriptRepository.listTranscriptsForExport(farm.id)).length, 1);
 });
 
 class SequenceIds {
@@ -351,6 +545,23 @@ class FakePhotoAttachmentStorageRepository implements PhotoAttachmentStorageRepo
 class FailingFarmEventRepository extends InMemoryFarmEventRepository implements FarmEventRepository {
   override async saveFarmEvent(): Promise<void> {
     throw new Error("metadata save failed");
+  }
+}
+
+class FakeTranscriptionService {
+  constructor(private readonly text: string) {}
+
+  async transcribe() {
+    return {
+      text: this.text,
+      modelName: "whisper-tiny.en",
+    };
+  }
+}
+
+class MissingModelTranscriptionService {
+  async transcribe() {
+    throw new TranscriptionModelUnavailableError();
   }
 }
 

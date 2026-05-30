@@ -5,6 +5,7 @@ import { useRouter } from "expo-router";
 import type { Farm } from "../../domain/farm/Farm";
 import type { ExportRepository, MobilePilotExportFile } from "../../application/ports/ExportRepository";
 import type { FarmEventRepository } from "../../application/ports/FarmEventRepository";
+import type { FarmNoteTranscriptRepository } from "../../application/ports/FarmNoteTranscriptRepository";
 import type { FarmReferenceRepository } from "../../application/ports/FarmReferenceRepository";
 import type { LocalRecordRepository } from "../../application/ports/LocalRecordRepository";
 import { createFarmEventRecoveryPackage } from "../../application/use-cases/export-mobile-pilot-data/CreateFarmEventRecoveryPackage";
@@ -24,12 +25,14 @@ export function RecoveryCopyExportScreen({
   exportRepository,
   farm,
   farmEventRepository,
+  farmNoteTranscriptRepository,
   farmReferenceRepository,
   localRecordRepository,
 }: {
   exportRepository: ExportRepository;
   farm: Farm;
   farmEventRepository: FarmEventRepository;
+  farmNoteTranscriptRepository: FarmNoteTranscriptRepository;
   farmReferenceRepository: FarmReferenceRepository;
   localRecordRepository: LocalRecordRepository;
 }) {
@@ -64,7 +67,14 @@ export function RecoveryCopyExportScreen({
     try {
       const nextFile = await createFarmEventRecoveryPackage(
         { farmId: farm.id },
-        { clock: systemClock, exportRepository, farmEventRepository, farmReferenceRepository, localRecordRepository },
+        {
+          clock: systemClock,
+          exportRepository,
+          farmEventRepository,
+          farmNoteTranscriptRepository,
+          farmReferenceRepository,
+          localRecordRepository,
+        },
       );
       setFile(nextFile);
     } catch {
@@ -96,7 +106,7 @@ export function RecoveryCopyExportScreen({
       </Card>
       <Card>
         <SectionHeading
-          detail="This ZIP includes the manual JSON data plus saved farm-note metadata, voice memos, and photos. Restore/import is not available yet."
+          detail="This ZIP includes the manual JSON data plus saved farm-note metadata, voice memos, photos, and transcript drafts when present. Restore/import is not available yet."
           title="Farm-note media package"
         />
         <Text style={styles.body}>

@@ -1,12 +1,20 @@
-import { Image, StyleSheet, Text, View } from "react-native";
+import { useState } from "react";
+import { StyleSheet, Text, View } from "react-native";
 import { useAudioPlayer, useAudioPlayerStatus } from "expo-audio";
 
 import { FARM_EVENT_TYPE_LABELS } from "../../domain/events/FarmEvent";
+import type { FarmNoteTranscript } from "../../domain/events/FarmNoteTranscript";
 import type { FarmLocation } from "../../domain/farm/FarmLocation";
-import type { FarmEventView } from "../../application/ports/FarmEventRepository";
+import type { FarmEventRepository, FarmEventView } from "../../application/ports/FarmEventRepository";
+import type { FarmNoteTranscriptRepository } from "../../application/ports/FarmNoteTranscriptRepository";
+import type { IdGenerator } from "../../application/ports/IdGenerator";
+import type { VoiceMemoTranscriptionService } from "../../application/ports/VoiceMemoTranscriptionService";
+import { transcribeFarmNoteVoiceMemo } from "../../application/use-cases/transcribe-farm-note/TranscribeFarmNoteVoiceMemo";
+import { systemClock } from "../../infrastructure/system/clock";
 import { Button } from "../components/Button";
 import { Card } from "../components/Card";
 import { EmptyState } from "../components/EmptyState";
+import { FarmNotePhotoPreview } from "../components/FarmNotePhotoPreview";
 import { LocalDataNotice } from "../components/LocalDataNotice";
 import { PageHeader } from "../components/PageHeader";
 import { PrivateDataNotice } from "../components/PrivateDataNotice";
@@ -18,13 +26,26 @@ import { theme } from "../theme/theme";
 
 export function FarmEventDetailScreen({
   event,
+  farmEventRepository,
+  idGenerator,
   isLoading,
   locations,
+  onTranscriptChanged,
+  transcript,
+  transcriptionRepository,
+  transcriptionService,
 }: {
   event: FarmEventView | null;
+  farmEventRepository: FarmEventRepository;
+  idGenerator: IdGenerator;
   isLoading: boolean;
   locations: FarmLocation[];
+  onTranscriptChanged: (transcript: FarmNoteTranscript) => void;
+  transcript: FarmNoteTranscript | null;
+  transcriptionRepository: FarmNoteTranscriptRepository;
+  transcriptionService: VoiceMemoTranscriptionService;
 }) {
+  const [isTranscribing, setIsTranscribing] = useState(false);
   const voiceMemo = event?.attachments.find((attachment) => attachment.kind === "voiceMemo");
   const photos = event?.attachments.filter((attachment) => attachment.kind === "photo") ?? [];
   const placePath = buildFarmPlacePath(locations, event?.event.placeId);
@@ -39,6 +60,29 @@ export function FarmEventDetailScreen({
 
     player.seekTo(0);
     player.play();
+  }
+
+  async function handleTranscribe() {
+    if (!event || !voiceMemo) {
+      return;
+    }
+
+    setIsTranscribing(true);
+    try {
+      const nextTranscript = await transcribeFarmNoteVoiceMemo(
+        { farmId: event.event.farmId, farmEventId: event.event.id },
+        {
+          clock: systemClock,
+          farmEventRepository,
+          idGenerator,
+          transcriptionRepository,
+          transcriptionService,
+        },
+      );
+      onTranscriptChanged(nextTranscript);
+    } finally {
+      setIsTranscribing(false);
+    }
   }
 
   return (
@@ -74,9 +118,33 @@ export function FarmEventDetailScreen({
               <>
                 <Text style={styles.muted}>{formatDuration(voiceMemo.durationMs)}</Text>
                 <Button label={playerStatus.playing ? "Pause playback" : "Play memo"} onPress={handlePlayPause} />
+                <Button
+                  disabled={isTranscribing}
+                  label={isTranscribing ? "Transcribing..." : transcript ? "Retry transcription" : "Transcribe voice memo"}
+                  onPress={handleTranscribe}
+                  variant="secondary"
+                />
+                <Text style={styles.muted}>Audio stays on this device for this transcription.</Text>
               </>
             ) : (
               <EmptyState text="No voice memo is attached to this farm note." />
+            )}
+          </Card>
+          <Card>
+            <SectionHeading
+              detail="Generated on this device from the saved voice memo. Check the audio if accuracy matters."
+              title="Transcript draft"
+            />
+            {!voiceMemo ? (
+              <EmptyState text="No voice memo is available to transcribe." />
+            ) : !transcript ? (
+              <EmptyState text="No transcript draft yet." />
+            ) : transcript.status === "completed" ? (
+              <Text style={styles.transcriptText}>{transcript.text}</Text>
+            ) : (
+              <Text style={styles.error}>
+                {transcript.errorSummary ?? "Transcript could not be generated on this device."}
+              </Text>
             )}
           </Card>
           <Card>
@@ -84,12 +152,7 @@ export function FarmEventDetailScreen({
             {photos.length ? (
               <View style={styles.photoGrid}>
                 {photos.map((photo) => (
-                  <Image
-                    accessibilityLabel="Saved farm note photo"
-                    key={photo.id}
-                    source={{ uri: photo.localUri }}
-                    style={styles.photo}
-                  />
+                  <FarmNotePhotoPreview key={photo.id} uri={photo.localUri} />
                 ))}
               </View>
             ) : (
@@ -138,14 +201,19 @@ const styles = StyleSheet.create({
     color: theme.colors.textSecondary,
     fontSize: theme.typography.body,
   },
-  photo: {
-    aspectRatio: 1,
-    borderRadius: theme.radius.sm,
-    width: 132,
+  error: {
+    color: theme.colors.error,
+    fontSize: theme.typography.body,
+    lineHeight: 22,
   },
   photoGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
     gap: theme.spacing.sm,
+  },
+  transcriptText: {
+    color: theme.colors.textPrimary,
+    fontSize: theme.typography.body,
+    lineHeight: 24,
   },
 });

@@ -8,7 +8,7 @@ Phase 2 implements the first complete operational workflow: manual harvest recor
 
 Phase 3 completes the core manual Mobile Pilot 1 workflow set. Farmers can now record harvests, material use, and inventory counts, review those records in one local activity history, inspect read-only details, and create a local versioned JSON recovery copy for the implemented manual records and required reference data.
 
-ADR-0012 pivots the next farmer-shareable pilot direction toward quick voice/photo farm-event capture. The app now supports local voice memos with optional local photos for farm notes, local timeline/detail review, and a user-controlled media recovery package containing retained media. This work does not authorize AI transcription, computer vision, server upload, synchronization, accounts, cloud backup, analytics, or sharing.
+ADR-0012 pivots the next farmer-shareable pilot direction toward quick voice/photo farm-event capture. The app now supports local voice memos with optional local photos for farm notes, local timeline/detail review, and a user-controlled media recovery package containing retained media. ADR-0013 accepts `whisper.rn`/`whisper.cpp` as the on-device transcription path for draft farm-note transcripts, but a local model file and Android development-build validation still must be completed before real transcription can be relied on.
 
 ## Accepted Stack
 
@@ -18,6 +18,7 @@ ADR-0012 pivots the next farmer-shareable pilot direction toward quick voice/pho
 - Runtime boundary validation with Zod: [ADR-0011](../../docs/adr/ADR-0011-mobile-pilot-1-runtime-boundary-validation.md)
 - Local voice memo recording with `expo-audio`: [ADR-0012](../../docs/adr/ADR-0012-voice-photo-first-farm-event-capture-pilot.md)
 - Optional farm-note photo attachments with `expo-image-picker`: [ADR-0012](../../docs/adr/ADR-0012-voice-photo-first-farm-event-capture-pilot.md)
+- On-device draft transcription path with `whisper.rn`/`whisper.cpp`: [ADR-0013](../../docs/adr/ADR-0013-on-device-farm-note-transcription-with-whisper-rn.md)
 
 Package versions are pinned in `package.json`, and `package-lock.json` records the app-local dependency resolution.
 
@@ -47,13 +48,16 @@ Canonical record meaning lives in [Mobile Pilot 1 Operational Records](../../doc
 - Farm-event capture metadata and local attachment-reference persistence foundation for ADR-0012 voice/photo work.
 - Local voice memo recording, microphone permission request, playback, optional photo attachment, and farm-note save flow.
 - Local farm-note timeline with type, place, and date filters plus read-only detail review with audio playback and photo previews.
-- ZIP media recovery package export containing manual JSON data, farm-note metadata, voice memo files, and photo files.
+- Persistent `Farm Notes` header with a hamburger menu for local navigation between capture, timeline, setup, activity history, and recovery copy.
+- Saved farm-note detail includes a transcript-draft area and a `Transcribe voice memo` action using the `whisper.rn` adapter. It looks for `ggml-tiny.en.bin` in app document storage under `farm-note-transcription-models/` and shows a model-missing message when the model is absent.
+- ZIP media recovery package export containing manual JSON data, farm-note metadata, voice memo files, photo files, and transcript drafts when present.
 - Zod validation for setup/reference names, tracked item kinds, manual record inputs, and recovery-copy export payloads.
 - A reusable earthy mobile UI foundation for setup, manual record, history, and data-safety screens.
 
 ## Planned But Not Implemented Yet
 
 - Import or restore from a recovery copy.
+- Bundled or installed local Whisper model handling for farmer test builds. Expo Go is not sufficient for `whisper.rn` native-module transcription; a development build is required.
 - Physical-device pre-distribution review and internal farmer-test build preparation.
 
 ## Pilot Unit Vocabulary

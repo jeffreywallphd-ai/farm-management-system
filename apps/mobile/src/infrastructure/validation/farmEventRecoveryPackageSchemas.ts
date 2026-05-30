@@ -37,6 +37,21 @@ const farmEventSchema = z.object({
   schemaVersion: z.literal(1),
 });
 
+const farmNoteTranscriptSchema = z.object({
+  id: z.string().min(1),
+  farmId: z.string().min(1),
+  farmEventId: z.string().min(1),
+  sourceAttachmentId: z.string().min(1),
+  text: z.string().optional(),
+  status: z.enum(["completed", "failed"]),
+  modelName: z.string().min(1),
+  generatedLocally: z.literal(true),
+  errorSummary: z.string().optional(),
+  createdAt: isoDateTimeString,
+  updatedAt: isoDateTimeString,
+  privacy: z.literal("privateToFarm"),
+});
+
 const packageLocationSchema = z.object({
   id: z.string().min(1),
   farmId: z.string().min(1),
@@ -58,6 +73,7 @@ export const farmEventRecoveryPackageManifestSchema = z.object({
       attachments: z.array(farmEventAttachmentSchema),
     }),
   ),
+  farmNoteTranscripts: z.array(farmNoteTranscriptSchema),
   packageNotes: z.object({
     privateData: z.literal(true),
     userControlledExport: z.literal(true),

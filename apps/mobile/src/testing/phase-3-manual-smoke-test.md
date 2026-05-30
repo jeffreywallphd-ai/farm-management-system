@@ -2,58 +2,65 @@
 
 Use this checklist on a physical Android test device before farmer distribution preparation.
 
-1. Run the app through Expo Go or the accepted development-build path.
+1. Run the app through Expo Go or the accepted development-build path. Use a development build when validating `whisper.rn` transcription, because Expo Go does not include that native module.
 2. Confirm no warnings appear for `AppBootstrap.tsx`, `FarmRouteGate.tsx`, or `DatabaseProvider.tsx` as route files.
 3. Confirm no `Couldn't find any screens for the navigator` error occurs.
 4. Confirm the initial dashboard or setup screen renders.
-5. Start with a fresh local database.
-6. Confirm earthy UI styling is readable and consistent.
-7. Create a farm.
-8. Confirm the next screen emphasizes `Set up your farm places`, not operational recording.
-9. Add `Field 1`.
-10. Add `Bed 1` inside `Field 1`.
-11. Add `Row 1` inside `Bed 1`.
-12. Add `Greenhouse 1`.
-13. Add `Bench 1` inside `Greenhouse 1`.
-14. Confirm the farm-place tree is understandable.
-15. Add one crop.
-16. Add one material.
-17. Add one countable item.
-18. Enable airplane mode.
-19. Tap `Record farm note`.
-20. Grant microphone permission when prompted.
-21. Record a short voice memo.
-22. Stop recording and play the memo back.
-23. Take a photo and confirm it appears as a preview.
-24. Choose an existing photo and confirm it appears as a preview.
-25. Remove one selected photo and confirm it is not saved with the farm note.
-26. Add optional farm place/type/text context.
-27. Save the farm note and confirm the message says it was saved on this device.
-28. Open `Review farm notes`.
-29. Confirm the saved note appears in newest-first order.
-30. Filter farm notes by type, place, and date.
-31. Open the note detail and confirm voice playback, photo previews, note text, place, time, and private/local wording are understandable.
-32. Confirm the screen does not claim transcription, AI interpretation, upload, or sharing.
-33. Record a harvest using a nested farm place.
-34. Record material use using a farm-place path.
-35. Record an inventory count of `0`.
-36. Record another inventory count greater than zero.
-37. Confirm blank inventory count is rejected.
-38. Confirm all save confirmations communicate device-local storage.
-39. Open unified local activity history.
-40. Confirm all three manual record types appear.
-41. Confirm newest-first ordering.
-42. Open each manual record type's detail view.
-43. Confirm values, labels, and private/local wording are understandable.
-44. Close and relaunch the app while offline.
-45. Confirm farm setup, farm-place hierarchy, manual records, and the farm note metadata remain available where currently surfaced.
-46. Create a recovery copy.
-47. Confirm native share/save behavior opens.
-48. Inspect JSON where practical and confirm it includes farm, locations with kind/parent relationships, tracked items, harvest records, material-use records, inventory-count records, and export/schema metadata.
-49. Create a media recovery package and confirm native share/save behavior opens for a ZIP file.
-50. Inspect the package where practical and confirm it includes metadata plus saved voice memo and photo files.
-51. Confirm export messaging states that data is private and not uploaded automatically.
-52. Cancel or fail a share action and confirm locally retained records remain unchanged.
-53. Confirm no UI suggests synchronization, server connection, accounts, cloud backup, AI, listing publication, or messaging.
-54. Confirm touch targets, validation messages, contrast, recording controls, playback, photo controls, timeline filters, and form behavior are workable on a physical device.
-55. Record any usability concerns before distribution preparation.
+5. Confirm the `Farm Notes` header is visible.
+6. Open and close the hamburger menu.
+7. Confirm the menu navigates to `Record farm note`, `Farm notes timeline`, `Farm setup`, `Activity history`, and `Recovery copy`.
+8. Start with a fresh local database.
+9. Confirm earthy UI styling is readable and consistent.
+10. Create a farm.
+11. Confirm the next screen emphasizes `Set up your farm places`, not operational recording.
+12. Add `Field 1`.
+13. Add `Bed 1` inside `Field 1`.
+14. Add `Row 1` inside `Bed 1`.
+15. Add `Greenhouse 1`.
+16. Add `Bench 1` inside `Greenhouse 1`.
+17. Confirm the farm-place tree is understandable.
+18. Add one crop.
+19. Add one material.
+20. Add one countable item.
+21. Enable airplane mode.
+22. Tap `Record farm note`.
+23. Grant microphone permission when prompted.
+24. Record a short voice memo.
+25. Stop recording and play the memo back.
+26. Take a photo and confirm it appears as a preview.
+27. Choose an existing photo and confirm it appears as a preview.
+28. Remove one selected photo and confirm it is not saved with the farm note.
+29. Add at least two photos, optional farm place/type/text context, then save the farm note.
+30. Open `Review farm notes`.
+31. Confirm the saved note appears in newest-first order.
+32. Filter farm notes by type, place, and date.
+33. Open the note detail and confirm voice playback, both photo previews, note text, place, time, and private/local wording are understandable.
+34. Close and relaunch the app while offline.
+35. Open the same previous note again and confirm the voice memo still plays and both photos still appear.
+36. If a photo file has been removed from the device, confirm the UI says `Photo unavailable on this device.`
+37. Tap `Transcribe voice memo`.
+38. If this test build does not include the local Whisper model, confirm the app says `Transcription model is not installed in this test build.` and the original audio still plays.
+39. If this test build includes the local Whisper model, confirm airplane mode remains enabled, progress appears, a `Transcript draft` appears, and the transcript persists after relaunch.
+40. Confirm transcript wording says generated/draft/local and does not imply a confirmed farm record.
+41. Confirm the screen does not claim cloud transcription, structured AI interpretation, upload, or sharing.
+42. Record a harvest using a nested farm place.
+43. Record material use using a farm-place path.
+44. Record an inventory count of `0`.
+45. Record another inventory count greater than zero.
+46. Confirm blank inventory count is rejected.
+47. Confirm all save confirmations communicate device-local storage.
+48. Open unified local activity history.
+49. Confirm all three manual record types appear.
+50. Confirm newest-first ordering.
+51. Open each manual record type's detail view.
+52. Confirm values, labels, and private/local wording are understandable.
+53. Create a recovery copy.
+54. Confirm native share/save behavior opens.
+55. Inspect JSON where practical and confirm it includes farm, locations with kind/parent relationships, tracked items, harvest records, material-use records, inventory-count records, and export/schema metadata.
+56. Create a media recovery package and confirm native share/save behavior opens for a ZIP file.
+57. Inspect the package where practical and confirm it includes metadata plus saved voice memo files, photo files, and transcript drafts when present.
+58. Confirm export messaging states that data is private and not uploaded automatically.
+59. Cancel or fail a share action and confirm locally retained records remain unchanged.
+60. Confirm no UI suggests synchronization, server connection, accounts, cloud backup, structured AI extraction, listing publication, or messaging.
+61. Confirm touch targets, validation messages, contrast, recording controls, playback, photo controls, transcript states, timeline filters, header/menu, and form behavior are workable on a physical device.
+62. Record any usability concerns before distribution preparation.

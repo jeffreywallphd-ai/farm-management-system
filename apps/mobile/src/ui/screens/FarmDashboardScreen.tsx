@@ -93,7 +93,7 @@ export function FarmDashboardScreen({
       <LocalDataNotice />
       <Card>
         <SectionHeading
-          detail="Speak a quick note while the work is fresh. Add photos when they help. Saved on this device; no transcription or upload happens."
+          detail="Speak a quick note while the work is fresh. Add photos when they help. Saved on this device; no upload happens."
           title="Quick capture"
         />
         <Button label="Record farm note" onPress={() => pushRoute(router, "/farm-events/new")} />

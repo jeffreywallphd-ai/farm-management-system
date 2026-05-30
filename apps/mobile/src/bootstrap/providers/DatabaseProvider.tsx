@@ -2,10 +2,12 @@ import { createContext, ReactNode, useContext, useEffect, useMemo, useState } fr
 
 import type { FarmReferenceRepository } from "../../application/ports/FarmReferenceRepository";
 import type { FarmEventRepository } from "../../application/ports/FarmEventRepository";
+import type { FarmNoteTranscriptRepository } from "../../application/ports/FarmNoteTranscriptRepository";
 import type { LocalRecordRepository } from "../../application/ports/LocalRecordRepository";
 import { openMobilePilotDatabase } from "../../infrastructure/sqlite/database";
 import { SqliteFarmReferenceRepository } from "../../infrastructure/sqlite/repositories/SqliteFarmReferenceRepository";
 import { SqliteFarmEventRepository } from "../../infrastructure/sqlite/repositories/SqliteFarmEventRepository";
+import { SqliteFarmNoteTranscriptRepository } from "../../infrastructure/sqlite/repositories/SqliteFarmNoteTranscriptRepository";
 import { SqliteHarvestRecordRepository } from "../../infrastructure/sqlite/repositories/SqliteHarvestRecordRepository";
 
 type DatabaseState =
@@ -13,6 +15,7 @@ type DatabaseState =
   | {
       status: "ready";
       farmEventRepository: FarmEventRepository;
+      farmNoteTranscriptRepository: FarmNoteTranscriptRepository;
       farmReferenceRepository: FarmReferenceRepository;
       localRecordRepository: LocalRecordRepository;
     }
@@ -34,6 +37,7 @@ export function DatabaseProvider({ children }: { children: ReactNode }) {
           setState({
             status: "ready",
             farmEventRepository: new SqliteFarmEventRepository(database),
+            farmNoteTranscriptRepository: new SqliteFarmNoteTranscriptRepository(database),
             farmReferenceRepository: new SqliteFarmReferenceRepository(database),
             localRecordRepository: new SqliteHarvestRecordRepository(database),
           });
