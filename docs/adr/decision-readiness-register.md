@@ -3,7 +3,7 @@
 - Status: accepted
 - Last reviewed: 2026-05-28
 - Canonical for: current readiness classification of foundational product-technical decisions
-- Related ADRs: [ADR-0001](ADR-0001-offline-first-field-operation.md), [ADR-0002](ADR-0002-history-preserving-idempotent-synchronization.md), [ADR-0003](ADR-0003-ai-interpretations-require-confirmation.md), [ADR-0004](ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](ADR-0005-data-portability-and-recoverability.md), [ADR-0006](ADR-0006-deployment-mode-compatibility.md), [ADR-0007](ADR-0007-standalone-mobile-pilot-before-server-connected-features.md), [ADR-0008](ADR-0008-mobile-pilot-1-application-stack.md), [ADR-0009](ADR-0009-mobile-pilot-1-local-persistence.md), [ADR-0010](ADR-0010-mobile-pilot-1-export-and-recovery-copy.md), [ADR-0011](ADR-0011-mobile-pilot-1-runtime-boundary-validation.md), [ADR-0012](ADR-0012-voice-photo-first-farm-event-capture-pilot.md)
+- Related ADRs: [ADR-0001](ADR-0001-offline-first-field-operation.md), [ADR-0002](ADR-0002-history-preserving-idempotent-synchronization.md), [ADR-0003](ADR-0003-ai-interpretations-require-confirmation.md), [ADR-0004](ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](ADR-0005-data-portability-and-recoverability.md), [ADR-0006](ADR-0006-deployment-mode-compatibility.md), [ADR-0007](ADR-0007-standalone-mobile-pilot-before-server-connected-features.md), [ADR-0008](ADR-0008-mobile-pilot-1-application-stack.md), [ADR-0009](ADR-0009-mobile-pilot-1-local-persistence.md), [ADR-0010](ADR-0010-mobile-pilot-1-export-and-recovery-copy.md), [ADR-0011](ADR-0011-mobile-pilot-1-runtime-boundary-validation.md), [ADR-0012](ADR-0012-voice-photo-first-farm-event-capture-pilot.md), [ADR-0013](ADR-0013-on-device-farm-note-transcription-with-whisper-rn.md)
 - Related docs: [Documentation Governance](../README.md), [Standards Index](../standards/README.md), [Change Impact Matrix](../standards/change-impact-matrix.md), [Initial Vertical Slice](../product/initial-vertical-slice.md), [Operational Event Catalog](../domain/operational-event-catalog.md), [Offline-First Mobile Architecture](../architecture/offline-first-mobile-architecture.md), [Synchronization Architecture](../architecture/synchronization-architecture.md), [AI-Assisted Capture Boundaries](../architecture/ai-assisted-capture-boundaries.md), [Identity, Privacy, and Sharing](../architecture/identity-privacy-and-sharing.md), [Server and Deployment Operating Model](../architecture/server-and-deployment-operating-model.md), [Backup, Restore, and Data Export Requirements](../operations/backup-restore-and-data-export-requirements.md)
 - Related tests: not yet implemented
 - Supersedes: none
@@ -40,6 +40,7 @@ This register identifies whether additional candidate decisions are accepted, pr
 | [ADR-0010](ADR-0010-mobile-pilot-1-export-and-recovery-copy.md) | Mobile Pilot 1 export/recovery-copy mechanism | Pilot data must be retrievable without server/cloud decisions | Mobile Pilot 1 uses local versioned JSON export through Expo FileSystem and Expo Sharing |
 | [ADR-0011](ADR-0011-mobile-pilot-1-runtime-boundary-validation.md) | Mobile Pilot 1 runtime boundary validation | TypeScript alone cannot validate runtime data boundaries | Mobile Pilot 1 uses Zod for input, persistence, and export boundary validation; import validation applies only if import/restore becomes accepted |
 | [ADR-0012](ADR-0012-voice-photo-first-farm-event-capture-pilot.md) | Voice/photo-first farm-event capture pilot | Manual forms are useful foundation but not the strongest farmer-test differentiator | Next farmer-shareable mobile pilot prioritizes local voice memo and optional photo farm-event capture before AI/server features |
+| [ADR-0013](ADR-0013-on-device-farm-note-transcription-with-whisper-rn.md) | On-device farm-note transcription | Farmer review can benefit from generated text without cloud transcription | `whisper.rn` is accepted for manual local draft transcription when native build/model requirements are satisfied; no structured extraction is authorized |
 
 ## Proposed and Deferred Decisions
 
@@ -60,7 +61,7 @@ This register identifies whether additional candidate decisions are accepted, pr
 | ORM adoption for Mobile Pilot 1 | Deferred pending technical evaluation and need | ADR-0009 chooses direct SQLite through adapters for the pilot | Superseding ADR if complexity justifies it |
 | Import/restore, cloud backup, or server backup | Deferred pending validation and technical evaluation | ADR-0010 chooses only local JSON export/recovery copy for the pilot | Data-safety evidence plus product/ADR work |
 | Voice/photo farm-event capture workflow | Accepted ADR for local capture-first pilot; implementation still pending | Direction accepted to test capture behavior before AI interpretation | Implement local event model, voice memo capture, optional photos, timeline, and recovery package within ADR-0012 constraints |
-| AI transcription, AI interpretation, or photo-count inference | Deferred pending validation and technical evaluation | Capture behavior must be tested before inference/model decisions | Farmer evidence plus later product/architecture/ADR work |
+| Structured AI extraction, AI interpretation, or photo-count inference | Deferred pending validation and technical evaluation | Capture behavior and transcript usefulness must be tested before extraction/model decisions | Farmer evidence plus later product/architecture/ADR work |
 | Availability listings/messaging/group purchasing | Deferred pending validation | Coordination scope intentionally narrow | Farmer validation |
 | Need-listing publication as initial external coordination workflow | Deferred pending validation | ADR-0007 removes publication from the standalone mobile pilot | Create or update ADR/product docs before implementation |
 
@@ -77,7 +78,7 @@ This register identifies whether additional candidate decisions are accepted, pr
 - Synchronization protocol, library, or vendor.
 - API style and transport.
 - Background-job mechanism.
-- AI transcription/inference technology.
+- Cloud transcription and structured AI inference technology.
 - Computer-vision model/runtime.
 - Model training/evaluation tooling.
 - Deployment packaging technology.

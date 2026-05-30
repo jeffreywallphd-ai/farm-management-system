@@ -28,7 +28,8 @@ The mobile app now presents record locations as farmer-facing farm places. Farm 
 | Item movement | Candidate later workflow |
 | Equipment issue | Candidate later workflow |
 | Private supply need | Candidate later discovery workflow |
-| Voice transcription or structured draft | Later experiment after capture-first evidence |
+| On-device farm-note transcript draft | Accepted local review aid; native/model validation still required |
+| Structured voice draft into operational records | Later experiment after capture-first evidence |
 | Photo-count inference draft | Later experiment after capture-first evidence |
 | Shared need publication | Future server-connected scope |
 
@@ -40,7 +41,7 @@ The mobile app now presents record locations as farmer-facing farm places. Farm 
 - Problem or trigger: something worth remembering happens, but a structured form would interrupt the work.
 - Desired user action: tap `Record farm note`, speak a short memo, optionally attach photos, add light context if useful, and save.
 - Expected pilot outcome: the event is saved locally, appears in a local timeline, remains private/device-local, and is included in a recovery package.
-- Implementation note: this workflow captures source audio/photos for later review. It does not transcribe, infer fields, count objects, create operational records automatically, upload data, or synchronize.
+- Implementation note: this workflow captures source audio/photos for later review. A saved note may later have a local generated transcript draft when the development build includes the on-device Whisper model path. The transcript does not infer fields, count objects, create operational records automatically, upload data, or synchronize.
 - Why it matters: this tests whether farmers capture useful information more readily when the capture flow matches field conditions.
 - Online/offline relevance: capture and local review must remain usable without reception.
 - Future server note: server storage, synchronization, and shared visibility remain deferred.
@@ -52,7 +53,7 @@ Given the worker is in the field without reliable reception
 When the worker records a quick farm note and optionally attaches photos
 Then the event is saved on the device
 And the event appears in the local timeline
-And the app does not imply transcription, cloud upload, or sharing
+And the app does not imply cloud transcription, cloud upload, or sharing
 ```
 
 ## Workflow 2: Record a Harvest in the Field Without Reception

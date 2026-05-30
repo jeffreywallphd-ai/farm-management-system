@@ -3,7 +3,7 @@
 - Status: proposed
 - Last reviewed: 2026-05-28
 - Canonical for: architecture boundaries separating AI inference, drafts, confirmation, operational records, offline retention, attachments, privacy handoff, and model-evaluation constraints
-- Related ADRs: [ADR-0003](../adr/ADR-0003-ai-interpretations-require-confirmation.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md)
+- Related ADRs: [ADR-0003](../adr/ADR-0003-ai-interpretations-require-confirmation.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md), [ADR-0013](../adr/ADR-0013-on-device-farm-note-transcription-with-whisper-rn.md)
 - Related docs: [AI-Assisted Capture and Confirmation Rules](../domain/ai-assisted-capture-and-confirmation-rules.md), [AI-Assisted Capture Validation Plan](../product/ai-assisted-capture-validation-plan.md), [Privacy, Visibility, and Sharing Rules](../domain/privacy-visibility-and-sharing-rules.md), [Identity, Privacy, and Sharing](identity-privacy-and-sharing.md), [Offline-First Mobile Architecture](offline-first-mobile-architecture.md), [Synchronization Architecture](synchronization-architecture.md), [Persistence and Attachment Storage](persistence-and-attachment-storage.md)
 - Related tests: not yet implemented
 - Supersedes: none
@@ -12,7 +12,7 @@
 
 AI-assisted capture is a boundary capability that transforms user-provided source captures into reviewable drafts. It does not own or redefine the operational-record domain.
 
-AI-assisted capture is Mobile Pilot 2 or later, not Mobile Pilot 1. When later authorized, it is limited to constrained local draft-and-confirm experiments. Server inference, external provider transfer, synchronization of captures, and publication remain deferred unless later decisions authorize them.
+Structured AI-assisted capture remains Mobile Pilot 2 or later, not Mobile Pilot 1. ADR-0013 accepts a narrower Mobile Pilot 1B review aid: manually requested on-device transcription of a saved farm-note voice memo into a local draft transcript. That transcript is not a confirmed operational record, does not extract structured facts, and does not authorize server inference, external provider transfer, synchronization of captures, publication, or model-provider APIs.
 
 ```text
 User Intentional Capture
@@ -185,10 +185,9 @@ Invariant:
 
 ## Implementation Technology Deliberately Deferred
 
-This architecture does not choose:
+This architecture now chooses `whisper.rn`/`whisper.cpp` for the narrow saved-note draft transcription path in ADR-0013. It still does not choose:
 
 - Platform-native speech APIs.
-- Local transcription models.
 - Server-based speech processing.
 - Small intent models.
 - Large language models.

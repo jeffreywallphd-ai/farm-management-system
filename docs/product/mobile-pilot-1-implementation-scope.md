@@ -3,14 +3,14 @@
 - Status: accepted
 - Last reviewed: 2026-05-30
 - Canonical for: standalone mobile pilot scope, including the implemented manual foundation and the accepted voice/photo-first farmer-test direction
-- Related ADRs: [ADR-0001](../adr/ADR-0001-offline-first-field-operation.md), [ADR-0002](../adr/ADR-0002-history-preserving-idempotent-synchronization.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](../adr/ADR-0005-data-portability-and-recoverability.md), [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md), [ADR-0008](../adr/ADR-0008-mobile-pilot-1-application-stack.md), [ADR-0009](../adr/ADR-0009-mobile-pilot-1-local-persistence.md), [ADR-0010](../adr/ADR-0010-mobile-pilot-1-export-and-recovery-copy.md), [ADR-0011](../adr/ADR-0011-mobile-pilot-1-runtime-boundary-validation.md), [ADR-0012](../adr/ADR-0012-voice-photo-first-farm-event-capture-pilot.md)
+- Related ADRs: [ADR-0001](../adr/ADR-0001-offline-first-field-operation.md), [ADR-0002](../adr/ADR-0002-history-preserving-idempotent-synchronization.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](../adr/ADR-0005-data-portability-and-recoverability.md), [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md), [ADR-0008](../adr/ADR-0008-mobile-pilot-1-application-stack.md), [ADR-0009](../adr/ADR-0009-mobile-pilot-1-local-persistence.md), [ADR-0010](../adr/ADR-0010-mobile-pilot-1-export-and-recovery-copy.md), [ADR-0011](../adr/ADR-0011-mobile-pilot-1-runtime-boundary-validation.md), [ADR-0012](../adr/ADR-0012-voice-photo-first-farm-event-capture-pilot.md), [ADR-0013](../adr/ADR-0013-on-device-farm-note-transcription-with-whisper-rn.md)
 - Related docs: [Initial Vertical Slice](initial-vertical-slice.md), [Field Workflows](field-workflows.md), [Roadmap](roadmap.md), [Mobile Pilot 1 Operational Records](../domain/mobile-pilot-1-operational-records.md), [Mobile Pilot Data-Safety Requirements](../operations/mobile-pilot-data-safety-requirements.md), [Offline-First Mobile Architecture](../architecture/offline-first-mobile-architecture.md), [Mobile App README](../../apps/mobile/README.md)
 - Related tests: [Reference use-case tests](../../apps/mobile/src/application/use-cases/referenceUseCases.test.ts), [Reference validation tests](../../apps/mobile/src/domain/validation/referenceValidation.test.ts), [Harvest use-case tests](../../apps/mobile/src/application/use-cases/harvestUseCases.test.ts), [Manual record use-case tests](../../apps/mobile/src/application/use-cases/manualRecordUseCases.test.ts), [Harvest validation tests](../../apps/mobile/src/domain/validation/harvestValidation.test.ts), [Manual record validation tests](../../apps/mobile/src/domain/validation/manualRecordValidation.test.ts), [Phase 1 manual smoke test](../../apps/mobile/src/testing/phase-1-manual-smoke-test.md), [Phase 2 manual smoke test](../../apps/mobile/src/testing/phase-2-manual-smoke-test.md), [Phase 3 manual smoke test](../../apps/mobile/src/testing/phase-3-manual-smoke-test.md)
 - Supersedes: none
 
 ## Scope Statement
 
-> Mobile Pilot 1 is the standalone offline-first farmer-testing pilot. Its implemented manual-record foundation validates device-local setup, local history, and farmer-controlled recovery. Its next farmer-shareable differentiator is quick farm-event capture through voice memos, optional photos, light context, local timeline review, and recovery export. It does not include AI interpretation, server synchronization, external sharing, multi-device access, authentication, cloud backup, analytics, or deployment-mode implementation.
+> Mobile Pilot 1 is the standalone offline-first farmer-testing pilot. Its implemented manual-record foundation validates device-local setup, local history, and farmer-controlled recovery. Its farmer-shareable differentiator is quick farm-event capture through voice memos, optional photos, light context, local timeline review, and recovery export. ADR-0013 adds manually requested on-device transcript drafts as a review aid only. It does not include structured AI interpretation, server synchronization, external sharing, multi-device access, authentication, cloud backup, analytics, or deployment-mode implementation.
 
 The Mobile Pilot 1 implementation stack is selected in ADR-0008 through ADR-0011. Phase 1 setup/reference behavior now exists under `apps/mobile`: one local farm profile, farmer-facing farm places, tracked crops, tracked materials, tracked countable items, SQLite-backed local persistence, Zod validation, and a reusable earthy UI foundation.
 
@@ -18,7 +18,7 @@ Farm places are the implemented farmer-facing form of local location data. Each 
 
 Phase 3 now implements the complete manual Mobile Pilot 1 core: manual `HarvestRecorded`, `MaterialUseRecorded`, and `InventoryCountRecorded` creation; unified local activity history/detail; and a versioned JSON recovery-copy export for farm setup/reference data and all implemented manual records.
 
-ADR-0012 pivots the next farmer-testable implementation direction toward voice/photo-first farm-event capture. The app now has the first model/persistence foundation for local farm-event metadata and attachment references, plus local voice memo recording/playback, optional local photo attachments, farm-note save flow, local timeline/detail review, and a user-controlled ZIP recovery package containing metadata plus retained media. Import/restore, AI interpretation, server-connected behavior, farmer distribution configuration, and later candidate workflows are still not implemented.
+ADR-0012 pivots the farmer-testable implementation direction toward voice/photo-first farm-event capture. The app now has the first model/persistence foundation for local farm-event metadata and attachment references, plus local voice memo recording/playback, optional local photo attachments, farm-note save flow, local timeline/detail review, persistent local navigation, and a user-controlled ZIP recovery package containing metadata plus retained media. ADR-0013 adds local transcript-draft storage and UI for saved voice memos through a `whisper.rn` adapter; actual Whisper inference still requires a local model file and development-build validation. Import/restore, structured AI interpretation, server-connected behavior, farmer distribution configuration, and later candidate workflows are still not implemented.
 
 ## Included Mobile Pilot 1 Capabilities
 
@@ -32,13 +32,14 @@ ADR-0012 pivots the next farmer-testable implementation direction toward voice/p
 | Manual harvest record | Included |
 | Manual material-use record | Included |
 | Manual inventory-count observation | Included |
-| Farm-event metadata and attachment-reference model | Foundation implemented; no media capture UI yet |
+| Farm-event metadata and attachment-reference model | Implemented |
 | Voice memo farm-event capture | Basic local recording/playback/save implemented |
 | Optional photo attachments for farm events | Implemented for local farm notes |
-| Local farm-event timeline | Accepted next implementation scope; not yet implemented |
+| Saved-note transcript drafts | Local persistence/UI/export path implemented; real on-device inference requires native/model completion |
+| Local farm-event timeline | Implemented |
 | Local activity history for included records | Included |
 | Clear locally saved/device-local status | Included |
-| Practical export/backup of Mobile Pilot 1 data | Included for manual data; must expand to media recovery package before voice/photo farmer reliance |
+| Practical export/backup of Mobile Pilot 1 data | Included for manual data and farm-note media package; transcript drafts included when present |
 | Manual correction/editing only to the extent deliberately defined for the pilot | Basic correction for obvious entry mistakes may be included; correction history beyond basic pilot needs is deferred |
 | Field usability and offline behavior validation | Included |
 
@@ -50,7 +51,7 @@ ADR-0012 pivots the next farmer-testable implementation direction toward voice/p
 | Item movement record | Candidate later manual workflow after discovery |
 | Equipment issue record | Candidate later manual workflow after discovery |
 | Private internal supply-need note | Candidate discovery workflow after core recording proves usable |
-| AI transcription or voice-to-structured-record workflow | Later constrained experiment after capture-first evidence |
+| Structured voice-to-operational-record workflow | Later constrained experiment after capture-first evidence |
 | Photo-count inference workflow | Later constrained experiment after capture-first evidence |
 | More advanced inventory reconciliation | Later refinement after manual count/use feedback |
 

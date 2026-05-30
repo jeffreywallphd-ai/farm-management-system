@@ -51,6 +51,7 @@ Accepted ADRs are binding architecture guidance for the decisions they record. P
 | [ADR-0010](ADR-0010-mobile-pilot-1-export-and-recovery-copy.md) | accepted | Mobile Pilot 1 uses local versioned JSON export/recovery copy through Expo FileSystem and Expo Sharing |
 | [ADR-0011](ADR-0011-mobile-pilot-1-runtime-boundary-validation.md) | accepted | Mobile Pilot 1 uses Zod for runtime validation at input, persistence, and export boundaries |
 | [ADR-0012](ADR-0012-voice-photo-first-farm-event-capture-pilot.md) | accepted | The next farmer-shareable standalone mobile pilot is voice/photo-first farm-event capture rather than manual-form-first recordkeeping |
+| [ADR-0013](ADR-0013-on-device-farm-note-transcription-with-whisper-rn.md) | accepted | Saved farm-note voice memos may be transcribed on device with `whisper.rn` as generated local draft transcripts |
 
 ## ADR Rules
 
@@ -82,7 +83,7 @@ Accepted ADRs are binding architecture guidance for the decisions they record. P
 
 Server synchronization, multi-device operation, in-product need-listing publication, responses/messaging, hosted/local/cooperative server implementation, and broader network functionality are deferred from the pilot. Future server compatibility remains required, but it does not authorize building a server now.
 
-[ADR-0008](ADR-0008-mobile-pilot-1-application-stack.md) through [ADR-0011](ADR-0011-mobile-pilot-1-runtime-boundary-validation.md) select the Mobile Pilot 1 app stack, local persistence, export/recovery-copy mechanism, and runtime boundary validation. [ADR-0012](ADR-0012-voice-photo-first-farm-event-capture-pilot.md) refines the next farmer-shareable pilot direction around local voice/photo farm-event capture. These ADRs do not select future server language, server framework, server database, synchronization protocol, AI runtime, authentication, cloud provider, or deployment technology.
+[ADR-0008](ADR-0008-mobile-pilot-1-application-stack.md) through [ADR-0011](ADR-0011-mobile-pilot-1-runtime-boundary-validation.md) select the Mobile Pilot 1 app stack, local persistence, export/recovery-copy mechanism, and runtime boundary validation. [ADR-0012](ADR-0012-voice-photo-first-farm-event-capture-pilot.md) refines the next farmer-shareable pilot direction around local voice/photo farm-event capture. [ADR-0013](ADR-0013-on-device-farm-note-transcription-with-whisper-rn.md) accepts on-device draft transcription for saved voice memos without structured extraction. These ADRs do not select future server language, server framework, server database, synchronization protocol, cloud transcription, authentication, cloud provider, or deployment technology.
 
 Use `docs/adr/template.md` for new ADRs.
 

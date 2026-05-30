@@ -3,7 +3,7 @@
 - Status: proposed
 - Last reviewed: 2026-05-28
 - Canonical for: AI-assisted capture domain meaning, draft confirmation, provenance, ambiguity handling, and standalone-pilot assisted-capture boundaries
-- Related ADRs: [ADR-0003](../adr/ADR-0003-ai-interpretations-require-confirmation.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md)
+- Related ADRs: [ADR-0003](../adr/ADR-0003-ai-interpretations-require-confirmation.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md), [ADR-0013](../adr/ADR-0013-on-device-farm-note-transcription-with-whisper-rn.md)
 - Related docs: [Glossary](glossary.md), [Operational Event Catalog](operational-event-catalog.md), [Inventory and Reconciliation Rules](inventory-and-reconciliation-rules.md), [Privacy, Visibility, and Sharing Rules](privacy-visibility-and-sharing-rules.md), [AI-Assisted Capture Boundaries](../architecture/ai-assisted-capture-boundaries.md), [Initial Vertical Slice](../product/initial-vertical-slice.md), [Field Workflows](../product/field-workflows.md), [AI-Assisted Capture Validation Plan](../product/ai-assisted-capture-validation-plan.md)
 - Related tests: not yet implemented
 - Supersedes: none
@@ -47,6 +47,8 @@ The assisted-capture experiment is Mobile Pilot 2 or later, not Mobile Pilot 1. 
 | Failed interpretation | System could not produce a usable draft | No |
 
 Later architecture may refine technical statuses, but it must preserve this trust distinction.
+
+ADR-0013 introduces a narrow local transcript draft for saved farm-note voice memos. A transcript draft is generated on the device when the local model path is available, remains associated with the source audio, and is a review/search aid only. It is not a structured harvest, material-use, inventory-count, listing, or supply-need record.
 
 ## Manual Entry Versus AI-Assisted Entry
 

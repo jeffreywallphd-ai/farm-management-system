@@ -3,7 +3,7 @@
 - Status: accepted
 - Last reviewed: 2026-05-28
 - Canonical for: device-local Mobile Pilot 1 data retention, export/backup expectations, farmer communication, update/replacement safety, and limitations before real pilot reliance
-- Related ADRs: [ADR-0001](../adr/ADR-0001-offline-first-field-operation.md), [ADR-0002](../adr/ADR-0002-history-preserving-idempotent-synchronization.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](../adr/ADR-0005-data-portability-and-recoverability.md), [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md), [ADR-0009](../adr/ADR-0009-mobile-pilot-1-local-persistence.md), [ADR-0010](../adr/ADR-0010-mobile-pilot-1-export-and-recovery-copy.md), [ADR-0011](../adr/ADR-0011-mobile-pilot-1-runtime-boundary-validation.md), [ADR-0012](../adr/ADR-0012-voice-photo-first-farm-event-capture-pilot.md)
+- Related ADRs: [ADR-0001](../adr/ADR-0001-offline-first-field-operation.md), [ADR-0002](../adr/ADR-0002-history-preserving-idempotent-synchronization.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](../adr/ADR-0005-data-portability-and-recoverability.md), [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md), [ADR-0009](../adr/ADR-0009-mobile-pilot-1-local-persistence.md), [ADR-0010](../adr/ADR-0010-mobile-pilot-1-export-and-recovery-copy.md), [ADR-0011](../adr/ADR-0011-mobile-pilot-1-runtime-boundary-validation.md), [ADR-0012](../adr/ADR-0012-voice-photo-first-farm-event-capture-pilot.md), [ADR-0013](../adr/ADR-0013-on-device-farm-note-transcription-with-whisper-rn.md)
 - Related docs: [Mobile Pilot 1 Implementation Scope](../product/mobile-pilot-1-implementation-scope.md), [Mobile Pilot 1 Operational Records](../domain/mobile-pilot-1-operational-records.md), [Offline-First Mobile Architecture](../architecture/offline-first-mobile-architecture.md), [Backup, Restore, and Data Export Requirements](backup-restore-and-data-export-requirements.md), [Upgrades, Migrations, and Recovery Requirements](upgrades-migrations-and-recovery-requirements.md), [Mobile App README](../../apps/mobile/README.md)
 - Related tests: [Harvest use-case tests](../../apps/mobile/src/application/use-cases/harvestUseCases.test.ts), [Manual record use-case tests](../../apps/mobile/src/application/use-cases/manualRecordUseCases.test.ts)
 - Supersedes: none
@@ -24,7 +24,7 @@ Before a farmer relies on Mobile Pilot 1 for meaningful records:
    - `HarvestRecorded`.
    - `MaterialUseRecorded`.
    - `InventoryCountRecorded`.
-   - Farm-event capture metadata, voice memo files, and photo files once the ADR-0012 capture-first pilot is implemented.
+   - Farm-event capture metadata, voice memo files, photo files, and transcript drafts when present.
    - Essential identifiers, timestamps, quantities, units, location/item relationships, and privacy classification needed to understand the records.
 3. The app must clearly communicate:
    - Records are stored on the device.
@@ -41,7 +41,7 @@ Phase 3 implements a one-way versioned JSON recovery copy for the complete manua
 
 Farm-place hierarchy in the recovery copy is data-safety context only. It helps interpret records such as `Field 1 > Bed 1 > Row 1` after export, but it does not imply restore/import, mapping, GIS, server backup, or cloud backup behavior.
 
-The app now has event metadata and local attachment-reference storage foundation for the ADR-0012 capture-first pilot, plus a user-controlled ZIP media recovery package that includes event metadata with retained audio and photo files. The package remains user-controlled and does not upload, synchronize, or share captured media automatically. Restore/import remains unimplemented.
+The app now has event metadata and local attachment-reference storage foundation for the ADR-0012 capture-first pilot, plus a user-controlled ZIP media recovery package that includes event metadata with retained audio and photo files. ADR-0013 transcript drafts are included in that package when present, clearly as generated local draft text. The package remains user-controlled and does not upload, synchronize, or share captured media automatically. Restore/import remains unimplemented.
 
 ## Scope Boundary
 
