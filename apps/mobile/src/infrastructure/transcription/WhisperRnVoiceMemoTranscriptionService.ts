@@ -1,5 +1,3 @@
-import * as FileSystem from "expo-file-system/legacy";
-
 import type { TranscriptionModelRepository } from "../../application/ports/TranscriptionModelRepository";
 import {
   TranscriptionAudioUnavailableError,
@@ -25,6 +23,7 @@ export class WhisperRnVoiceMemoTranscriptionService implements VoiceMemoTranscri
     if (!modelFileUri) {
       throw new TranscriptionModelUnavailableError();
     }
+    const FileSystem = await import("expo-file-system/legacy");
     const modelInfo = await FileSystem.getInfoAsync(modelFileUri);
     if (!modelInfo.exists) {
       throw new TranscriptionModelLoadError();

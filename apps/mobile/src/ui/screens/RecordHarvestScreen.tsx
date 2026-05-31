@@ -18,7 +18,6 @@ import { Button } from "../components/Button";
 import { Card } from "../components/Card";
 import { EmptyState } from "../components/EmptyState";
 import { FormField } from "../components/FormField";
-import { LocalDataNotice } from "../components/LocalDataNotice";
 import { PageHeader } from "../components/PageHeader";
 import { Screen } from "../components/Screen";
 import { SelectField } from "../components/SelectField";
@@ -106,7 +105,6 @@ export function RecordHarvestScreen({
         supportingText="Record a crop harvest where the work happens. No reception is needed."
         title="Record harvest"
       />
-      <LocalDataNotice />
       {missingReferences ? (
         <Card>
           <SectionHeading title="Finish setup first" />

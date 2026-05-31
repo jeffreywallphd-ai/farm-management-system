@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     color: theme.colors.textPrimary,
     fontSize: theme.typography.body,
-    minHeight: 48,
+    minHeight: theme.spacing.touchTarget,
     paddingHorizontal: theme.spacing.md,
     paddingVertical: theme.spacing.md,
   },

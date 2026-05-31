@@ -7,6 +7,7 @@ import { expandManualRecordUnits } from "./0004_expand_manual_record_units";
 import { addFarmPlaceHierarchy } from "./0005_add_farm_place_hierarchy";
 import { createFarmEvents } from "./0006_create_farm_events";
 import { createFarmNoteTranscripts } from "./0007_create_farm_note_transcripts";
+import { addCorePlacesSetupState } from "./0008_add_core_places_setup_state";
 
 export interface Migration {
   version: number;
@@ -22,6 +23,7 @@ const migrations: Migration[] = [
   addFarmPlaceHierarchy,
   createFarmEvents,
   createFarmNoteTranscripts,
+  addCorePlacesSetupState,
 ];
 
 export async function runMigrations(database: SQLiteDatabase): Promise<void> {

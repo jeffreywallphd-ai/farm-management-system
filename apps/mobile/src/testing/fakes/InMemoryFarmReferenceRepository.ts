@@ -16,6 +16,12 @@ export class InMemoryFarmReferenceRepository implements FarmReferenceRepository 
     return this.farm;
   }
 
+  async markCorePlacesSetupComplete(farmId: FarmId, completedAt: string): Promise<void> {
+    if (this.farm?.id === farmId) {
+      this.farm = { ...this.farm, corePlacesSetupCompletedAt: completedAt };
+    }
+  }
+
   async addLocation(location: FarmLocation): Promise<void> {
     if (location.parentId) {
       const parent = this.locations.find(
@@ -30,12 +36,46 @@ export class InMemoryFarmReferenceRepository implements FarmReferenceRepository 
     this.locations.push(location);
   }
 
+  async updateLocation(location: FarmLocation): Promise<void> {
+    const index = this.locations.findIndex(
+      (candidate) => candidate.id === location.id && candidate.farmId === location.farmId,
+    );
+
+    if (index < 0) {
+      throw new Error("Choose a saved farm place to edit.");
+    }
+
+    if (location.parentId) {
+      const parent = this.locations.find(
+        (candidate) => candidate.id === location.parentId && candidate.farmId === location.farmId,
+      );
+
+      if (!parent) {
+        throw new Error("Choose a saved parent place or leave it as a top-level place.");
+      }
+    }
+
+    this.locations[index] = location;
+  }
+
   async listLocations(farmId: FarmId): Promise<FarmLocation[]> {
     return this.locations.filter((location) => location.farmId === farmId);
   }
 
   async addTrackedItem(item: TrackedItem): Promise<void> {
     this.trackedItems.push(item);
+  }
+
+  async updateTrackedItem(item: TrackedItem): Promise<void> {
+    const index = this.trackedItems.findIndex(
+      (candidate) => candidate.id === item.id && candidate.farmId === item.farmId && candidate.kind === item.kind,
+    );
+
+    if (index < 0) {
+      throw new Error("Choose a saved setup item to edit.");
+    }
+
+    this.trackedItems[index] = item;
   }
 
   async listTrackedItems(farmId: FarmId, kind?: TrackedItemKind): Promise<TrackedItem[]> {

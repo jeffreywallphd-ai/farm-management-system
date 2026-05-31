@@ -19,9 +19,7 @@ import { Button } from "../components/Button";
 import { Card } from "../components/Card";
 import { EmptyState } from "../components/EmptyState";
 import { FarmNotePhotoPreview } from "../components/FarmNotePhotoPreview";
-import { LocalDataNotice } from "../components/LocalDataNotice";
 import { PageHeader } from "../components/PageHeader";
-import { PrivateDataNotice } from "../components/PrivateDataNotice";
 import { Screen } from "../components/Screen";
 import { SectionHeading } from "../components/SectionHeading";
 import { buildFarmPlacePath } from "../farmPlaceDisplay";
@@ -145,8 +143,6 @@ export function FarmEventDetailScreen({
         supportingText="Read-only local note details saved on this device."
         title={event ? FARM_EVENT_TYPE_LABELS[event.event.eventType] : "Farm note"}
       />
-      <LocalDataNotice />
-      <PrivateDataNotice text="This farm note is private to this device. The app does not transcribe, upload, or share it automatically." />
       {isLoading ? (
         <Card>
           <Text style={styles.muted}>Loading farm note...</Text>
@@ -162,7 +158,7 @@ export function FarmEventDetailScreen({
             <DetailRow label="Type" value={FARM_EVENT_TYPE_LABELS[event.event.eventType]} />
             <DetailRow label="Farm place" value={placePath ?? "No place"} />
             <DetailRow label="Captured" value={formatRecordDate(event.event.capturedAt)} />
-            <DetailRow label="Saved" value="Saved on this device" />
+            <DetailRow label="Saved" value="Local note" />
             {event.event.note ? <DetailRow label="Text note" value={event.event.note} /> : null}
           </Card>
           <Card>

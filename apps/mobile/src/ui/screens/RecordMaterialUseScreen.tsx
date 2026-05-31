@@ -18,7 +18,6 @@ import { Button } from "../components/Button";
 import { Card } from "../components/Card";
 import { EmptyState } from "../components/EmptyState";
 import { FormField } from "../components/FormField";
-import { LocalDataNotice } from "../components/LocalDataNotice";
 import { PageHeader } from "../components/PageHeader";
 import { Screen } from "../components/Screen";
 import { SelectField } from "../components/SelectField";
@@ -80,7 +79,6 @@ export function RecordMaterialUseScreen({
   return (
     <Screen>
       <PageHeader eyebrow="Material use" supportingText="Record material use without reception." title="Record material use" />
-      <LocalDataNotice />
       {materials.length === 0 ? (
         <Card>
           <SectionHeading title="Finish setup first" />

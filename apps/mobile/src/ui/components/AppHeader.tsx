@@ -6,9 +6,14 @@ import { pushRoute } from "../navigation";
 import { theme } from "../theme/theme";
 
 const menuItems = [
+  { label: "Home", route: "/home" },
   { label: "Record farm note", route: "/farm-events/new" },
   { label: "Farm notes timeline", route: "/farm-events" },
-  { label: "Farm setup", route: "/" },
+  { label: "Farm places", route: "/setup?section=farmPlaces" },
+  { label: "Crops", route: "/setup?section=crops" },
+  { label: "Materials", route: "/setup?section=materials" },
+  { label: "Countable items", route: "/setup?section=countableItems" },
+  { label: "Farm setup", route: "/setup" },
   { label: "Activity history", route: "/activity" },
   { label: "Recovery copy", route: "/data-safety/export" },
 ] as const;
@@ -25,14 +30,21 @@ export function AppHeader() {
   return (
     <View style={styles.container}>
       <View style={styles.bar}>
-        <Text style={styles.title}>Farm Notes</Text>
+        <Pressable
+          accessibilityLabel="Go to Home"
+          accessibilityRole="button"
+          onPress={() => handleNavigate("/home")}
+          style={styles.titleButton}
+        >
+          <Text style={styles.title}>Farm Notes</Text>
+        </Pressable>
         <Pressable
           accessibilityLabel={isOpen ? "Close menu" : "Open menu"}
           accessibilityRole="button"
           onPress={() => setIsOpen((current) => !current)}
           style={styles.menuButton}
         >
-          <Text style={styles.menuIcon}>{isOpen ? "×" : "☰"}</Text>
+          <Text style={styles.menuIcon}>{isOpen ? "Close" : "Menu"}</Text>
         </Pressable>
       </View>
       {isOpen ? (
@@ -61,7 +73,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     flexDirection: "row",
     justifyContent: "space-between",
-    minHeight: 56,
+    minHeight: theme.spacing.primaryTouchTarget,
     paddingHorizontal: theme.spacing.lg,
   },
   container: {
@@ -77,17 +89,17 @@ const styles = StyleSheet.create({
   menuButton: {
     alignItems: "center",
     justifyContent: "center",
-    minHeight: 48,
-    minWidth: 48,
+    minHeight: theme.spacing.touchTarget,
+    minWidth: theme.spacing.primaryTouchTarget,
   },
   menuIcon: {
     color: theme.colors.onPrimary,
-    fontSize: 28,
+    fontSize: theme.typography.body,
     fontWeight: "700",
   },
   menuItem: {
     borderRadius: theme.radius.sm,
-    minHeight: 48,
+    minHeight: theme.spacing.primaryTouchTarget,
     justifyContent: "center",
     paddingHorizontal: theme.spacing.md,
   },
@@ -100,5 +112,10 @@ const styles = StyleSheet.create({
     color: theme.colors.onPrimary,
     fontSize: theme.typography.title,
     fontWeight: "800",
+  },
+  titleButton: {
+    justifyContent: "center",
+    minHeight: theme.spacing.touchTarget,
+    paddingRight: theme.spacing.md,
   },
 });

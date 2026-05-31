@@ -11,7 +11,6 @@ import { EmptyState } from "../components/EmptyState";
 import { ListRow } from "../components/ListRow";
 import { LocalSaveConfirmation } from "../components/LocalSaveConfirmation";
 import { PageHeader } from "../components/PageHeader";
-import { PrivateDataNotice } from "../components/PrivateDataNotice";
 import { Screen } from "../components/Screen";
 import { SectionHeading } from "../components/SectionHeading";
 import { getActivityDetail, getActivityTitle } from "../formatters";
@@ -55,7 +54,6 @@ export function ActivityHistoryScreen({
       {params.saved && savedMessages[params.saved] ? (
         <LocalSaveConfirmation message={savedMessages[params.saved]} />
       ) : null}
-      <PrivateDataNotice text="These records are not sent anywhere unless you create and share a recovery copy." />
       <Card>
         <SectionHeading title="Saved activity" />
         {isLoading ? (

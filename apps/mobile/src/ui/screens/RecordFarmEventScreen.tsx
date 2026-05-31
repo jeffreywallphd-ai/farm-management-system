@@ -25,9 +25,7 @@ import { ExpoVoiceMemoStorageRepository } from "../../infrastructure/media/ExpoV
 import { Button } from "../components/Button";
 import { Card } from "../components/Card";
 import { FormField } from "../components/FormField";
-import { LocalDataNotice } from "../components/LocalDataNotice";
 import { PageHeader } from "../components/PageHeader";
-import { PrivateDataNotice } from "../components/PrivateDataNotice";
 import { Screen } from "../components/Screen";
 import { SelectField } from "../components/SelectField";
 import { SectionHeading } from "../components/SectionHeading";
@@ -264,8 +262,6 @@ export function RecordFarmEventScreen({
         supportingText="Record a quick voice memo while the work is fresh. Add photos when a picture helps."
         title="Record farm note"
       />
-      <LocalDataNotice />
-      <PrivateDataNotice text="Voice memos and photos are saved on this device. The app does not transcribe, upload, or share them automatically." />
       <Card>
         <SectionHeading detail="Speak what happened. You can add place and type context if it helps." title="Voice memo" />
         <View style={styles.recorderPanel}>

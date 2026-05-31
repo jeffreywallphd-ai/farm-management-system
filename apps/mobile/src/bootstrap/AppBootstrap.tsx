@@ -2,24 +2,21 @@ import { useCallback, useEffect, useState } from "react";
 import { Text } from "react-native";
 
 import { listLocations } from "../application/use-cases/list-locations/listLocations";
-import { listTrackedItems } from "../application/use-cases/list-tracked-items/listTrackedItems";
 import type { Farm } from "../domain/farm/Farm";
 import type { FarmLocation } from "../domain/farm/FarmLocation";
-import type { TrackedItem } from "../domain/farm/TrackedItem";
 import { Card } from "../ui/components/Card";
 import { PageHeader } from "../ui/components/PageHeader";
 import { Screen } from "../ui/components/Screen";
-import { FarmDashboardScreen } from "../ui/screens/FarmDashboardScreen";
+import { FarmPlacesSetupScreen } from "../ui/screens/FarmPlacesSetupScreen";
 import { FarmSetupScreen } from "../ui/screens/FarmSetupScreen";
+import { HomeScreen } from "../ui/screens/HomeScreen";
+import { getStartupStep } from "../ui/setupFlow";
 import { useDatabase } from "./providers/DatabaseProvider";
 
 export function AppBootstrap() {
   const database = useDatabase();
   const [farm, setFarm] = useState<Farm | null>(null);
   const [locations, setLocations] = useState<FarmLocation[]>([]);
-  const [crops, setCrops] = useState<TrackedItem[]>([]);
-  const [materials, setMaterials] = useState<TrackedItem[]>([]);
-  const [countableItems, setCountableItems] = useState<TrackedItem[]>([]);
   const [isLoadingReferences, setIsLoadingReferences] = useState(false);
 
   const loadReferences = useCallback(async () => {
@@ -34,17 +31,8 @@ export function AppBootstrap() {
       setFarm(nextFarm);
 
       if (nextFarm) {
-        const [nextLocations, nextCrops, nextMaterials, nextCountableItems] = await Promise.all([
-          listLocations(nextFarm.id, database.farmReferenceRepository),
-          listTrackedItems(nextFarm.id, "crop", database.farmReferenceRepository),
-          listTrackedItems(nextFarm.id, "material", database.farmReferenceRepository),
-          listTrackedItems(nextFarm.id, "countableItem", database.farmReferenceRepository),
-        ]);
-
+        const nextLocations = await listLocations(nextFarm.id, database.farmReferenceRepository);
         setLocations(nextLocations);
-        setCrops(nextCrops);
-        setMaterials(nextMaterials);
-        setCountableItems(nextCountableItems);
       }
     } finally {
       setIsLoadingReferences(false);
@@ -74,7 +62,9 @@ export function AppBootstrap() {
     );
   }
 
-  if (!farm) {
+  const startupStep = getStartupStep(farm);
+
+  if (startupStep === "farmName") {
     return (
       <FarmSetupScreen
         onFarmCreated={(createdFarm) => {
@@ -86,15 +76,17 @@ export function AppBootstrap() {
     );
   }
 
-  return (
-    <FarmDashboardScreen
-      countableItems={countableItems}
-      crops={crops}
-      farm={farm}
-      locations={locations}
-      materials={materials}
-      onReferenceSaved={loadReferences}
-      repository={database.farmReferenceRepository}
-    />
-  );
+  if (startupStep === "coreFarmPlaces" && farm) {
+    return (
+      <FarmPlacesSetupScreen
+        farm={farm}
+        locations={locations}
+        onReferenceSaved={loadReferences}
+        onSetupCompleted={(updatedFarm) => setFarm(updatedFarm)}
+        repository={database.farmReferenceRepository}
+      />
+    );
+  }
+
+  return farm ? <HomeScreen farmName={farm.name} /> : null;
 }

@@ -9,7 +9,6 @@ import { Button } from "../components/Button";
 import { Card } from "../components/Card";
 import { EmptyState } from "../components/EmptyState";
 import { PageHeader } from "../components/PageHeader";
-import { PrivateDataNotice } from "../components/PrivateDataNotice";
 import { Screen } from "../components/Screen";
 import { SectionHeading } from "../components/SectionHeading";
 import { formatHarvestQuantity, formatRecordDate } from "../formatters";
@@ -42,7 +41,6 @@ export function HarvestDetailScreen({
   return (
     <Screen>
       <PageHeader eyebrow="Harvest" title="Harvest details" />
-      <PrivateDataNotice text="This confirmed harvest is saved locally and remains private on this device." />
       <Card>
         {isLoading ? (
           <Text style={styles.muted}>Loading harvest...</Text>
@@ -52,7 +50,7 @@ export function HarvestDetailScreen({
             <DetailLine label="Amount" value={formatHarvestQuantity(detail)} />
             <DetailLine label="Location" value={detail.sourceLocation.name} />
             <DetailLine label="Date" value={formatRecordDate(detail.record.effectiveAt)} />
-            <DetailLine label="Status" value="Saved on this device" />
+            <DetailLine label="Status" value="Local record" />
             {detail.record.note ? <DetailLine label="Note" value={detail.record.note} /> : null}
           </>
         ) : (

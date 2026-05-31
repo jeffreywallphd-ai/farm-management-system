@@ -10,6 +10,7 @@ interface FarmRow {
   id: string;
   name: string;
   created_at: string;
+  core_places_setup_completed_at: string | null;
 }
 
 interface LocationRow {
@@ -35,23 +36,37 @@ export class SqliteFarmReferenceRepository implements FarmReferenceRepository {
 
   async createFarm(farm: Farm): Promise<void> {
     await this.database.runAsync(
-      "INSERT INTO farms (id, name, created_at) VALUES (?, ?, ?);",
-      [farm.id, farm.name, farm.createdAt],
+      "INSERT INTO farms (id, name, created_at, core_places_setup_completed_at) VALUES (?, ?, ?, ?);",
+      [farm.id, farm.name, farm.createdAt, farm.corePlacesSetupCompletedAt ?? null],
     );
   }
 
   async getFarm(): Promise<Farm | null> {
     const row = await this.database.getFirstAsync<FarmRow>(
-      "SELECT id, name, created_at FROM farms ORDER BY created_at ASC LIMIT 1;",
+      "SELECT id, name, created_at, core_places_setup_completed_at FROM farms ORDER BY created_at ASC LIMIT 1;",
     );
 
     return row ? mapFarm(row) : null;
+  }
+
+  async markCorePlacesSetupComplete(farmId: FarmId, completedAt: string): Promise<void> {
+    await this.database.runAsync(
+      "UPDATE farms SET core_places_setup_completed_at = ? WHERE id = ?;",
+      [completedAt, farmId],
+    );
   }
 
   async addLocation(location: FarmLocation): Promise<void> {
     await this.database.runAsync(
       "INSERT INTO farm_locations (id, farm_id, name, kind, parent_id, created_at) VALUES (?, ?, ?, ?, ?, ?);",
       [location.id, location.farmId, location.name, location.kind, location.parentId ?? null, location.createdAt],
+    );
+  }
+
+  async updateLocation(location: FarmLocation): Promise<void> {
+    await this.database.runAsync(
+      "UPDATE farm_locations SET name = ?, kind = ?, parent_id = ? WHERE id = ? AND farm_id = ?;",
+      [location.name, location.kind, location.parentId ?? null, location.id, location.farmId],
     );
   }
 
@@ -68,6 +83,13 @@ export class SqliteFarmReferenceRepository implements FarmReferenceRepository {
     await this.database.runAsync(
       "INSERT INTO tracked_items (id, farm_id, kind, name, created_at, default_unit) VALUES (?, ?, ?, ?, ?, ?);",
       [item.id, item.farmId, item.kind, item.name, item.createdAt, item.defaultUnit ?? null],
+    );
+  }
+
+  async updateTrackedItem(item: TrackedItem): Promise<void> {
+    await this.database.runAsync(
+      "UPDATE tracked_items SET name = ?, default_unit = ? WHERE id = ? AND farm_id = ? AND kind = ?;",
+      [item.name, item.defaultUnit ?? null, item.id, item.farmId, item.kind],
     );
   }
 
@@ -91,6 +113,7 @@ function mapFarm(row: FarmRow): Farm {
     id: row.id,
     name: row.name,
     createdAt: row.created_at,
+    corePlacesSetupCompletedAt: row.core_places_setup_completed_at ?? undefined,
   };
 }
 

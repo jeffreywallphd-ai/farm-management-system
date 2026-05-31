@@ -11,7 +11,6 @@ import { EmptyState } from "../components/EmptyState";
 import { ListRow } from "../components/ListRow";
 import { LocalSaveConfirmation } from "../components/LocalSaveConfirmation";
 import { PageHeader } from "../components/PageHeader";
-import { PrivateDataNotice } from "../components/PrivateDataNotice";
 import { Screen } from "../components/Screen";
 import { SectionHeading } from "../components/SectionHeading";
 import { formatHarvestQuantity, formatRecordDate } from "../formatters";
@@ -48,7 +47,6 @@ export function HarvestHistoryScreen({
         title="Harvest history"
       />
       {params.saved === "1" ? <LocalSaveConfirmation message="Harvest saved on this device" /> : null}
-      <PrivateDataNotice text="Harvest records are not sent anywhere unless you create and share a recovery copy." />
       <Card>
         <SectionHeading title="Saved harvests" />
         {isLoading ? (

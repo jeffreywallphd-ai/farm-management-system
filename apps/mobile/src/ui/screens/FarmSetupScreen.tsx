@@ -45,8 +45,8 @@ export function FarmSetupScreen({
   return (
     <Screen>
       <PageHeader
-        eyebrow="Farm records pilot"
-        supportingText="Keep simple farm records in the field, even without reception."
+        eyebrow="Step 1 of 2"
+        supportingText="Name this device-local farm setup before adding the main places where work happens."
         title="Set up your farm"
       />
       <LocalDataNotice />
@@ -59,7 +59,7 @@ export function FarmSetupScreen({
           placeholder="Green Hill Farm"
           value={farmName}
         />
-        <Button disabled={isSaving} label={isSaving ? "Saving..." : "Create farm"} onPress={handleCreateFarm} />
+        <Button disabled={isSaving} label={isSaving ? "Saving..." : "Save farm name"} onPress={handleCreateFarm} size="large" />
       </Card>
     </Screen>
   );

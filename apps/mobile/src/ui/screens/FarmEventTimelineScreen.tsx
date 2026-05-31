@@ -9,9 +9,7 @@ import { Button } from "../components/Button";
 import { Card } from "../components/Card";
 import { EmptyState } from "../components/EmptyState";
 import { ListRow } from "../components/ListRow";
-import { LocalDataNotice } from "../components/LocalDataNotice";
 import { PageHeader } from "../components/PageHeader";
-import { PrivateDataNotice } from "../components/PrivateDataNotice";
 import { Screen } from "../components/Screen";
 import { SelectField } from "../components/SelectField";
 import { SectionHeading } from "../components/SectionHeading";
@@ -62,8 +60,6 @@ export function FarmEventTimelineScreen({
         supportingText="Review voice and photo notes saved privately on this device."
         title="Farm note timeline"
       />
-      <LocalDataNotice />
-      <PrivateDataNotice text="Farm notes stay on this device unless you choose to create and share a media recovery package." />
       <Card>
         <SectionHeading detail="Filter your saved notes without needing reception." title="Find notes" />
         <SelectField

@@ -16,7 +16,6 @@ import { Button } from "../components/Button";
 import { Card } from "../components/Card";
 import { EmptyState } from "../components/EmptyState";
 import { PageHeader } from "../components/PageHeader";
-import { PrivateDataNotice } from "../components/PrivateDataNotice";
 import { Screen } from "../components/Screen";
 import { SectionHeading } from "../components/SectionHeading";
 import { formatQuantity, formatRecordDate, getActivityKindLabel } from "../formatters";
@@ -50,7 +49,6 @@ export function ActivityDetailScreen({
   return (
     <Screen>
       <PageHeader eyebrow={getActivityKindLabel(kind)} title="Activity details" />
-      <PrivateDataNotice text="This confirmed record is saved locally and remains private on this device." />
       <Card>
         {isLoading ? (
           <Text style={styles.muted}>Loading activity...</Text>
@@ -75,7 +73,7 @@ function ActivityDetailContent({ detail }: { detail: LocalActivityRecordView }) 
         <DetailLine label="Amount" value={formatQuantity(harvest.record.quantity)} />
         <DetailLine label="Location" value={harvest.sourceLocation.name} />
         <DetailLine label="Date" value={formatRecordDate(harvest.record.effectiveAt)} />
-        <DetailLine label="Status" value="Saved on this device" />
+        <DetailLine label="Status" value="Local record" />
         {harvest.record.note ? <DetailLine label="Note" value={harvest.record.note} /> : null}
       </>
     );
@@ -90,7 +88,7 @@ function ActivityDetailContent({ detail }: { detail: LocalActivityRecordView }) 
         <DetailLine label="Amount" value={formatQuantity(materialUse.record.quantity)} />
         <DetailLine label="Location" value={materialUse.useLocation?.name ?? "No location"} />
         <DetailLine label="Date" value={formatRecordDate(materialUse.record.effectiveAt)} />
-        <DetailLine label="Status" value="Saved on this device" />
+        <DetailLine label="Status" value="Local record" />
         {materialUse.record.note ? <DetailLine label="Note" value={materialUse.record.note} /> : null}
       </>
     );
@@ -104,7 +102,7 @@ function ActivityDetailContent({ detail }: { detail: LocalActivityRecordView }) 
       <DetailLine label="Observed count" value={formatQuantity(inventoryCount.record.observedQuantity)} />
       <DetailLine label="Location" value={inventoryCount.location?.name ?? "No location"} />
       <DetailLine label="Date" value={formatRecordDate(inventoryCount.record.effectiveAt)} />
-      <DetailLine label="Status" value="Saved on this device" />
+      <DetailLine label="Status" value="Local record" />
       {inventoryCount.record.note ? <DetailLine label="Note" value={inventoryCount.record.note} /> : null}
     </>
   );

@@ -15,7 +15,6 @@ import { Button } from "../components/Button";
 import { Card } from "../components/Card";
 import { LocalSaveConfirmation } from "../components/LocalSaveConfirmation";
 import { PageHeader } from "../components/PageHeader";
-import { PrivateDataNotice } from "../components/PrivateDataNotice";
 import { Screen } from "../components/Screen";
 import { SectionHeading } from "../components/SectionHeading";
 import { theme } from "../theme/theme";
@@ -91,7 +90,6 @@ export function RecoveryCopyExportScreen({
         supportingText="Save or share a copy of data stored on this device."
         title="Create recovery copy"
       />
-      <PrivateDataNotice text="Recovery files contain private farm information. The app does not upload them automatically." />
       <Card>
         <SectionHeading
           detail="This includes farm setup, locations, tracked items, harvests, material use, and inventory counts. Restore/import is not available yet."

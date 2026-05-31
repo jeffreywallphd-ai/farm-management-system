@@ -1,10 +1,14 @@
 import { ReactNode, useEffect, useState } from "react";
 import { Text } from "react-native";
 
+import { listLocations } from "../application/use-cases/list-locations/listLocations";
 import type { Farm } from "../domain/farm/Farm";
+import type { FarmLocation } from "../domain/farm/FarmLocation";
 import { Card } from "../ui/components/Card";
 import { PageHeader } from "../ui/components/PageHeader";
 import { Screen } from "../ui/components/Screen";
+import { FarmPlacesSetupScreen } from "../ui/screens/FarmPlacesSetupScreen";
+import { getStartupStep } from "../ui/setupFlow";
 import { useDatabase } from "./providers/DatabaseProvider";
 
 export function FarmRouteGate({
@@ -17,20 +21,33 @@ export function FarmRouteGate({
 }) {
   const database = useDatabase();
   const [farm, setFarm] = useState<Farm | null>(null);
+  const [locations, setLocations] = useState<FarmLocation[]>([]);
   const [isLoadingFarm, setIsLoadingFarm] = useState(true);
 
+  async function loadFarm() {
+    if (database.status !== "ready") {
+      return;
+    }
+
+    setIsLoadingFarm(true);
+    const nextFarm = await database.farmReferenceRepository.getFarm();
+    setFarm(nextFarm);
+    if (nextFarm) {
+      setLocations(await listLocations(nextFarm.id, database.farmReferenceRepository));
+    }
+    setIsLoadingFarm(false);
+  }
+
   useEffect(() => {
-    async function loadFarm() {
+    async function load() {
       if (database.status !== "ready") {
         return;
       }
 
-      setIsLoadingFarm(true);
-      setFarm(await database.farmReferenceRepository.getFarm());
-      setIsLoadingFarm(false);
+      await loadFarm();
     }
 
-    loadFarm();
+    load();
   }, [database]);
 
   if (database.status === "loading" || isLoadingFarm) {
@@ -52,7 +69,9 @@ export function FarmRouteGate({
     );
   }
 
-  if (!farm) {
+  const startupStep = getStartupStep(farm);
+
+  if (startupStep === "farmName") {
     return (
       <Screen>
         <PageHeader supportingText="Create a farm profile before recording harvests." title="Set up your farm" />
@@ -60,5 +79,17 @@ export function FarmRouteGate({
     );
   }
 
-  return <>{children({ farm, database })}</>;
+  if (startupStep === "coreFarmPlaces" && farm) {
+    return (
+      <FarmPlacesSetupScreen
+        farm={farm}
+        locations={locations}
+        onReferenceSaved={loadFarm}
+        onSetupCompleted={(updatedFarm) => setFarm(updatedFarm)}
+        repository={database.farmReferenceRepository}
+      />
+    );
+  }
+
+  return farm ? <>{children({ farm, database })}</> : null;
 }

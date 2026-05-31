@@ -65,7 +65,7 @@ const styles = StyleSheet.create({
     borderColor: theme.colors.border,
     borderRadius: theme.radius.md,
     borderWidth: 1,
-    minHeight: 44,
+    minHeight: theme.spacing.touchTarget,
     justifyContent: "center",
     paddingHorizontal: theme.spacing.md,
     paddingVertical: theme.spacing.sm,

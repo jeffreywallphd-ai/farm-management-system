@@ -5,4 +5,6 @@ export const spacing = {
   lg: 16,
   xl: 24,
   xxl: 32,
+  touchTarget: 56,
+  primaryTouchTarget: 72,
 } as const;

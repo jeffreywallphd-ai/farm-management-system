@@ -15,6 +15,7 @@ import {
   TranscriptionAudioUnavailableError,
   TranscriptionModelLoadError,
   TranscriptionModelUnavailableError,
+  type VoiceMemoTranscriptionService,
 } from "../ports/VoiceMemoTranscriptionService";
 import { InMemoryFarmEventRepository } from "../../testing/fakes/InMemoryFarmEventRepository";
 import { InMemoryFarmReferenceRepository } from "../../testing/fakes/InMemoryFarmReferenceRepository";
@@ -515,18 +516,19 @@ test("farm note without a voice memo cannot be transcribed", async () => {
   await references.createFarm(farm);
   const eventRepository = new InMemoryFarmEventRepository({ locations: [] });
 
-  await recordFarmEvent(
+  await eventRepository.saveFarmEvent(
     {
+      id: "event-1",
+      kind: "FarmEvent",
       farmId: farm.id,
+      eventType: "general",
       note: "Typed note only",
-      attachments: [],
+      capturedAt: "2026-05-30T12:00:00.000Z",
+      createdAt: "2026-05-30T12:00:00.000Z",
+      privacy: "privateToFarm",
+      schemaVersion: 1,
     },
-    {
-      clock: { now: () => new Date("2026-05-30T12:00:00.000Z") },
-      farmEventRepository: eventRepository,
-      farmReferenceRepository: references,
-      idGenerator: new SequenceIds(["event-1"]),
-    },
+    [],
   );
 
   await assert.rejects(
@@ -695,16 +697,16 @@ class FakeTranscriptionService {
   }
 }
 
-class MissingModelTranscriptionService {
-  async transcribe() {
+class MissingModelTranscriptionService implements VoiceMemoTranscriptionService {
+  async transcribe(): Promise<never> {
     throw new TranscriptionModelUnavailableError();
   }
 }
 
-class FailingTranscriptionService {
+class FailingTranscriptionService implements VoiceMemoTranscriptionService {
   constructor(private readonly error: Error) {}
 
-  async transcribe() {
+  async transcribe(): Promise<never> {
     throw this.error;
   }
 }

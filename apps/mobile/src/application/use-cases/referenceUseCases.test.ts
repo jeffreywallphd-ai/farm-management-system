@@ -3,9 +3,12 @@ import test from "node:test";
 
 import { addLocation } from "./add-location/addLocation";
 import { addTrackedItem } from "./add-tracked-item/addTrackedItem";
+import { completeCorePlacesSetup } from "./complete-core-places-setup/completeCorePlacesSetup";
 import { listLocations } from "./list-locations/listLocations";
 import { listTrackedItems } from "./list-tracked-items/listTrackedItems";
 import { setupFarm } from "./setup-farm/setupFarm";
+import { updateLocation } from "./update-location/updateLocation";
+import { updateTrackedItem } from "./update-tracked-item/updateTrackedItem";
 import { InMemoryFarmReferenceRepository } from "../../testing/fakes/InMemoryFarmReferenceRepository";
 
 function dependencies() {
@@ -27,6 +30,18 @@ test("a farm can be created with stable identity and timestamp", async () => {
   assert.equal(farm.name, "Green Hill Farm");
   assert.equal(farm.createdAt, "2026-05-29T12:00:00.000Z");
   assert.deepEqual(await deps.repository.getFarm(), farm);
+});
+
+test("core farm places setup can be completed after the farm name step", async () => {
+  const deps = dependencies();
+  const farm = await setupFarm({ name: "Green Hill Farm" }, deps);
+
+  assert.equal(farm.corePlacesSetupCompletedAt, undefined);
+
+  const updatedFarm = await completeCorePlacesSetup(farm.id, deps);
+
+  assert.equal(updatedFarm?.corePlacesSetupCompletedAt, "2026-05-29T12:00:00.000Z");
+  assert.equal((await deps.repository.getFarm())?.corePlacesSetupCompletedAt, "2026-05-29T12:00:00.000Z");
 });
 
 test("a location can be added and listed for its farm", async () => {
@@ -81,6 +96,38 @@ test("farm place cannot be its own parent", async () => {
   );
 });
 
+test("farm places can be edited without breaking derived child paths", async () => {
+  const deps = dependencies();
+  const farm = await setupFarm({ name: "Green Hill Farm" }, deps);
+
+  const field = await addLocation({ farmId: farm.id, name: "Field 1", kind: "field" }, deps);
+  const bed = await addLocation({ farmId: farm.id, name: "Bed 1", kind: "bed", parentId: field.id }, deps);
+
+  const updatedField = await updateLocation(
+    { farmId: farm.id, id: field.id, name: "North Field", kind: "field" },
+    deps,
+  );
+
+  assert.equal(updatedField.name, "North Field");
+  assert.deepEqual(await listLocations(farm.id, deps.repository), [
+    updatedField,
+    { ...bed, parentId: updatedField.id },
+  ]);
+});
+
+test("farm places cannot be edited inside one of their children", async () => {
+  const deps = dependencies();
+  const farm = await setupFarm({ name: "Green Hill Farm" }, deps);
+
+  const field = await addLocation({ farmId: farm.id, name: "Field 1", kind: "field" }, deps);
+  const bed = await addLocation({ farmId: farm.id, name: "Bed 1", kind: "bed", parentId: field.id }, deps);
+
+  await assert.rejects(
+    () => updateLocation({ farmId: farm.id, id: field.id, name: "Field 1", kind: "field", parentId: bed.id }, deps),
+    /inside one of its child places/,
+  );
+});
+
 test("tracked item lists return only matching farm and kind", async () => {
   const deps = dependencies();
   const farm = await setupFarm({ name: "Green Hill Farm" }, deps);
@@ -91,4 +138,15 @@ test("tracked item lists return only matching farm and kind", async () => {
   await addTrackedItem({ farmId: "other-farm", kind: "crop", name: "Carrots" }, deps);
 
   assert.deepEqual(await listTrackedItems(farm.id, "crop", deps.repository), [crop]);
+});
+
+test("tracked setup items can be edited after creation", async () => {
+  const deps = dependencies();
+  const farm = await setupFarm({ name: "Green Hill Farm" }, deps);
+  const crop = await addTrackedItem({ farmId: farm.id, kind: "crop", name: "Kale" }, deps);
+
+  const updatedCrop = await updateTrackedItem({ farmId: farm.id, id: crop.id, kind: "crop", name: "Lacinato kale" }, deps);
+
+  assert.equal(updatedCrop.name, "Lacinato kale");
+  assert.deepEqual(await listTrackedItems(farm.id, "crop", deps.repository), [updatedCrop]);
 });

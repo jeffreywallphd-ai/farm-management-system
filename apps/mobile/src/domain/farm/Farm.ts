@@ -6,4 +6,5 @@ export interface Farm {
   id: FarmId;
   name: string;
   createdAt: IsoDateTimeString;
+  corePlacesSetupCompletedAt?: IsoDateTimeString;
 }

@@ -18,7 +18,6 @@ import { Button } from "../components/Button";
 import { Card } from "../components/Card";
 import { EmptyState } from "../components/EmptyState";
 import { FormField } from "../components/FormField";
-import { LocalDataNotice } from "../components/LocalDataNotice";
 import { PageHeader } from "../components/PageHeader";
 import { Screen } from "../components/Screen";
 import { SelectField } from "../components/SelectField";
@@ -80,7 +79,6 @@ export function RecordInventoryCountScreen({
   return (
     <Screen>
       <PageHeader eyebrow="Inventory count" supportingText="Record an observed count. It will not overwrite earlier history." title="Record inventory count" />
-      <LocalDataNotice />
       {items.length === 0 ? (
         <Card>
           <SectionHeading title="Finish setup first" />
