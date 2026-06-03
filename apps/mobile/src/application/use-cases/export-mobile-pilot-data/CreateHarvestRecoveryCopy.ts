@@ -8,6 +8,8 @@ import type { Clock } from "../../ports/Clock";
 import type { ExportRepository, MobilePilotExportFile } from "../../ports/ExportRepository";
 import type { FarmReferenceRepository } from "../../ports/FarmReferenceRepository";
 import type { LocalRecordRepository } from "../../ports/LocalRecordRepository";
+import type { OrganicCertificationRepository } from "../../ports/OrganicCertificationRepository";
+import type { PlanningRepository } from "../../ports/PlanningRepository";
 import { serializeRecoveryCopy } from "../../../infrastructure/export/JsonRecoveryCopyExporter";
 
 export async function createMobilePilotRecoveryCopy(
@@ -17,6 +19,8 @@ export async function createMobilePilotRecoveryCopy(
     exportRepository: ExportRepository;
     farmReferenceRepository: FarmReferenceRepository;
     localRecordRepository: LocalRecordRepository;
+    organicCertificationRepository?: OrganicCertificationRepository;
+    planningRepository?: PlanningRepository;
   },
 ): Promise<MobilePilotExportFile> {
   const farm = await dependencies.farmReferenceRepository.getFarm();
@@ -39,6 +43,8 @@ export async function buildMobilePilotRecoveryCopyPayload(
     clock: Clock;
     farmReferenceRepository: FarmReferenceRepository;
     localRecordRepository: LocalRecordRepository;
+    organicCertificationRepository?: OrganicCertificationRepository;
+    planningRepository?: PlanningRepository;
   },
 ): Promise<MobilePilotRecoveryCopy> {
   const farm = await dependencies.farmReferenceRepository.getFarm();
@@ -47,12 +53,80 @@ export async function buildMobilePilotRecoveryCopyPayload(
     throw new Error("Farm setup could not be found for this recovery copy.");
   }
 
-  const [locations, trackedItems, harvestRecords, materialUseRecords, inventoryCountRecords] = await Promise.all([
+  const [
+    locations,
+    trackedItems,
+    harvestRecords,
+    materialUseRecords,
+    inventoryCountRecords,
+    organicOperationProfile,
+    organicCertificationScopes,
+    organicPlaceProfiles,
+    organicBoundaryEvidence,
+    organicInputs,
+    organicInputApplications,
+    seedLots,
+    commercialAvailabilitySearches,
+    organicPlantingEvents,
+    soilFertilityPractices,
+    compostBatches,
+    compostTemperatureLogs,
+    manureApplications,
+    cropRotationRecords,
+    pestWeedDiseaseObservations,
+    pestWeedDiseaseActions,
+    plasticMulchRecords,
+    organicLots,
+    organicHandlingEvents,
+    organicStorageRecords,
+    organicSaleRecords,
+    organicSystemPlanSections,
+    organicInspectionReadinessItems,
+    organicReportPackages,
+    organicAdvancedScopeRecords,
+    organicEvidenceLinks,
+    planningGoals,
+    planningBoards,
+    planningPeriods,
+    planningTasks,
+    planningLinks,
+  ] = await Promise.all([
     dependencies.farmReferenceRepository.listLocations(input.farmId),
     dependencies.farmReferenceRepository.listTrackedItems(input.farmId),
     dependencies.localRecordRepository.listHarvestRecordsForExport(input.farmId),
     dependencies.localRecordRepository.listMaterialUseRecordsForExport(input.farmId),
     dependencies.localRecordRepository.listInventoryCountRecordsForExport(input.farmId),
+    dependencies.organicCertificationRepository?.getProfile(input.farmId) ?? Promise.resolve(undefined),
+    dependencies.organicCertificationRepository?.listScopes(input.farmId) ?? Promise.resolve([]),
+    dependencies.organicCertificationRepository?.listPlaceProfiles(input.farmId) ?? Promise.resolve([]),
+    dependencies.organicCertificationRepository?.listBoundaryEvidence(input.farmId) ?? Promise.resolve([]),
+    dependencies.organicCertificationRepository?.listOrganicInputs(input.farmId) ?? Promise.resolve([]),
+    dependencies.organicCertificationRepository?.listOrganicInputApplications(input.farmId) ?? Promise.resolve([]),
+    dependencies.organicCertificationRepository?.listSeedLots(input.farmId) ?? Promise.resolve([]),
+    dependencies.organicCertificationRepository?.listCommercialAvailabilitySearches(input.farmId) ?? Promise.resolve([]),
+    dependencies.organicCertificationRepository?.listOrganicPlantingEvents(input.farmId) ?? Promise.resolve([]),
+    dependencies.organicCertificationRepository?.listSoilFertilityPractices(input.farmId) ?? Promise.resolve([]),
+    dependencies.organicCertificationRepository?.listCompostBatches(input.farmId) ?? Promise.resolve([]),
+    dependencies.organicCertificationRepository?.listCompostTemperatureLogs(input.farmId) ?? Promise.resolve([]),
+    dependencies.organicCertificationRepository?.listManureApplications(input.farmId) ?? Promise.resolve([]),
+    dependencies.organicCertificationRepository?.listCropRotationRecords(input.farmId) ?? Promise.resolve([]),
+    dependencies.organicCertificationRepository?.listPestWeedDiseaseObservations(input.farmId) ?? Promise.resolve([]),
+    dependencies.organicCertificationRepository?.listPestWeedDiseaseActions(input.farmId) ?? Promise.resolve([]),
+    dependencies.organicCertificationRepository?.listPlasticMulchRecords(input.farmId) ?? Promise.resolve([]),
+    dependencies.organicCertificationRepository?.listOrganicLots(input.farmId) ?? Promise.resolve([]),
+    dependencies.organicCertificationRepository?.listOrganicHandlingEvents(input.farmId) ?? Promise.resolve([]),
+    dependencies.organicCertificationRepository?.listOrganicStorageRecords(input.farmId) ?? Promise.resolve([]),
+    dependencies.organicCertificationRepository?.listOrganicSaleRecords(input.farmId) ?? Promise.resolve([]),
+    dependencies.organicCertificationRepository?.listOrganicSystemPlanSections(input.farmId) ?? Promise.resolve([]),
+    dependencies.organicCertificationRepository?.listOrganicInspectionReadinessItems(input.farmId) ?? Promise.resolve([]),
+    dependencies.organicCertificationRepository?.listOrganicReportPackages(input.farmId) ?? Promise.resolve([]),
+    dependencies.organicCertificationRepository?.listOrganicAdvancedScopeRecords(input.farmId) ?? Promise.resolve([]),
+    dependencies.organicCertificationRepository?.listOrganicEvidenceLinks(input.farmId) ?? Promise.resolve([]),
+    dependencies.planningRepository?.listGoals(input.farmId) ?? Promise.resolve([]),
+    dependencies.planningRepository?.listBoards(input.farmId) ?? Promise.resolve([]),
+    dependencies.planningRepository?.listPeriods(input.farmId) ?? Promise.resolve([]),
+    dependencies.planningRepository?.listTasks(input.farmId) ?? Promise.resolve([]),
+    dependencies.planningRepository?.listLinks(input.farmId) ?? Promise.resolve([]),
   ]);
 
   const createdAt = dependencies.clock.now().toISOString();
@@ -66,6 +140,37 @@ export async function buildMobilePilotRecoveryCopyPayload(
     harvestRecords,
     materialUseRecords,
     inventoryCountRecords,
+    organicOperationProfile: organicOperationProfile ?? undefined,
+    organicCertificationScopes,
+    organicPlaceProfiles,
+    organicBoundaryEvidence,
+    organicInputs,
+    organicInputApplications,
+    seedLots,
+    commercialAvailabilitySearches,
+    organicPlantingEvents,
+    soilFertilityPractices,
+    compostBatches,
+    compostTemperatureLogs,
+    manureApplications,
+    cropRotationRecords,
+    pestWeedDiseaseObservations,
+    pestWeedDiseaseActions,
+    plasticMulchRecords,
+    organicLots,
+    organicHandlingEvents,
+    organicStorageRecords,
+    organicSaleRecords,
+    organicSystemPlanSections,
+    organicInspectionReadinessItems,
+    organicReportPackages,
+    organicAdvancedScopeRecords,
+    organicEvidenceLinks,
+    planningGoals,
+    planningBoards,
+    planningPeriods,
+    planningTasks,
+    planningLinks,
   };
 }
 

@@ -42,6 +42,7 @@ export function FarmPlacesEditor({
   const [kind, setKind] = useState<FarmPlaceKind | "">("");
   const [parentId, setParentId] = useState<FarmLocationId | "">("");
   const [editingPlaceId, setEditingPlaceId] = useState<FarmLocationId | undefined>();
+  const [isAddingPlace, setIsAddingPlace] = useState(false);
   const [error, setError] = useState<string | undefined>();
   const [isSaving, setIsSaving] = useState(false);
   const placeDisplays = buildFarmPlaceDisplays(locations);
@@ -55,6 +56,7 @@ export function FarmPlacesEditor({
     setKind("");
     setParentId("");
     setEditingPlaceId(undefined);
+    setIsAddingPlace(false);
     setError(undefined);
   }
 
@@ -92,6 +94,7 @@ export function FarmPlacesEditor({
 
   function beginEdit(place: FarmLocation) {
     setEditingPlaceId(place.id);
+    setIsAddingPlace(false);
     setName(place.name);
     setKind(place.kind);
     setParentId(place.parentId ?? "");
@@ -105,63 +108,75 @@ export function FarmPlacesEditor({
         {placeDisplays.length === 0 ? (
           <EmptyState text="No farm places yet. Add a field, greenhouse, tunnel, storage area, or other work place." />
         ) : (
-          placeDisplays.map((display) => (
-            <View key={display.place.id} style={[styles.placeRow, { marginLeft: display.depth * 16 }]}>
-              <View style={styles.placeText}>
-                <Text style={styles.placeTitle}>{display.place.name}</Text>
-                <Text style={styles.placeDetail}>{display.typeLabel}</Text>
+          placeDisplays.map((display) => {
+            const isEditing = editingPlaceId === display.place.id;
+
+            return (
+              <View key={display.place.id} style={[styles.placeRow, { marginLeft: display.depth * 16 }]}>
+                {isEditing ? (
+                  <PlaceForm
+                    error={error}
+                    isSaving={isSaving}
+                    kind={kind}
+                    name={name}
+                    parentId={parentId}
+                    parentOptions={parentOptions}
+                    onCancel={resetForm}
+                    onKindChange={(value) => setKind(value as FarmPlaceKind)}
+                    onNameChange={setName}
+                    onParentChange={setParentId}
+                    onSave={handleSave}
+                    saveLabel="Save place changes"
+                  />
+                ) : (
+                  <>
+                    <View style={styles.placeText}>
+                      <Text style={styles.placeTitle}>{display.place.name}</Text>
+                      <Text style={styles.placeDetail}>{display.typeLabel}</Text>
+                    </View>
+                    <View style={styles.rowActions}>
+                      <Button
+                        label="Edit"
+                        onPress={() => beginEdit(display.place)}
+                        size="large"
+                        variant="secondary"
+                      />
+                    </View>
+                  </>
+                )}
               </View>
-              <View style={styles.rowActions}>
-                <Button
-                  label="Edit"
-                  onPress={() => beginEdit(display.place)}
-                  size="large"
-                  variant="secondary"
-                />
-                <Button
-                  label="Add inside"
-                  onPress={() => {
-                    setEditingPlaceId(undefined);
-                    setParentId(display.place.id);
-                    setKind("");
-                    setName("");
-                    setError(undefined);
-                  }}
-                  size="large"
-                  variant="secondary"
-                />
-              </View>
-            </View>
-          ))
+            );
+          })
         )}
       </View>
-      <SelectField
-        error={error && !kind ? error : undefined}
-        label="What kind of place is this?"
-        onChange={(value) => setKind(value as FarmPlaceKind)}
-        options={FARM_PLACE_KINDS.map((placeKind) => ({
-          label: FARM_PLACE_KIND_LABELS[placeKind],
-          value: placeKind,
-        }))}
-        value={kind}
-      />
-      {kind ? <Text style={styles.helperText}>{placeTypeGuidance[kind]}</Text> : null}
-      <FormField
-        error={error && kind ? error : undefined}
-        label="Name"
-        onChangeText={setName}
-        onSubmitEditing={handleSave}
-        placeholder="Field 1"
-        value={name}
-      />
-      <SelectField label="Parent place" onChange={setParentId} options={parentOptions} value={parentId} />
-      <Button
-        disabled={isSaving}
-        label={isSaving ? "Saving..." : editingPlaceId ? "Save place changes" : locations.length === 0 ? "Add first place" : "Add place"}
-        onPress={handleSave}
-        size="large"
-      />
-      {editingPlaceId ? <Button label="Cancel edit" onPress={resetForm} size="large" variant="secondary" /> : null}
+      {isAddingPlace ? (
+        <View style={styles.placeRow}>
+          <PlaceForm
+            error={error}
+            isSaving={isSaving}
+            kind={kind}
+            name={name}
+            parentId={parentId}
+            parentOptions={parentOptions}
+            onCancel={resetForm}
+            onKindChange={(value) => setKind(value as FarmPlaceKind)}
+            onNameChange={setName}
+            onParentChange={setParentId}
+            onSave={handleSave}
+            saveLabel={locations.length === 0 ? "Add first place" : "Add place"}
+          />
+        </View>
+      ) : (
+        <Button
+          label={locations.length === 0 ? "Add first place" : "Add place"}
+          onPress={() => {
+            resetForm();
+            setIsAddingPlace(true);
+          }}
+          size="large"
+          variant="secondary"
+        />
+      )}
     </View>
   );
 }
@@ -187,12 +202,14 @@ export function TrackedItemsEditor({
 }) {
   const [name, setName] = useState("");
   const [editingItemId, setEditingItemId] = useState<string | undefined>();
+  const [isAddingItem, setIsAddingItem] = useState(false);
   const [error, setError] = useState<string | undefined>();
   const [isSaving, setIsSaving] = useState(false);
 
   function resetForm() {
     setName("");
     setEditingItemId(undefined);
+    setIsAddingItem(false);
     setError(undefined);
   }
 
@@ -225,41 +242,159 @@ export function TrackedItemsEditor({
         {items.length === 0 ? (
           <EmptyState text={`No ${title.toLowerCase()} yet.`} />
         ) : (
-          items.map((item) => (
-            <View key={item.id} style={styles.itemRow}>
-              <View style={styles.itemText}>
-                <ListRow title={item.name} />
+          items.map((item) => {
+            const isEditing = editingItemId === item.id;
+
+            return (
+              <View key={item.id} style={styles.itemRow}>
+                {isEditing ? (
+                  <TrackedItemForm
+                    error={error}
+                    isSaving={isSaving}
+                    name={name}
+                    placeholder={placeholder}
+                    saveLabel={`Save ${title.toLowerCase()} changes`}
+                    onCancel={resetForm}
+                    onNameChange={setName}
+                    onSave={handleSave}
+                  />
+                ) : (
+                  <>
+                    <View style={styles.itemText}>
+                      <ListRow title={item.name} />
+                    </View>
+                    <Button
+                      label="Edit"
+                      onPress={() => {
+                        setEditingItemId(item.id);
+                        setIsAddingItem(false);
+                        setName(item.name);
+                        setError(undefined);
+                      }}
+                      size="large"
+                      variant="secondary"
+                    />
+                  </>
+                )}
               </View>
-              <Button
-                label="Edit"
-                onPress={() => {
-                  setEditingItemId(item.id);
-                  setName(item.name);
-                  setError(undefined);
-                }}
-                size="large"
-                variant="secondary"
-              />
-            </View>
-          ))
+            );
+          })
         )}
       </View>
+      {isAddingItem ? (
+        <View style={styles.itemRow}>
+          <TrackedItemForm
+            error={error}
+            isSaving={isSaving}
+            name={name}
+            placeholder={placeholder}
+            saveLabel={addLabel}
+            onCancel={resetForm}
+            onNameChange={setName}
+            onSave={handleSave}
+          />
+        </View>
+      ) : (
+        <Button
+          label={addLabel}
+          onPress={() => {
+            resetForm();
+            setIsAddingItem(true);
+          }}
+          size="large"
+          variant="secondary"
+        />
+      )}
+    </View>
+  );
+}
+
+function TrackedItemForm({
+  error,
+  isSaving,
+  name,
+  placeholder,
+  saveLabel,
+  onCancel,
+  onNameChange,
+  onSave,
+}: {
+  error?: string;
+  isSaving: boolean;
+  name: string;
+  placeholder: string;
+  saveLabel: string;
+  onCancel: () => void;
+  onNameChange: (value: string) => void;
+  onSave: () => void;
+}) {
+  return (
+    <View style={styles.stack}>
       <FormField
         error={error}
         label="Name"
-        onChangeText={setName}
-        onSubmitEditing={handleSave}
+        onChangeText={onNameChange}
+        onSubmitEditing={onSave}
         placeholder={placeholder}
         value={name}
       />
-      <Button
-        disabled={isSaving}
-        label={isSaving ? "Saving..." : editingItemId ? `Save ${title.toLowerCase()} changes` : addLabel}
-        onPress={handleSave}
-        size="large"
-        variant={editingItemId ? "primary" : "secondary"}
+      <Button disabled={isSaving} label={isSaving ? "Saving..." : saveLabel} onPress={onSave} size="large" />
+      <Button label="Cancel" onPress={onCancel} size="large" variant="secondary" />
+    </View>
+  );
+}
+
+function PlaceForm({
+  error,
+  isSaving,
+  kind,
+  name,
+  parentId,
+  parentOptions,
+  saveLabel,
+  onCancel,
+  onKindChange,
+  onNameChange,
+  onParentChange,
+  onSave,
+}: {
+  error?: string;
+  isSaving: boolean;
+  kind: FarmPlaceKind | "";
+  name: string;
+  parentId: string;
+  parentOptions: { label: string; value: string }[];
+  saveLabel: string;
+  onCancel: () => void;
+  onKindChange: (value: string) => void;
+  onNameChange: (value: string) => void;
+  onParentChange: (value: string) => void;
+  onSave: () => void;
+}) {
+  return (
+    <View style={styles.stack}>
+      <SelectField
+        error={error && !kind ? error : undefined}
+        label="What kind of place is this?"
+        onChange={onKindChange}
+        options={FARM_PLACE_KINDS.map((placeKind) => ({
+          label: FARM_PLACE_KIND_LABELS[placeKind],
+          value: placeKind,
+        }))}
+        value={kind}
       />
-      {editingItemId ? <Button label="Cancel edit" onPress={resetForm} size="large" variant="secondary" /> : null}
+      {kind ? <Text style={styles.helperText}>{placeTypeGuidance[kind]}</Text> : null}
+      <FormField
+        error={error && kind ? error : undefined}
+        label="Name"
+        onChangeText={onNameChange}
+        onSubmitEditing={onSave}
+        placeholder="Field 1"
+        value={name}
+      />
+      <SelectField label="Parent place" onChange={onParentChange} options={parentOptions} value={parentId} />
+      <Button disabled={isSaving} label={isSaving ? "Saving..." : saveLabel} onPress={onSave} size="large" />
+      <Button label="Cancel" onPress={onCancel} size="large" variant="secondary" />
     </View>
   );
 }

@@ -8,6 +8,21 @@ import { addFarmPlaceHierarchy } from "./0005_add_farm_place_hierarchy";
 import { createFarmEvents } from "./0006_create_farm_events";
 import { createFarmNoteTranscripts } from "./0007_create_farm_note_transcripts";
 import { addCorePlacesSetupState } from "./0008_add_core_places_setup_state";
+import { createOrganicCertificationProfile } from "./0009_create_organic_certification_profile";
+import { createOrganicPlaceProfiles } from "./0010_create_organic_place_profiles";
+import { createOrganicInputs } from "./0011_create_organic_inputs";
+import { createOrganicSeeds } from "./0012_create_organic_seeds";
+import { createOrganicSoil } from "./0013_create_organic_soil";
+import { createOrganicPest } from "./0014_create_organic_pest";
+import { createOrganicTraceability } from "./0015_create_organic_traceability";
+import { createOrganicSystemPlan } from "./0016_create_organic_system_plan";
+import { createOrganicReportPackages } from "./0017_create_organic_report_packages";
+import { createOrganicAdvancedScopes } from "./0018_create_organic_advanced_scopes";
+import { createOrganicEvidenceLinks } from "./0019_create_organic_evidence_links";
+import { createPlanning } from "./0020_create_planning";
+import { addPlanningPlaceReferences } from "./0021_add_planning_place_references";
+import { removeCountableItems } from "./0022_remove_countable_items";
+import { createPlanningBoards } from "./0023_create_planning_boards";
 
 export interface Migration {
   version: number;
@@ -24,6 +39,21 @@ const migrations: Migration[] = [
   createFarmEvents,
   createFarmNoteTranscripts,
   addCorePlacesSetupState,
+  createOrganicCertificationProfile,
+  createOrganicPlaceProfiles,
+  createOrganicInputs,
+  createOrganicSeeds,
+  createOrganicSoil,
+  createOrganicPest,
+  createOrganicTraceability,
+  createOrganicSystemPlan,
+  createOrganicReportPackages,
+  createOrganicAdvancedScopes,
+  createOrganicEvidenceLinks,
+  createPlanning,
+  addPlanningPlaceReferences,
+  removeCountableItems,
+  createPlanningBoards,
 ];
 
 export async function runMigrations(database: SQLiteDatabase): Promise<void> {

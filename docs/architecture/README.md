@@ -10,6 +10,8 @@
 - [Persistence and Attachment Storage](persistence-and-attachment-storage.md): persistence responsibilities, attachment lifecycle principles, storage boundaries, and data ownership implications.
 - [AI-Assisted Capture Boundaries](ai-assisted-capture-boundaries.md): architecture constraints separating inference, drafts, confirmation, operational records, offline retention, attachments, and later privacy boundaries.
 - [Identity, Privacy, and Sharing](identity-privacy-and-sharing.md): architecture boundaries among identity, authorized access, synchronization, publication, visibility, local-network distribution, AI captures, and attachment access.
+- [Organic Certification Architecture](organic-certification-architecture.md): local architecture boundaries for USDA organic readiness records, reports, and exports.
+- [Planning Architecture](planning-architecture.md): local architecture boundaries for goals, subgoals, periods, tasks, planning links, and certification planning templates.
 - [Server and Deployment Operating Model](server-and-deployment-operating-model.md): deployment-mode architecture constraints and the relationship among mobile offline use, server operation, private/shared boundaries, data portability, and future technical choices.
 
 Architecture guidance now distinguishes the accepted standalone mobile pilot from future server-connected expansion. These documents do not choose implementation technologies.

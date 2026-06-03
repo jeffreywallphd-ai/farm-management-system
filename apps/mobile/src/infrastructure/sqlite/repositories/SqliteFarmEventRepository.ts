@@ -17,6 +17,7 @@ interface FarmEventRow {
   event_type: FarmEventType;
   place_id: string | null;
   note: string | null;
+  needs_organic_review?: number;
   captured_at: string;
   created_at: string;
   privacy: "privateToFarm";
@@ -57,14 +58,15 @@ export class SqliteFarmEventRepository implements FarmEventRepository {
 
     await this.database.runAsync(
       `INSERT INTO farm_events (
-        id, farm_id, event_type, place_id, note, captured_at, created_at, privacy, schema_version
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+        id, farm_id, event_type, place_id, note, needs_organic_review, captured_at, created_at, privacy, schema_version
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
       [
         event.id,
         event.farmId,
         event.eventType,
         event.placeId ?? null,
         event.note ?? null,
+        event.needsOrganicReview ? 1 : 0,
         event.capturedAt,
         event.createdAt,
         event.privacy,
@@ -92,6 +94,13 @@ export class SqliteFarmEventRepository implements FarmEventRepository {
         ],
       );
     }
+  }
+
+  async updateFarmEventOrganicReview(farmId: FarmId, id: FarmEventId, needsOrganicReview: boolean): Promise<void> {
+    await this.database.runAsync(
+      "UPDATE farm_events SET needs_organic_review = ? WHERE farm_id = ? AND id = ?;",
+      [needsOrganicReview ? 1 : 0, farmId, id],
+    );
   }
 
   async listFarmEvents(farmId: FarmId): Promise<FarmEventView[]> {
@@ -154,6 +163,7 @@ const FARM_EVENT_VIEW_SELECT = `SELECT
   farm_events.event_type,
   farm_events.place_id,
   farm_events.note,
+  farm_events.needs_organic_review,
   farm_events.captured_at,
   farm_events.created_at,
   farm_events.privacy,
@@ -173,6 +183,7 @@ function mapFarmEvent(row: FarmEventRow): FarmEvent {
     eventType: row.event_type,
     placeId: row.place_id ?? undefined,
     note: row.note ?? undefined,
+    needsOrganicReview: row.needs_organic_review === 1,
     capturedAt: row.captured_at,
     createdAt: row.created_at,
     privacy: row.privacy,
@@ -206,4 +217,3 @@ function mapAttachment(row: FarmEventAttachmentRow): FarmEventAttachment {
     createdAt: row.created_at,
   };
 }
-

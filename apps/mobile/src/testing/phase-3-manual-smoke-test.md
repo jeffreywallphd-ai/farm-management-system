@@ -8,7 +8,7 @@ Use this checklist on a physical Android test device before farmer distribution 
 4. Confirm the initial dashboard or setup screen renders.
 5. Confirm the `Farm Notes` header is visible.
 6. Open and close the hamburger menu.
-7. Confirm the menu navigates to `Record farm note`, `Farm notes timeline`, `Farm setup`, `Activity history`, and `Recovery copy`.
+7. Confirm the menu navigates to `Quick record farm events`, `Farm planning`, `Manage farm tasks`, `Farm setup`, and `Organic certification`.
 8. Start with a fresh local database.
 9. Confirm earthy UI styling is readable and consistent.
 10. Create a farm.
@@ -21,18 +21,18 @@ Use this checklist on a physical Android test device before farmer distribution 
 17. Confirm the farm-place tree is understandable.
 18. Add one crop.
 19. Add one material.
-20. Add one countable item.
+20. Add one crop or material that can be counted later.
 21. Enable airplane mode.
-22. Tap `Record farm note`.
+22. Tap `Quick record farm events`.
 23. Grant microphone permission when prompted.
 24. Record a short voice memo.
 25. Stop recording and play the memo back.
 26. Take a photo and confirm it appears as a preview.
 27. Choose an existing photo and confirm it appears as a preview.
 28. Remove one selected photo and confirm it is not saved with the farm note.
-29. Add at least two photos, optional farm place/type/text context, then save the farm note.
-30. Open `Review farm notes`.
-31. Confirm the saved note appears in newest-first order.
+29. Add at least two photos, optional farm place/type/text context, then save the farm event.
+30. Open the farm event timeline from an implemented route or direct test link.
+31. Confirm the saved event appears in newest-first order.
 32. Filter farm notes by type, place, and date.
 33. Open the note detail and confirm voice playback, both photo previews, note text, place, time, and private/local wording are understandable.
 34. Close and relaunch the app while offline.

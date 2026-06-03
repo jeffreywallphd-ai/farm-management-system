@@ -1,0 +1,72 @@
+import type { Migration } from "./migrationRunner";
+
+export const createOrganicTraceability: Migration = {
+  version: 15,
+  name: "create_organic_traceability",
+  statements: [
+    `CREATE TABLE IF NOT EXISTS organic_lots (
+      id TEXT PRIMARY KEY NOT NULL,
+      farm_id TEXT NOT NULL,
+      lot_code TEXT NOT NULL,
+      crop_id TEXT NOT NULL,
+      place_id TEXT NOT NULL,
+      harvest_date TEXT NOT NULL,
+      organic_status TEXT NOT NULL CHECK (organic_status IN ('organic', 'transitioning', 'nonOrganic', 'unknown')),
+      quantity_harvested REAL NOT NULL,
+      unit TEXT NOT NULL,
+      created_from_harvest_record_id TEXT,
+      notes TEXT,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    );`,
+    `CREATE TABLE IF NOT EXISTS organic_handling_events (
+      id TEXT PRIMARY KEY NOT NULL,
+      farm_id TEXT NOT NULL,
+      lot_id TEXT NOT NULL,
+      event_type TEXT NOT NULL CHECK (event_type IN ('wash', 'pack', 'cool', 'dry', 'freeze', 'sort', 'grade', 'combine', 'split', 'relabel', 'transport', 'other')),
+      event_date TEXT NOT NULL,
+      input_lot_ids_json TEXT NOT NULL DEFAULT '[]',
+      output_lot_ids_json TEXT NOT NULL DEFAULT '[]',
+      quantity_in REAL,
+      quantity_out REAL,
+      unit TEXT,
+      facility_place_id TEXT,
+      equipment_used TEXT,
+      cleaning_record_id TEXT,
+      notes TEXT,
+      created_at TEXT NOT NULL
+    );`,
+    `CREATE TABLE IF NOT EXISTS organic_storage_records (
+      id TEXT PRIMARY KEY NOT NULL,
+      farm_id TEXT NOT NULL,
+      lot_id TEXT NOT NULL,
+      storage_place_id TEXT NOT NULL,
+      date_in TEXT NOT NULL,
+      date_out TEXT,
+      quantity_in REAL NOT NULL,
+      quantity_out REAL,
+      unit TEXT NOT NULL,
+      container_id TEXT,
+      notes TEXT,
+      created_at TEXT NOT NULL
+    );`,
+    `CREATE TABLE IF NOT EXISTS organic_sale_records (
+      id TEXT PRIMARY KEY NOT NULL,
+      farm_id TEXT NOT NULL,
+      lot_id TEXT NOT NULL,
+      buyer TEXT NOT NULL,
+      sale_date TEXT NOT NULL,
+      quantity REAL NOT NULL,
+      unit TEXT NOT NULL,
+      invoice_number TEXT,
+      organic_claim TEXT,
+      evidence_attachment_ids_json TEXT NOT NULL DEFAULT '[]',
+      created_at TEXT NOT NULL
+    );`,
+    "CREATE INDEX IF NOT EXISTS idx_organic_lots_farm ON organic_lots(farm_id);",
+    "CREATE INDEX IF NOT EXISTS idx_organic_lots_crop ON organic_lots(farm_id, crop_id);",
+    "CREATE INDEX IF NOT EXISTS idx_organic_handling_events_farm ON organic_handling_events(farm_id);",
+    "CREATE INDEX IF NOT EXISTS idx_organic_storage_records_farm ON organic_storage_records(farm_id);",
+    "CREATE INDEX IF NOT EXISTS idx_organic_sale_records_farm ON organic_sale_records(farm_id);",
+  ],
+};

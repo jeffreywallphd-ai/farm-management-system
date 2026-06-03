@@ -46,6 +46,7 @@ export const farmEventInputSchema = z
       .pipe(z.string().max(MAX_FARM_EVENT_NOTE_LENGTH, "Your note is too long."))
       .optional()
       .transform((value) => (value ? value : undefined)),
+    needsOrganicReview: z.boolean().default(false),
     attachments: z.array(farmEventAttachmentInputSchema).min(1, "Add a voice memo before saving."),
   })
   .refine((value) => value.attachments.some((attachment) => attachment.kind === "voiceMemo"), {
@@ -59,4 +60,3 @@ export type ParsedFarmEventInput = z.output<typeof farmEventInputSchema>;
 export function parseFarmEventInput(input: FarmEventInput): ParsedFarmEventInput {
   return farmEventInputSchema.parse(input);
 }
-

@@ -19,7 +19,7 @@ export const createReferenceTables: Migration = {
     `CREATE TABLE IF NOT EXISTS tracked_items (
       id TEXT PRIMARY KEY NOT NULL,
       farm_id TEXT NOT NULL,
-      kind TEXT NOT NULL CHECK (kind IN ('crop', 'material', 'countableItem')),
+      kind TEXT NOT NULL CHECK (kind IN ('crop', 'material')),
       name TEXT NOT NULL,
       created_at TEXT NOT NULL,
       default_unit TEXT,

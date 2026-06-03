@@ -8,6 +8,8 @@ import type { FarmEventRepository } from "../../application/ports/FarmEventRepos
 import type { FarmNoteTranscriptRepository } from "../../application/ports/FarmNoteTranscriptRepository";
 import type { FarmReferenceRepository } from "../../application/ports/FarmReferenceRepository";
 import type { LocalRecordRepository } from "../../application/ports/LocalRecordRepository";
+import type { OrganicCertificationRepository } from "../../application/ports/OrganicCertificationRepository";
+import type { PlanningRepository } from "../../application/ports/PlanningRepository";
 import { createFarmEventRecoveryPackage } from "../../application/use-cases/export-mobile-pilot-data/CreateFarmEventRecoveryPackage";
 import { createMobilePilotRecoveryCopy } from "../../application/use-cases/export-mobile-pilot-data/CreateHarvestRecoveryCopy";
 import { systemClock } from "../../infrastructure/system/clock";
@@ -27,6 +29,8 @@ export function RecoveryCopyExportScreen({
   farmNoteTranscriptRepository,
   farmReferenceRepository,
   localRecordRepository,
+  organicCertificationRepository,
+  planningRepository,
 }: {
   exportRepository: ExportRepository;
   farm: Farm;
@@ -34,6 +38,8 @@ export function RecoveryCopyExportScreen({
   farmNoteTranscriptRepository: FarmNoteTranscriptRepository;
   farmReferenceRepository: FarmReferenceRepository;
   localRecordRepository: LocalRecordRepository;
+  organicCertificationRepository?: OrganicCertificationRepository;
+  planningRepository?: PlanningRepository;
 }) {
   const router = useRouter();
   const [isExporting, setIsExporting] = useState(false);
@@ -48,7 +54,7 @@ export function RecoveryCopyExportScreen({
     try {
       const nextFile = await createMobilePilotRecoveryCopy(
         { farmId: farm.id },
-        { clock: systemClock, exportRepository, farmReferenceRepository, localRecordRepository },
+        { clock: systemClock, exportRepository, farmReferenceRepository, localRecordRepository, organicCertificationRepository, planningRepository },
       );
       setFile(nextFile);
     } catch {
@@ -73,6 +79,7 @@ export function RecoveryCopyExportScreen({
           farmNoteTranscriptRepository,
           farmReferenceRepository,
           localRecordRepository,
+          planningRepository,
         },
       );
       setFile(nextFile);

@@ -19,16 +19,14 @@ async function seededManualPilot() {
   const location = { id: "location-1", farmId: farm.id, name: "North Field", kind: "field" as const, createdAt: farm.createdAt };
   const crop = { id: "crop-1", farmId: farm.id, kind: "crop" as const, name: "Kale", createdAt: farm.createdAt };
   const material = { id: "material-1", farmId: farm.id, kind: "material" as const, name: "Compost", createdAt: farm.createdAt };
-  const countableItem = { id: "countable-1", farmId: farm.id, kind: "countableItem" as const, name: "Seedling trays", createdAt: farm.createdAt };
   const farmReferenceRepository = new InMemoryFarmReferenceRepository();
   await farmReferenceRepository.createFarm(farm);
   await farmReferenceRepository.addLocation(location);
   await farmReferenceRepository.addTrackedItem(crop);
   await farmReferenceRepository.addTrackedItem(material);
-  await farmReferenceRepository.addTrackedItem(countableItem);
   const localRecordRepository = new InMemoryLocalRecordRepository({
     locations: [location],
-    trackedItems: [crop, material, countableItem],
+    trackedItems: [crop, material],
   });
   const dependencies = {
     clock: {
@@ -39,7 +37,7 @@ async function seededManualPilot() {
     localRecordRepository,
   };
 
-  return { ...dependencies, farm, location, crop, material, countableItem };
+  return { ...dependencies, farm, location, crop, material };
 }
 
 test("material use creates a private confirmed local record", async () => {
@@ -63,7 +61,7 @@ test("material use creates a private confirmed local record", async () => {
   assert.equal(record.note, "Side dressing");
 });
 
-test("inventory count creates material and countable item observations and rejects crops", async () => {
+test("inventory count creates crop and material observations and rejects unknown items", async () => {
   const deps = await seededManualPilot();
   const materialCount = await recordInventoryCount(
     {
@@ -76,10 +74,10 @@ test("inventory count creates material and countable item observations and rejec
     },
     deps,
   );
-  const trayCount = await recordInventoryCount(
+  const cropCount = await recordInventoryCount(
     {
       farmId: deps.farm.id,
-      trackedItemId: deps.countableItem.id,
+      trackedItemId: deps.crop.id,
       quantityText: "18",
       unit: "tray",
       locationId: "",
@@ -89,20 +87,20 @@ test("inventory count creates material and countable item observations and rejec
   );
 
   assert.equal(materialCount.observedQuantity.amount, 0);
-  assert.equal(trayCount.observedQuantity.unit, "tray");
+  assert.equal(cropCount.observedQuantity.unit, "tray");
   await assert.rejects(
     () =>
       recordInventoryCount(
         {
           farmId: deps.farm.id,
-          trackedItemId: deps.crop.id,
+          trackedItemId: "missing-item",
           quantityText: "1",
           unit: "each",
           note: "",
         },
         deps,
       ),
-    /Choose a material or countable item/,
+    /Choose a crop or material/,
   );
 });
 
@@ -117,7 +115,7 @@ test("unified activity history and detail cover all three implemented records", 
     deps,
   );
   const count = await recordInventoryCount(
-    { farmId: deps.farm.id, trackedItemId: deps.countableItem.id, quantityText: "18", unit: "tray", note: "" },
+    { farmId: deps.farm.id, trackedItemId: deps.crop.id, quantityText: "18", unit: "tray", note: "" },
     deps,
   );
 
@@ -145,7 +143,7 @@ test("expanded recovery copy includes all implemented manual records", async () 
     deps,
   );
   await recordInventoryCount(
-    { farmId: deps.farm.id, trackedItemId: deps.countableItem.id, quantityText: "18", unit: "tray", note: "" },
+    { farmId: deps.farm.id, trackedItemId: deps.crop.id, quantityText: "18", unit: "tray", note: "" },
     deps,
   );
   const exportRepository = new CapturingExportRepository();
@@ -153,8 +151,8 @@ test("expanded recovery copy includes all implemented manual records", async () 
   await createMobilePilotRecoveryCopy({ farmId: deps.farm.id }, { ...deps, exportRepository });
   const payload = JSON.parse(exportRepository.contents);
 
-  assert.equal(payload.exportVersion, 3);
-  assert.equal(payload.appDataSchemaVersion, 4);
+  assert.equal(payload.exportVersion, 16);
+  assert.equal(payload.appDataSchemaVersion, 17);
   assert.equal(payload.harvestRecords.length, 1);
   assert.equal(payload.materialUseRecords.length, 1);
   assert.equal(payload.inventoryCountRecords.length, 1);
@@ -170,13 +168,43 @@ test("expanded recovery copy rejects malformed manual record payloads", async ()
 
   assert.throws(() =>
     serializeRecoveryCopy({
-      exportVersion: 3,
+      exportVersion: 16,
       createdAt,
-      appDataSchemaVersion: 4,
+      appDataSchemaVersion: 17,
       farm: deps.farm,
       locations: [deps.location],
-      trackedItems: [deps.crop, deps.material, deps.countableItem],
+      trackedItems: [deps.crop, deps.material],
       harvestRecords: [],
+      organicCertificationScopes: [],
+      organicPlaceProfiles: [],
+      organicBoundaryEvidence: [],
+      organicInputs: [],
+      organicInputApplications: [],
+      seedLots: [],
+      commercialAvailabilitySearches: [],
+      organicPlantingEvents: [],
+      soilFertilityPractices: [],
+      compostBatches: [],
+      compostTemperatureLogs: [],
+      manureApplications: [],
+      cropRotationRecords: [],
+      pestWeedDiseaseObservations: [],
+      pestWeedDiseaseActions: [],
+      plasticMulchRecords: [],
+      organicLots: [],
+      organicHandlingEvents: [],
+      organicStorageRecords: [],
+      organicSaleRecords: [],
+      organicSystemPlanSections: [],
+      organicInspectionReadinessItems: [],
+      organicReportPackages: [],
+      organicAdvancedScopeRecords: [],
+      organicEvidenceLinks: [],
+      planningGoals: [],
+      planningBoards: [],
+      planningPeriods: [],
+      planningTasks: [],
+      planningLinks: [],
       materialUseRecords: [
         {
           id: "material-use-1",
@@ -194,7 +222,7 @@ test("expanded recovery copy rejects malformed manual record payloads", async ()
           id: "count-1",
           kind: "InventoryCountRecorded",
           farmId: deps.farm.id,
-          trackedItemId: deps.countableItem.id,
+          trackedItemId: deps.crop.id,
           observedQuantity: { amount: -1, unit: "tray" },
           createdAt,
           effectiveAt: createdAt,
@@ -216,7 +244,7 @@ test("share failure does not alter locally saved manual records", async () => {
     deps,
   );
   const count = await recordInventoryCount(
-    { farmId: deps.farm.id, trackedItemId: deps.countableItem.id, quantityText: "18", unit: "tray", note: "" },
+    { farmId: deps.farm.id, trackedItemId: deps.crop.id, quantityText: "18", unit: "tray", note: "" },
     deps,
   );
 

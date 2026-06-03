@@ -10,7 +10,7 @@ export interface FarmEventView {
 
 export interface FarmEventRepository {
   saveFarmEvent(event: FarmEvent, attachments: FarmEventAttachment[]): Promise<void>;
+  updateFarmEventOrganicReview(farmId: FarmId, id: FarmEventId, needsOrganicReview: boolean): Promise<void>;
   listFarmEvents(farmId: FarmId): Promise<FarmEventView[]>;
   getFarmEventDetail(farmId: FarmId, id: FarmEventId): Promise<FarmEventView | null>;
 }
-

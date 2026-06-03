@@ -39,7 +39,7 @@ The mobile app now presents record locations as farmer-facing farm places. Farm 
 - Actor: farm worker, family member, or owner/operator.
 - Physical/work context: field, greenhouse, tunnel, wash/pack area, storage area, barn, vehicle, or any place where work happens.
 - Problem or trigger: something worth remembering happens, but a structured form would interrupt the work.
-- Desired user action: tap `Record farm note`, speak a short memo, optionally attach photos, add light context if useful, and save.
+- Desired user action: tap `Quick record farm events`, speak a short memo, optionally attach photos, add light context if useful, and save.
 - Expected pilot outcome: the event is saved locally, appears in a local timeline, remains private/device-local, and is included in a recovery package.
 - Implementation note: this workflow captures source audio/photos for later review. A saved note can download the local `Whisper tiny.en` model and generate a transcript draft on device. The first model download requires internet, but later transcription can work offline. The transcript does not infer fields, count objects, create operational records automatically, upload data, or synchronize.
 - Why it matters: this tests whether farmers capture useful information more readily when the capture flow matches field conditions.
@@ -106,12 +106,12 @@ And the worker does not need to re-enter the harvest because a server was unavai
 ## Workflow 5: Record an Inventory Count or Observation
 
 - Status: Mobile Pilot 1 included.
-- Actor: owner/operator or worker checking materials or countable items.
+- Actor: owner/operator or worker checking crops or materials.
 - Physical/work context: storage area, greenhouse, cooler, barn, wash/pack area, or field.
 - Problem or trigger: the observed amount differs from memory or expected quantity.
 - Desired user action: record observed quantity/count and context.
 - Expected pilot outcome: the observation is saved locally, and discrepancy meaning is preserved where the pilot displays expected versus observed understanding.
-- Implementation note: Phase 3 implements inventory-count observations for materials and countable items. A count is saved as its own record and does not overwrite earlier history.
+- Implementation note: Phase 3 implements inventory-count observations for crops and materials. A count is saved as its own record and does not overwrite earlier history.
 - Why it matters: an inventory count is evidence of current reality, not a reason to erase prior history.
 
 ## Workflow 6: Record an Equipment Issue

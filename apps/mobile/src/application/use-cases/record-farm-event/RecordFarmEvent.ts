@@ -54,6 +54,7 @@ export async function recordFarmEvent(
     eventType: parsed.eventType,
     placeId: parsed.placeId,
     note: parsed.note,
+    needsOrganicReview: parsed.needsOrganicReview,
     capturedAt: now,
     createdAt: now,
     privacy: "privateToFarm",
@@ -76,4 +77,3 @@ export async function recordFarmEvent(
   await dependencies.farmEventRepository.saveFarmEvent(event, attachments);
   return { event, attachments };
 }
-

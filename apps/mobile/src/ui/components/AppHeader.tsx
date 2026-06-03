@@ -7,15 +7,11 @@ import { theme } from "../theme/theme";
 
 const menuItems = [
   { label: "Home", route: "/home" },
-  { label: "Record farm note", route: "/farm-events/new" },
-  { label: "Farm notes timeline", route: "/farm-events" },
-  { label: "Farm places", route: "/setup?section=farmPlaces" },
-  { label: "Crops", route: "/setup?section=crops" },
-  { label: "Materials", route: "/setup?section=materials" },
-  { label: "Countable items", route: "/setup?section=countableItems" },
+  { label: "Quick record farm events", route: "/farm-events/new" },
+  { label: "Farm planning", route: "/planning" },
+  { label: "Manage farm tasks", route: "/planning/boards" },
   { label: "Farm setup", route: "/setup" },
-  { label: "Activity history", route: "/activity" },
-  { label: "Recovery copy", route: "/data-safety/export" },
+  { label: "Organic certification", route: "/organic" },
 ] as const;
 
 export function AppHeader() {

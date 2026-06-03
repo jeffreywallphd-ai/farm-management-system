@@ -7,6 +7,8 @@
 - [Product Vision and Scope](product-vision-and-scope.md): accepted product statement, problem framing, intended users, product principles, standalone mobile pilot posture, and open questions.
 - [Initial Vertical Slice](initial-vertical-slice.md): accepted standalone mobile pilot target, included capabilities, explicit non-goals, success criteria, and deferred server-connected decisions.
 - [Mobile Pilot 1 Implementation Scope](mobile-pilot-1-implementation-scope.md): accepted exact first buildable standalone mobile increment and its included/deferred capabilities.
+- [Organic Certification Readiness](organic-certification-readiness.md): accepted USDA organic readiness module scope, phase sequencing, and Phase 1 requirements.
+- [Farm Planning and Roadmapping](farm-planning-roadmapping.md): accepted local goals, subgoals, planning periods, and tasks for farm planning and certification planning.
 - [Field Workflows](field-workflows.md): representative farmer-facing workflows that should guide later domain modeling, UX, offline behavior, and acceptance testing.
 - [User Research and Validation](user-research-and-validation.md): current evidence level, hypotheses, interview guide, observation targets, and assumption status mechanism.
 - [AI-Assisted Capture Validation Plan](ai-assisted-capture-validation-plan.md): product hypotheses, field-testing expectations, and gates for expanding assisted-capture scope.

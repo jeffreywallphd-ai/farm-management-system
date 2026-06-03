@@ -26,7 +26,7 @@ test("reference names enforce the shared maximum length", () => {
 test("tracked item kinds are constrained to Mobile Pilot 1 reference kinds", () => {
   assert.equal(trackedItemKindSchema.safeParse("crop").success, true);
   assert.equal(trackedItemKindSchema.safeParse("material").success, true);
-  assert.equal(trackedItemKindSchema.safeParse("countableItem").success, true);
+  assert.equal(trackedItemKindSchema.safeParse("countableItem").success, false);
   assert.equal(trackedItemKindSchema.safeParse("equipment").success, false);
 });
 

@@ -3,7 +3,7 @@
 - Status: accepted
 - Last reviewed: 2026-05-28
 - Canonical for: product vision, product principles, intended users, accepted standalone mobile pilot scope, and product-scope boundaries
-- Related ADRs: [ADR-0001](../adr/ADR-0001-offline-first-field-operation.md), [ADR-0003](../adr/ADR-0003-ai-interpretations-require-confirmation.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](../adr/ADR-0005-data-portability-and-recoverability.md), [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md), [ADR-0008](../adr/ADR-0008-mobile-pilot-1-application-stack.md), [ADR-0009](../adr/ADR-0009-mobile-pilot-1-local-persistence.md), [ADR-0010](../adr/ADR-0010-mobile-pilot-1-export-and-recovery-copy.md)
+- Related ADRs: [ADR-0001](../adr/ADR-0001-offline-first-field-operation.md), [ADR-0003](../adr/ADR-0003-ai-interpretations-require-confirmation.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](../adr/ADR-0005-data-portability-and-recoverability.md), [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md), [ADR-0008](../adr/ADR-0008-mobile-pilot-1-application-stack.md), [ADR-0009](../adr/ADR-0009-mobile-pilot-1-local-persistence.md), [ADR-0010](../adr/ADR-0010-mobile-pilot-1-export-and-recovery-copy.md), [ADR-0014](../adr/ADR-0014-organic-certification-readiness-module.md)
 - Related docs: [Product README](README.md), [Initial Vertical Slice](initial-vertical-slice.md), [Mobile Pilot 1 Implementation Scope](mobile-pilot-1-implementation-scope.md), [Field Workflows](field-workflows.md), [User Research and Validation](user-research-and-validation.md), [Local Coordination and Sharing Validation Plan](local-coordination-and-sharing-validation-plan.md), [Deployment and Data-Control Validation Plan](deployment-and-data-control-validation-plan.md), [Roadmap](roadmap.md)
 - Related tests: not yet implemented
 - Supersedes: none
@@ -58,6 +58,7 @@ The first pilot serves a single farm operating on a device-local mobile app. Mul
 | Offline local retention | Required for realistic field operation | Included; Mobile Pilot 1 mechanism selected in ADR-0009 |
 | Clear local saved state | Prevents confusion about whether work exists | Included |
 | Practical export/backup | Prevents meaningful pilot data from being trapped on one device | Included before farmer reliance; Mobile Pilot 1 mechanism selected in ADR-0010 |
+| USDA organic certification readiness | Helps organic and transitioning farms organize evidence and reports for certifier review | Accepted local module under ADR-0014; not a certifier replacement or legal determination system |
 | Voice-assisted activity draft | Potential friction reducer | Constrained experiment, preferably one workflow first |
 | Photo-assisted count draft | Potential friction reducer | Constrained experiment, preferably one item class first |
 | Private internal supply-need note | Helps discover sourcing value | Optional private pilot workflow |
@@ -67,7 +68,7 @@ The first pilot serves a single farm operating on a device-local mobile app. Mul
 
 ## Product Boundaries and Non-Goals
 
-The standalone mobile pilot is not a generic farm ERP, marketplace, social network, accounting system, compliance platform, server product, or autonomous AI assistant.
+The standalone mobile pilot is not a generic farm ERP, marketplace, social network, accounting system, server product, or autonomous AI assistant. ADR-0014 accepts USDA organic certification readiness as a specific local evidence/reporting module, but the app must not claim to certify operations, replace accredited certifiers, provide legal advice, or make final legal/compliance determinations.
 
 The pilot must not include server synchronization, multi-device farm access, hosted/local/cooperative server implementation, in-product shared need-listing publication, listing responses, public sharing, payments, or marketplace/social functionality unless product scope and ADRs are intentionally revised.
 

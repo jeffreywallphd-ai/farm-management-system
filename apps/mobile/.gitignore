@@ -5,6 +5,8 @@ node_modules/
 dist/
 .test-build/
 .test-build-codex/
+.test-build-*/
+.codex-test-build-*/
 android/
 ios/
 expo-env.d.ts

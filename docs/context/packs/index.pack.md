@@ -44,6 +44,7 @@ This is an open-source small-farm support platform. The active implementation ta
 - [ADR-0010](../../adr/ADR-0010-mobile-pilot-1-export-and-recovery-copy.md): Mobile Pilot 1 uses local versioned JSON export/recovery copy through Expo FileSystem and Expo Sharing.
 - [ADR-0011](../../adr/ADR-0011-mobile-pilot-1-runtime-boundary-validation.md): Mobile Pilot 1 uses Zod for runtime boundary validation.
 - [ADR-0012](../../adr/ADR-0012-voice-photo-first-farm-event-capture-pilot.md): The next farmer-shareable pilot prioritizes local voice/photo farm-event capture before AI interpretation or server-connected features.
+- [ADR-0014](../../adr/ADR-0014-organic-certification-readiness-module.md): USDA organic certification readiness is accepted as a local evidence/reporting module, not as certifier replacement or legal determination.
 
 ## Current Pilot Sequencing
 
@@ -78,6 +79,8 @@ Do not use this baseline pack to skip specialized packs, broaden product scope, 
 | Testing/logging/defect diagnosis | `testing-and-diagnostics.pack.md` |
 | Dependency/provider/technology evaluation | `dependency-and-technology-selection.pack.md` |
 | Documentation/ADR/governance review | `documentation-and-adr-governance.pack.md` |
+| USDA organic certification readiness | `organic-certification.pack.md` |
+| Local farm planning, goals, subgoals, tasks, or certification planning templates | `planning.pack.md` |
 
 ## Minimal-Source Posture
 
@@ -92,6 +95,12 @@ This pack identifies the baseline. It does not remove the requirement to read ac
 - `docs/product/mobile-pilot-1-implementation-scope.md`: exact current implementation scope.
 - `docs/domain/mobile-pilot-1-operational-records.md`: accepted Pilot 1 record meanings.
 - `docs/operations/mobile-pilot-data-safety-requirements.md`: accepted Pilot 1 data-safety requirements.
+- `docs/product/organic-certification-readiness.md`: accepted organic readiness scope and phase sequence.
+- `docs/product/farm-planning-roadmapping.md`: accepted local planning and task foundation scope.
+- `docs/domain/organic-certification-rules.md`: accepted organic readiness domain rules.
+- `docs/domain/farm-planning-rules.md`: accepted local planning domain rules.
+- `docs/architecture/organic-certification-architecture.md`: accepted organic readiness architecture boundaries.
+- `docs/architecture/planning-architecture.md`: accepted local planning architecture boundaries.
 - `apps/mobile/README.md`: current Mobile Pilot 1 app structure and stack notes.
 - `docs/context/prompt-routing.md`: task classification and pack assembly.
 

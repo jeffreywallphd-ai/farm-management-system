@@ -15,8 +15,21 @@ import { z } from "zod";
 import type { Farm } from "../../domain/farm/Farm";
 import type { FarmLocation } from "../../domain/farm/FarmLocation";
 import { FARM_EVENT_TYPE_LABELS, FARM_EVENT_TYPES, type FarmEventType } from "../../domain/events/FarmEvent";
+import {
+  PLANNING_TASK_STATUS_LABELS,
+  type PlanningTask,
+} from "../../domain/planning/Planning";
+import {
+  ORGANIC_EVIDENCE_CATEGORIES,
+  ORGANIC_EVIDENCE_CATEGORY_LABELS,
+  type OrganicEvidenceCategory,
+} from "../../domain/organic/OrganicEvidenceLink";
 import type { FarmEventRepository } from "../../application/ports/FarmEventRepository";
 import type { FarmReferenceRepository } from "../../application/ports/FarmReferenceRepository";
+import type { OrganicCertificationRepository } from "../../application/ports/OrganicCertificationRepository";
+import type { PlanningRepository } from "../../application/ports/PlanningRepository";
+import { saveOrganicEvidenceLink } from "../../application/use-cases/manage-organic-certification/ManageOrganicEvidenceLinks";
+import { savePlanningLink } from "../../application/use-cases/manage-planning/ManagePlanning";
 import { recordVoiceMemoFarmEvent } from "../../application/use-cases/record-voice-memo-farm-event/RecordVoiceMemoFarmEvent";
 import { systemClock } from "../../infrastructure/system/clock";
 import { localIdGenerator } from "../../infrastructure/system/idGenerator";
@@ -27,6 +40,7 @@ import { Card } from "../components/Card";
 import { FormField } from "../components/FormField";
 import { PageHeader } from "../components/PageHeader";
 import { Screen } from "../components/Screen";
+import { SearchableSelectField } from "../components/SearchableSelectField";
 import { SelectField } from "../components/SelectField";
 import { SectionHeading } from "../components/SectionHeading";
 import { buildFarmPlaceOptions } from "../farmPlaceDisplay";
@@ -52,18 +66,33 @@ export function RecordFarmEventScreen({
   farm,
   farmEventRepository,
   farmReferenceRepository,
+  initialPlanningTaskId,
+  initialOrganicCategory,
   locations,
+  organicCertificationRepository,
+  planningRepository,
+  planningTasks,
 }: {
   farm: Farm;
   farmEventRepository: FarmEventRepository;
   farmReferenceRepository: FarmReferenceRepository;
+  initialPlanningTaskId?: string;
+  initialOrganicCategory?: string;
   locations: FarmLocation[];
+  organicCertificationRepository: OrganicCertificationRepository;
+  planningRepository: PlanningRepository;
+  planningTasks: PlanningTask[];
 }) {
   const recorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
   const recorderState = useAudioRecorderState(recorder);
   const [eventType, setEventType] = useState<FarmEventType>("general");
   const [placeId, setPlaceId] = useState("");
+  const [planningTaskId, setPlanningTaskId] = useState(initialPlanningTaskId ?? "");
+  const [organicCategory, setOrganicCategory] = useState<OrganicEvidenceCategory | "">(
+    isOrganicEvidenceCategory(initialOrganicCategory) ? initialOrganicCategory : "",
+  );
   const [note, setNote] = useState("");
+  const [needsOrganicReview, setNeedsOrganicReview] = useState(Boolean(isOrganicEvidenceCategory(initialOrganicCategory)));
   const [recordedUri, setRecordedUri] = useState<string | undefined>();
   const [recordedDurationMs, setRecordedDurationMs] = useState<number | undefined>();
   const [selectedPhotos, setSelectedPhotos] = useState<SelectedPhoto[]>([]);
@@ -76,8 +105,34 @@ export function RecordFarmEventScreen({
     { label: "No place", value: "" },
     ...buildFarmPlaceOptions(locations),
   ];
+  const planningTaskOptions = [
+    { label: "No task", value: "" },
+    ...planningTasks.map((task) => ({
+      detail: `${PLANNING_TASK_STATUS_LABELS[task.status]}${task.dueDate ? ` - due ${task.dueDate}` : ""}`,
+      label: task.title,
+      value: task.id,
+    })),
+  ];
+  const organicCategoryOptions = [
+    { label: "No certification requirement", value: "" },
+    ...ORGANIC_EVIDENCE_CATEGORIES.map((category) => ({
+      label: ORGANIC_EVIDENCE_CATEGORY_LABELS[category],
+      value: category,
+    })),
+  ];
   const photoAttachmentStorageRepository = useMemo(() => new ExpoPhotoAttachmentStorageRepository(), []);
   const voiceMemoStorageRepository = useMemo(() => new ExpoVoiceMemoStorageRepository(), []);
+
+  useEffect(() => {
+    setPlanningTaskId(initialPlanningTaskId ?? "");
+  }, [initialPlanningTaskId]);
+
+  useEffect(() => {
+    if (isOrganicEvidenceCategory(initialOrganicCategory)) {
+      setOrganicCategory(initialOrganicCategory);
+      setNeedsOrganicReview(true);
+    }
+  }, [initialOrganicCategory]);
 
   useEffect(() => {
     return () => {
@@ -212,12 +267,13 @@ export function RecordFarmEventScreen({
         ]);
       }
 
-      await recordVoiceMemoFarmEvent(
+      const result = await recordVoiceMemoFarmEvent(
         {
           farmId: farm.id,
           eventType,
           placeId,
           note,
+          needsOrganicReview,
           temporaryVoiceMemoUri: recordedUri,
           durationMs: recordedDurationMs,
           temporaryPhotoAttachments: selectedPhotos.map((photo) => ({
@@ -237,18 +293,74 @@ export function RecordFarmEventScreen({
           voiceMemoStorageRepository,
         },
       );
+      let taskLinkSaved = false;
+      let taskLinkFailed = false;
+      if (planningTaskId) {
+        try {
+          await savePlanningLink(
+            {
+              farmId: farm.id,
+              taskId: planningTaskId,
+              linkedRecordType: "farmNote",
+              linkedRecordId: result.event.id,
+              notes: "Connected from the record farm event screen.",
+            },
+            {
+              clock: systemClock,
+              idGenerator: localIdGenerator,
+              repository: planningRepository,
+            },
+          );
+          taskLinkSaved = true;
+        } catch {
+          taskLinkFailed = true;
+        }
+      }
+      let organicLinkSaved = false;
+      let organicLinkFailed = false;
+      if (organicCategory) {
+        try {
+          await saveOrganicEvidenceLink(
+            {
+              farmId: farm.id,
+              farmEventId: result.event.id,
+              category: organicCategory,
+              evidenceRole: "voiceNote",
+              notes: "Connected from quick record farm events.",
+            },
+            {
+              clock: systemClock,
+              farmEventRepository,
+              idGenerator: localIdGenerator,
+              repository: organicCertificationRepository,
+            },
+          );
+          organicLinkSaved = true;
+        } catch {
+          organicLinkFailed = true;
+        }
+      }
       setRecordedUri(undefined);
       setRecordedDurationMs(undefined);
       setSelectedPhotos([]);
       setNote("");
       setPlaceId("");
+      setPlanningTaskId("");
+      setOrganicCategory("");
       setEventType("general");
-      setSavedMessage("Farm note saved on this device.");
+      setNeedsOrganicReview(false);
+      setSavedMessage(
+        taskLinkFailed || organicLinkFailed
+          ? "Farm event saved on this device. One selected connection could not be saved."
+          : taskLinkSaved || organicLinkSaved
+            ? "Farm event saved on this device and connected to your selected context."
+            : "Farm event saved on this device.",
+      );
     } catch (caughtError) {
       if (caughtError instanceof z.ZodError) {
         setErrors(mapZodErrors(caughtError));
       } else {
-        setErrors({ form: "This farm note could not be saved on this device." });
+        setErrors({ form: "This farm event could not be saved on this device." });
       }
     } finally {
       setIsSaving(false);
@@ -258,9 +370,9 @@ export function RecordFarmEventScreen({
   return (
     <Screen>
       <PageHeader
-        eyebrow="Farm note"
+        eyebrow="Farm event"
         supportingText="Record a quick voice memo while the work is fresh. Add photos when a picture helps."
-        title="Record farm note"
+        title="Quick record farm events"
       />
       <Card>
         <SectionHeading detail="Speak what happened. You can add place and type context if it helps." title="Voice memo" />
@@ -295,12 +407,30 @@ export function RecordFarmEventScreen({
           }))}
           value={eventType}
         />
-        <SelectField
+        <SearchableSelectField
           error={errors.placeId}
           label="Farm place"
           onChange={setPlaceId}
           options={placeOptions}
+          placeholder="Search farm places"
           value={placeId}
+        />
+        <SearchableSelectField
+          label="Associated task"
+          onChange={setPlanningTaskId}
+          options={planningTaskOptions}
+          placeholder="Search tasks"
+          value={planningTaskId}
+        />
+        <SearchableSelectField
+          label="Certification requirement"
+          onChange={(value) => {
+            setOrganicCategory(isOrganicEvidenceCategory(value) ? value : "");
+            setNeedsOrganicReview(Boolean(value));
+          }}
+          options={organicCategoryOptions}
+          placeholder="Search certification areas"
+          value={organicCategory}
         />
         <FormField
           error={errors.note}
@@ -310,7 +440,16 @@ export function RecordFarmEventScreen({
           placeholder="Optional"
           value={note}
         />
-        <SectionHeading detail="Optional photos stay local with this farm note." title="Photos" />
+        <Pressable
+          accessibilityRole="button"
+          onPress={() => setNeedsOrganicReview((current) => !current)}
+          style={[styles.reviewToggle, needsOrganicReview ? styles.reviewToggleSelected : null]}
+        >
+          <Text style={[styles.reviewToggleText, needsOrganicReview ? styles.reviewToggleTextSelected : null]}>
+            {needsOrganicReview ? "Marked for organic review" : "Mark for organic review"}
+          </Text>
+        </Pressable>
+        <SectionHeading detail="Optional photos stay local with this farm event." title="Photos" />
         <View style={styles.photoActions}>
           <Button label="Take photo" onPress={handleTakePhoto} variant="secondary" />
           <Button label="Choose photos" onPress={handleChoosePhotos} variant="secondary" />
@@ -336,10 +475,14 @@ export function RecordFarmEventScreen({
         {errors.attachments ? <Text style={styles.error}>{errors.attachments}</Text> : null}
         {errors.form ? <Text style={styles.error}>{errors.form}</Text> : null}
         {savedMessage ? <Text style={styles.success}>{savedMessage}</Text> : null}
-        <Button disabled={isSaving || recorderState.isRecording} label={isSaving ? "Saving..." : "Save farm note"} onPress={handleSave} />
+        <Button disabled={isSaving || recorderState.isRecording} label={isSaving ? "Saving..." : "Save farm event"} onPress={handleSave} />
       </Card>
     </Screen>
   );
+}
+
+function isOrganicEvidenceCategory(value: unknown): value is OrganicEvidenceCategory {
+  return typeof value === "string" && ORGANIC_EVIDENCE_CATEGORIES.includes(value as OrganicEvidenceCategory);
 }
 
 function mapZodErrors(error: z.ZodError): FormErrors {
@@ -377,6 +520,27 @@ const styles = StyleSheet.create({
     color: theme.colors.textPrimary,
     fontSize: theme.typography.body,
     fontWeight: "700",
+  },
+  reviewToggle: {
+    alignItems: "center",
+    borderColor: theme.colors.border,
+    borderRadius: theme.radius.sm,
+    borderWidth: 1,
+    justifyContent: "center",
+    minHeight: theme.spacing.primaryTouchTarget,
+    paddingHorizontal: theme.spacing.md,
+  },
+  reviewToggleSelected: {
+    backgroundColor: theme.colors.accent,
+    borderColor: theme.colors.accentPressed,
+  },
+  reviewToggleText: {
+    color: theme.colors.textPrimary,
+    fontSize: theme.typography.body,
+    fontWeight: "700",
+  },
+  reviewToggleTextSelected: {
+    color: theme.colors.onAccent,
   },
   error: {
     color: theme.colors.error,

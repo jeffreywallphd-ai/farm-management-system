@@ -24,11 +24,11 @@ export async function recordInventoryCount(
   ]);
   const selectedItem = items.find((item) => item.id === parsed.trackedItemId);
 
-  if (!selectedItem || !["material", "countableItem"].includes(selectedItem.kind)) {
+  if (!selectedItem || !["crop", "material"].includes(selectedItem.kind)) {
     throw new z.ZodError([
       {
         code: "custom",
-        message: "Choose a material or countable item.",
+        message: "Choose a crop or material.",
         path: ["trackedItemId"],
         input: parsed.trackedItemId,
       },

@@ -4,7 +4,7 @@ import type { FarmId } from "./Farm";
 
 export type TrackedItemId = string;
 
-export type TrackedItemKind = "crop" | "material" | "countableItem";
+export type TrackedItemKind = "crop" | "material";
 
 export interface TrackedItem {
   id: TrackedItemId;

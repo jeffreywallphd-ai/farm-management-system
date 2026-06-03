@@ -19,6 +19,8 @@ ADR-0012 pivots the next farmer-shareable pilot direction toward quick voice/pho
 - Local voice memo recording with `expo-audio`: [ADR-0012](../../docs/adr/ADR-0012-voice-photo-first-farm-event-capture-pilot.md)
 - Optional farm-note photo attachments with `expo-image-picker`: [ADR-0012](../../docs/adr/ADR-0012-voice-photo-first-farm-event-capture-pilot.md)
 - On-device draft transcription path with `whisper.rn`/`whisper.cpp`: [ADR-0013](../../docs/adr/ADR-0013-on-device-farm-note-transcription-with-whisper-rn.md)
+- Local USDA organic certification readiness module: [ADR-0014](../../docs/adr/ADR-0014-organic-certification-readiness-module.md)
+- Local farm planning foundation for goals, subgoals, planning periods, tasks, and certification preparation: [ADR-0015](../../docs/adr/ADR-0015-local-farm-planning-foundation.md)
 
 Package versions are pinned in `package.json`, and `package-lock.json` records the app-local dependency resolution.
 
@@ -52,6 +54,18 @@ Canonical record meaning lives in [Mobile Pilot 1 Operational Records](../../doc
 - Persistent `Farm Notes` header with a hamburger menu for local navigation between capture, timeline, setup, activity history, and recovery copy.
 - Saved farm-note detail includes a transcript-draft area, local model download controls, and a `Transcribe voice memo` action using the `whisper.rn` adapter. It downloads `ggml-tiny.en.bin` from the accepted `ggerganov/whisper.cpp` Hugging Face model source into app document storage under `transcription-models/`. If transcription fails, the app maps common local causes such as missing audio, model-open failure, unsupported audio format, or native-module unavailability to user-safe messages while preserving the original audio.
 - ZIP media recovery package export containing manual JSON data, farm-note metadata, voice memo files, photo files, and transcript drafts when present.
+- Organic Certification Phase 1: local organic operation profile, certification scope selection, organic dashboard, Organic Profile Report, and recovery-copy inclusion. This organizes records for certifier review and does not certify the farm or provide legal determinations.
+- Organic Certification Phase 2: local organic place profiles, transition/boundary/buffer fields, boundary evidence records, place-level reports, and recovery-copy inclusion. Readable place paths are derived from the current farm-place hierarchy rather than snapshotted names.
+- Organic Certification Phase 3: local organic input records, approval evidence references, input application records, input reports, and recovery-copy inclusion. Approval status is farmer-entered and not automatically verified against OMRI, WSDA, USDA, or certifier systems.
+- Organic Certification Phase 4: local seed lots, commercial availability searches, planting events, seed reports, and recovery-copy inclusion. The app organizes evidence but does not automatically decide commercial availability sufficiency or seed acceptability.
+- Organic Certification Phase 5: local soil fertility practices, compost batches and temperature logs, manure interval planning dates, crop rotations, soil reports, and recovery-copy inclusion. Manure dates are planning warnings, not automatic harvest blocks or compliance determinations.
+- Organic Certification Phase 6: local pest/weed/disease observations, linked actions, input-escalation notes, plastic mulch records, reports, and recovery-copy inclusion. The app organizes hierarchy evidence but does not diagnose or prescribe treatments.
+- Organic Certification Phase 7: local harvest lots, handling events, storage records, sale records, traceability reports, mass-balance review, and recovery-copy inclusion. The app organizes lot evidence but does not submit to certifiers, print labels, automate recalls, or make compliance determinations.
+- Local Planning: device-local goals, child goals/subgoals, selectable planning periods, farmer-editable tasks, responsible-person labels for future assignment readiness, and farm-note/organic-record links. Planning remains local and does not add accounts, notifications, calendars, sync, analytics, or worker permissions.
+- Organic Certification planning: seeded certification goals, subgoals, and preparation tasks are shown inside the standalone Organic Certification area while using the shared local planning foundation. Farmers can adjust certification timelines and task status without creating certifier submissions or compliance determinations.
+- Organic Certification Phase 8: local Organic System Plan section drafts, certification preparation tasks, OSP/inspection reports, and recovery-copy inclusion. The app organizes draft evidence but does not submit certifier forms or score compliance.
+- Organic Certification Phase 9: local organic report package generation with manifest, combined report text, saved package records, and recovery-copy inclusion. The app does not upload packages, create signed certifier files, or bundle media automatically.
+- Organic Certification Phase 10: local advanced-scope readiness records for livestock, wild crops, mushrooms, producer groups, imports, and labeling/product claims. These are specialty-scope notes for certifier review, not full compliance modules.
 - Zod validation for setup/reference names, tracked item kinds, manual record inputs, and recovery-copy export payloads.
 - A reusable earthy mobile UI foundation for setup, manual record, history, and data-safety screens.
 
@@ -77,7 +91,7 @@ Farm places remain private and device-local. They do not include GIS boundaries,
 
 ## Deferred Capabilities
 
-Do not add packages or implementation for server synchronization, server APIs, multi-device behavior, shared need-listing publication, responses/messaging, AI capture, camera/audio, authentication, cloud backup, analytics, telemetry, maps/geolocation, push notifications, ORM, or deployment tooling without later accepted scope and ADR work.
+Do not add packages or implementation for server synchronization, server APIs, multi-device behavior, certifier submission, shared need-listing publication, responses/messaging, automatic AI extraction, authentication, cloud backup, analytics, telemetry, maps/geolocation, push notifications, ORM, or deployment tooling without later accepted scope and ADR work.
 
 ## Folder Overview
 

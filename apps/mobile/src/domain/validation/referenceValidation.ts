@@ -4,7 +4,7 @@ import { FARM_PLACE_KINDS } from "../farm/FarmLocation";
 
 export const REFERENCE_NAME_MAX_LENGTH = 80;
 
-export const trackedItemKindSchema = z.enum(["crop", "material", "countableItem"]);
+export const trackedItemKindSchema = z.enum(["crop", "material"]);
 export const farmPlaceKindSchema = z.enum(FARM_PLACE_KINDS, {
   message: "Choose what kind of place this is.",
 });

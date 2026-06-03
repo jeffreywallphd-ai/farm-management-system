@@ -35,7 +35,7 @@ Helps agents work on user-facing mobile workflows involving activity entry, fiel
 - ADR-0013 accepts an on-device transcript-draft action for saved voice memos, but it remains draft text only and requires native/model validation before farmer reliance. Photo files should be copied out of picker/camera cache into durable app-owned storage before a saved farm note claims to retain them.
 - Phase 1 setup/reference screens exist under `apps/mobile`; Phase 2 adds manual harvest entry; Phase 3 adds manual material use, inventory count, unified local activity history/detail, and expanded recovery-copy export.
 - The implemented manual record screens cover exactly `HarvestRecorded`, `MaterialUseRecorded`, and `InventoryCountRecorded`.
-- The next capture screens should emphasize one primary `Record farm note` action, local save, optional light context, and later timeline review.
+- The next capture screens should emphasize one primary `Quick record farm events` action, local save, optional light context, and later timeline review.
 - Record forms should present farm-place paths such as `Field 1 > Bed 1` when nested places exist, avoiding generic or technical location wording.
 - Future mobile screens should reuse the established earthy theme tokens and small UI component foundation.
 - ADR-0008 accepts Expo, React Native, TypeScript, development builds, and EAS/internal distribution for Mobile Pilot 1.

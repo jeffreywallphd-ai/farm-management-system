@@ -20,7 +20,7 @@ Use one copy per farmer session.
 
 ## Capture Observations
 
-- Did the farmer find `Record farm note` quickly?
+- Did the farmer find `Quick record farm events` quickly?
 - Did microphone permission make sense?
 - Did camera/photo permission make sense?
 - Did the farmer record a useful voice memo?

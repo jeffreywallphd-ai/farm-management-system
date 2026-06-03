@@ -12,6 +12,8 @@
 - [Sourcing and Local Network Model](sourcing-and-local-network-model.md): private supply needs, future intentionally shared need listings, local farm network concepts, and standalone-pilot sourcing boundaries.
 - [AI-Assisted Capture and Confirmation Rules](ai-assisted-capture-and-confirmation-rules.md): meaning of AI-assisted drafts, confirmation, correction, provenance, and their relationship to operational records.
 - [Privacy, Visibility, and Sharing Rules](privacy-visibility-and-sharing-rules.md): private-by-default domain behavior, visibility classes, intentionally shared representations, and sensitive content rules.
+- [Organic Certification Domain Rules](organic-certification-rules.md): domain vocabulary and record meaning for USDA organic certification readiness features.
+- [Farm Planning Domain Rules](farm-planning-rules.md): domain vocabulary and rules for local goals, subgoals, periods, tasks, and planning links.
 
 Domain rules should use farmer-understandable language. They must not be buried only in database models, UI forms, API schemas, or AI prompts.
 

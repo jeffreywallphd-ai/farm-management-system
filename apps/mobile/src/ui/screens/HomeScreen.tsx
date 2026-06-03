@@ -21,18 +21,36 @@ export function HomeScreen({ farmName }: { farmName: Farm["name"] }) {
       />
       <Card>
         <View style={styles.primaryAction}>
-          <Text style={styles.prompt}>What happened on the farm?</Text>
+          <Text style={styles.prompt}>Record a Farm Event</Text>
+          <Text style={styles.description}>Capture what happened with a quick voice note and optional photos.</Text>
           <Button
-            label="Record farm note"
+            label="Record Event"
             onPress={() => pushRoute(router, "/farm-events/new")}
             size="hero"
           />
         </View>
       </Card>
-      <View style={styles.secondaryActions}>
-        <Button label="Review farm notes" onPress={() => pushRoute(router, "/farm-events")} size="large" variant="secondary" />
-        <Button label="Farm setup" onPress={() => pushRoute(router, "/setup")} size="large" variant="secondary" />
-      </View>
+      <Card>
+        <View style={styles.primaryAction}>
+          <Text style={styles.prompt}>Track/Manage Farm Tasks</Text>
+          <Text style={styles.description}>Move planned work through task boards and record farm events from task cards.</Text>
+          <Button label="Manage Tasks" onPress={() => pushRoute(router, "/planning/boards")} size="hero" />
+        </View>
+      </Card>
+      <Card>
+        <View style={styles.primaryAction}>
+          <Text style={styles.prompt}>Plan Farm Work</Text>
+          <Text style={styles.description}>Create goals, subgoals, single tasks, and short-term work plans.</Text>
+          <Button label="Plan Work" onPress={() => pushRoute(router, "/planning")} size="large" variant="secondary" />
+        </View>
+      </Card>
+      <Card>
+        <View style={styles.primaryAction}>
+          <Text style={styles.prompt}>Setup Farm Places, Crops, and Materials</Text>
+          <Text style={styles.description}>Keep the local farm context that makes notes, tasks, and records easier to organize.</Text>
+          <Button label="Open Farm Setup" onPress={() => pushRoute(router, "/setup")} size="large" variant="secondary" />
+        </View>
+      </Card>
     </Screen>
   );
 }
@@ -47,7 +65,9 @@ const styles = StyleSheet.create({
     fontWeight: "800",
     lineHeight: 30,
   },
-  secondaryActions: {
-    gap: theme.spacing.sm,
+  description: {
+    color: theme.colors.textSecondary,
+    fontSize: theme.typography.body,
+    lineHeight: 24,
   },
 });

@@ -16,6 +16,12 @@ export class InMemoryFarmReferenceRepository implements FarmReferenceRepository 
     return this.farm;
   }
 
+  async updateFarmName(farmId: FarmId, name: string): Promise<void> {
+    if (this.farm?.id === farmId) {
+      this.farm = { ...this.farm, name };
+    }
+  }
+
   async markCorePlacesSetupComplete(farmId: FarmId, completedAt: string): Promise<void> {
     if (this.farm?.id === farmId) {
       this.farm = { ...this.farm, corePlacesSetupCompletedAt: completedAt };

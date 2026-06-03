@@ -83,11 +83,11 @@ Mobile Pilot 1 behavior:
 
 ## `InventoryCountRecorded`
 
-Plain-language meaning: a worker records an observed quantity of a tracked material or countable item at a point in time.
+Plain-language meaning: a worker records an observed quantity of a tracked crop or material at a point in time.
 
 Minimum required fields:
 
-- Tracked material or countable item.
+- Tracked crop or material.
 - Observed quantity.
 - Unit.
 - Date and time.

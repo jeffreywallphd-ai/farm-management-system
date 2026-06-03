@@ -9,11 +9,13 @@ import type { useDatabase } from "../../bootstrap/providers/DatabaseProvider";
 import { listLocations } from "../../application/use-cases/list-locations/listLocations";
 import { getFarmEventDetail } from "../../application/use-cases/view-farm-events/GetFarmEventDetail";
 import { getFarmNoteTranscript } from "../../application/use-cases/transcribe-farm-note/GetFarmNoteTranscript";
+import { listOrganicEvidenceLinksForFarmNote } from "../../application/use-cases/manage-organic-certification/ListOrganicEvidence";
 import { localIdGenerator } from "../../infrastructure/system/idGenerator";
 import { ExpoWhisperModelRepository } from "../../infrastructure/transcription/ExpoWhisperModelRepository";
 import { WhisperRnVoiceMemoTranscriptionService } from "../../infrastructure/transcription/WhisperRnVoiceMemoTranscriptionService";
 import { FarmEventDetailScreen } from "../../ui/screens/FarmEventDetailScreen";
 import type { FarmNoteTranscript } from "../../domain/events/FarmNoteTranscript";
+import type { OrganicEvidenceLink } from "../../domain/organic/OrganicEvidenceLink";
 
 type ReadyDatabase = Extract<ReturnType<typeof useDatabase>, { status: "ready" }>;
 const transcriptionModelRepository = new ExpoWhisperModelRepository();
@@ -37,6 +39,7 @@ function FarmEventDetailRouteContent({
   const params = useLocalSearchParams<{ id?: string }>();
   const [event, setEvent] = useState<FarmEventView | null>(null);
   const [transcript, setTranscript] = useState<FarmNoteTranscript | null>(null);
+  const [evidenceLinks, setEvidenceLinks] = useState<OrganicEvidenceLink[]>([]);
   const [locations, setLocations] = useState<FarmLocation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -56,9 +59,16 @@ function FarmEventDetailRouteContent({
           : Promise.resolve(null),
         listLocations(farm.id, database.farmReferenceRepository),
       ]);
+      const nextEvidenceLinks = params.id
+        ? await listOrganicEvidenceLinksForFarmNote(
+            { farmId: farm.id, farmEventId: params.id },
+            { repository: database.organicCertificationRepository },
+          )
+        : [];
       setEvent(nextEvent);
       setTranscript(nextTranscript);
       setLocations(nextLocations);
+      setEvidenceLinks(nextEvidenceLinks);
       setIsLoading(false);
     }
 
@@ -72,14 +82,18 @@ function FarmEventDetailRouteContent({
   ]);
 
   return (
-    <FarmEventDetailScreen
+        <FarmEventDetailScreen
       event={event}
+      evidenceLinks={evidenceLinks}
       farmEventRepository={database.farmEventRepository}
       idGenerator={localIdGenerator}
       isLoading={isLoading}
       locations={locations}
-      onTranscriptChanged={setTranscript}
-      transcript={transcript}
+      onEvidenceLinksChanged={setEvidenceLinks}
+          onTranscriptChanged={setTranscript}
+          organicCertificationRepository={database.organicCertificationRepository}
+          planningRepository={database.planningRepository}
+          transcript={transcript}
       transcriptionModelRepository={transcriptionModelRepository}
       transcriptionRepository={database.farmNoteTranscriptRepository}
       transcriptionService={transcriptionService}

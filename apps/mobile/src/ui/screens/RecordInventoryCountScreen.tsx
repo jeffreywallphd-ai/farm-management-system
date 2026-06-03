@@ -53,7 +53,7 @@ export function RecordInventoryCountScreen({
         listTrackedItems(farm.id, undefined, farmReferenceRepository),
         listLocations(farm.id, farmReferenceRepository),
       ]);
-      setItems(allItems.filter((item) => item.kind === "material" || item.kind === "countableItem"));
+      setItems(allItems.filter((item) => item.kind === "crop" || item.kind === "material"));
       setLocations(nextLocations);
     }
     loadReferences();
@@ -78,11 +78,11 @@ export function RecordInventoryCountScreen({
 
   return (
     <Screen>
-      <PageHeader eyebrow="Inventory count" supportingText="Record an observed count. It will not overwrite earlier history." title="Record inventory count" />
+      <PageHeader eyebrow="Inventory count" supportingText="Record an observed crop or material count. It will not overwrite earlier history." title="Record crop or material count" />
       {items.length === 0 ? (
         <Card>
           <SectionHeading title="Finish setup first" />
-          <EmptyState text="Add a material or countable item before recording a count." />
+          <EmptyState text="Add a crop or material before recording a count." />
           <Button label="Back to farm setup" onPress={() => replaceRoute(router, "/")} variant="secondary" />
         </Card>
       ) : (

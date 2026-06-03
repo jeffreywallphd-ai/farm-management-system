@@ -164,8 +164,8 @@ test("recovery copy export contains farm references and harvest records", async 
   assert.equal(file.fileName, "farm-pilot-recovery-copy-20260529T110000.json");
   assert.equal(exportRepository.sharedFile?.fileName, file.fileName);
   const payload = JSON.parse(exportRepository.contents);
-  assert.equal(payload.exportVersion, 3);
-  assert.equal(payload.appDataSchemaVersion, 4);
+  assert.equal(payload.exportVersion, 16);
+  assert.equal(payload.appDataSchemaVersion, 17);
   assert.equal(payload.farm.name, "Green Hill Farm");
   assert.equal(payload.locations[0].name, "North Field");
   assert.equal(payload.locations[0].kind, "field");

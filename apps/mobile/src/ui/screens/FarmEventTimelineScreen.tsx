@@ -106,7 +106,7 @@ export function FarmEventTimelineScreen({
           </View>
         )}
       </Card>
-      <Button label="Record farm note" onPress={() => pushRoute(router, "/farm-events/new")} />
+      <Button label="Quick record farm events" onPress={() => pushRoute(router, "/farm-events/new")} />
     </Screen>
   );
 }

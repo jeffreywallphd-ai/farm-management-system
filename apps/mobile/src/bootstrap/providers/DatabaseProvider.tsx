@@ -4,11 +4,15 @@ import type { FarmReferenceRepository } from "../../application/ports/FarmRefere
 import type { FarmEventRepository } from "../../application/ports/FarmEventRepository";
 import type { FarmNoteTranscriptRepository } from "../../application/ports/FarmNoteTranscriptRepository";
 import type { LocalRecordRepository } from "../../application/ports/LocalRecordRepository";
+import type { OrganicCertificationRepository } from "../../application/ports/OrganicCertificationRepository";
+import type { PlanningRepository } from "../../application/ports/PlanningRepository";
 import { openMobilePilotDatabase } from "../../infrastructure/sqlite/database";
 import { SqliteFarmReferenceRepository } from "../../infrastructure/sqlite/repositories/SqliteFarmReferenceRepository";
 import { SqliteFarmEventRepository } from "../../infrastructure/sqlite/repositories/SqliteFarmEventRepository";
 import { SqliteFarmNoteTranscriptRepository } from "../../infrastructure/sqlite/repositories/SqliteFarmNoteTranscriptRepository";
 import { SqliteHarvestRecordRepository } from "../../infrastructure/sqlite/repositories/SqliteHarvestRecordRepository";
+import { SqliteOrganicCertificationRepository } from "../../infrastructure/sqlite/repositories/SqliteOrganicCertificationRepository";
+import { SqlitePlanningRepository } from "../../infrastructure/sqlite/repositories/SqlitePlanningRepository";
 
 type DatabaseState =
   | { status: "loading" }
@@ -18,6 +22,8 @@ type DatabaseState =
       farmNoteTranscriptRepository: FarmNoteTranscriptRepository;
       farmReferenceRepository: FarmReferenceRepository;
       localRecordRepository: LocalRecordRepository;
+      organicCertificationRepository: OrganicCertificationRepository;
+      planningRepository: PlanningRepository;
     }
   | { status: "error"; message: string };
 
@@ -40,6 +46,8 @@ export function DatabaseProvider({ children }: { children: ReactNode }) {
             farmNoteTranscriptRepository: new SqliteFarmNoteTranscriptRepository(database),
             farmReferenceRepository: new SqliteFarmReferenceRepository(database),
             localRecordRepository: new SqliteHarvestRecordRepository(database),
+            organicCertificationRepository: new SqliteOrganicCertificationRepository(database),
+            planningRepository: new SqlitePlanningRepository(database),
           });
         }
       } catch {

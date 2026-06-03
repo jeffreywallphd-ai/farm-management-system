@@ -1,0 +1,61 @@
+import type { Migration } from "./migrationRunner";
+
+export const createOrganicSeeds: Migration = {
+  version: 12,
+  name: "create_organic_seeds",
+  statements: [
+    `CREATE TABLE IF NOT EXISTS seed_lots (
+      id TEXT PRIMARY KEY NOT NULL,
+      farm_id TEXT NOT NULL,
+      crop_id TEXT,
+      variety TEXT NOT NULL,
+      supplier TEXT,
+      lot_number TEXT,
+      purchase_date TEXT,
+      quantity TEXT,
+      organic_status TEXT NOT NULL CHECK (organic_status IN ('organic', 'untreatedNonOrganic', 'treatedAllowed', 'treatedProhibited', 'unknown')),
+      seed_treatment TEXT,
+      invoice_attachment_id TEXT,
+      label_attachment_id TEXT,
+      notes TEXT,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL,
+      FOREIGN KEY (farm_id) REFERENCES farms(id),
+      FOREIGN KEY (crop_id) REFERENCES tracked_items(id)
+    );`,
+    `CREATE TABLE IF NOT EXISTS commercial_availability_searches (
+      id TEXT PRIMARY KEY NOT NULL,
+      farm_id TEXT NOT NULL,
+      seed_lot_id TEXT NOT NULL,
+      crop TEXT,
+      variety TEXT,
+      searched_on TEXT NOT NULL,
+      supplier_name TEXT NOT NULL,
+      result TEXT NOT NULL CHECK (result IN ('available', 'unavailable', 'wrongVariety', 'wrongQuantity', 'wrongQuality', 'tooLate', 'other')),
+      evidence_attachment_id TEXT,
+      notes TEXT,
+      created_at TEXT NOT NULL,
+      FOREIGN KEY (farm_id) REFERENCES farms(id),
+      FOREIGN KEY (seed_lot_id) REFERENCES seed_lots(id)
+    );`,
+    `CREATE TABLE IF NOT EXISTS organic_planting_events (
+      id TEXT PRIMARY KEY NOT NULL,
+      farm_id TEXT NOT NULL,
+      seed_lot_id TEXT NOT NULL,
+      crop_id TEXT,
+      place_id TEXT,
+      date TEXT NOT NULL,
+      quantity_planted TEXT,
+      transplant_or_direct_seed TEXT CHECK (transplant_or_direct_seed IN ('transplant', 'directSeed')),
+      linked_farm_note_id TEXT,
+      created_at TEXT NOT NULL,
+      FOREIGN KEY (farm_id) REFERENCES farms(id),
+      FOREIGN KEY (seed_lot_id) REFERENCES seed_lots(id),
+      FOREIGN KEY (crop_id) REFERENCES tracked_items(id),
+      FOREIGN KEY (place_id) REFERENCES farm_locations(id)
+    );`,
+    "CREATE INDEX IF NOT EXISTS idx_seed_lots_farm ON seed_lots(farm_id);",
+    "CREATE INDEX IF NOT EXISTS idx_commercial_availability_seed_lot ON commercial_availability_searches(seed_lot_id);",
+    "CREATE INDEX IF NOT EXISTS idx_organic_planting_events_seed_lot ON organic_planting_events(seed_lot_id);",
+  ],
+};

@@ -49,6 +49,10 @@ export class SqliteFarmReferenceRepository implements FarmReferenceRepository {
     return row ? mapFarm(row) : null;
   }
 
+  async updateFarmName(farmId: FarmId, name: string): Promise<void> {
+    await this.database.runAsync("UPDATE farms SET name = ? WHERE id = ?;", [name, farmId]);
+  }
+
   async markCorePlacesSetupComplete(farmId: FarmId, completedAt: string): Promise<void> {
     await this.database.runAsync(
       "UPDATE farms SET core_places_setup_completed_at = ? WHERE id = ?;",

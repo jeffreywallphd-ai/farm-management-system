@@ -56,6 +56,7 @@ export async function recordVoiceMemoFarmEvent(
         eventType: input.eventType,
         placeId: input.placeId,
         note: input.note,
+        needsOrganicReview: input.needsOrganicReview,
         attachments: [
           {
             kind: "voiceMemo",

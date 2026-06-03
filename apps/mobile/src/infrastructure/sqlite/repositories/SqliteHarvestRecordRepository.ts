@@ -58,7 +58,7 @@ interface InventoryCountRow {
   id: string;
   farm_id: string;
   tracked_item_id: string;
-  tracked_item_kind: "material" | "countableItem";
+  tracked_item_kind: "crop" | "material";
   location_id: string | null;
   observed_quantity_amount: number;
   observed_quantity_unit: HarvestUnit;
@@ -146,7 +146,7 @@ export class SqliteHarvestRecordRepository implements LocalRecordRepository {
   }
 
   async saveInventoryCount(record: InventoryCountRecorded): Promise<void> {
-    await this.assertTrackedItem(record.trackedItemId, record.farmId, ["material", "countableItem"], "Counted item");
+    await this.assertTrackedItem(record.trackedItemId, record.farmId, ["crop", "material"], "Counted item");
     if (record.locationId) {
       await this.assertLocation(record.locationId, record.farmId);
     }
@@ -406,7 +406,7 @@ const INVENTORY_COUNT_VIEW_SELECT = `SELECT
   locations.parent_id AS location_parent_id,
   locations.created_at AS location_created_at
 FROM inventory_count_records
-JOIN tracked_items items ON items.id = inventory_count_records.tracked_item_id AND items.kind IN ('material', 'countableItem')
+JOIN tracked_items items ON items.id = inventory_count_records.tracked_item_id AND items.kind IN ('crop', 'material')
 LEFT JOIN farm_locations locations ON locations.id = inventory_count_records.location_id`;
 
 function mapHarvestView(row: HarvestRow): HarvestRecordView {

@@ -14,6 +14,12 @@ export class InMemoryFarmEventRepository implements FarmEventRepository {
     this.attachments.push(...attachments);
   }
 
+  async updateFarmEventOrganicReview(farmId: FarmId, id: FarmEventId, needsOrganicReview: boolean): Promise<void> {
+    this.events = this.events.map((event) =>
+      event.farmId === farmId && event.id === id ? { ...event, needsOrganicReview } : event,
+    );
+  }
+
   async listFarmEvents(farmId: FarmId): Promise<FarmEventView[]> {
     return this.events
       .filter((event) => event.farmId === farmId)
@@ -37,4 +43,3 @@ export class InMemoryFarmEventRepository implements FarmEventRepository {
     };
   }
 }
-

@@ -12,7 +12,7 @@
 
 > Mobile Pilot 1 is the standalone offline-first farmer-testing pilot. Its implemented manual-record foundation validates device-local setup, local history, and farmer-controlled recovery. Its farmer-shareable differentiator is quick farm-event capture through voice memos, optional photos, light context, local timeline review, and recovery export. ADR-0013 adds manually requested on-device transcript drafts as a review aid only. It does not include structured AI interpretation, server synchronization, external sharing, multi-device access, authentication, cloud backup, analytics, or deployment-mode implementation.
 
-The Mobile Pilot 1 implementation stack is selected in ADR-0008 through ADR-0011. Phase 1 setup/reference behavior now exists under `apps/mobile`: one local farm profile, farmer-facing farm places, tracked crops, tracked materials, tracked countable items, SQLite-backed local persistence, Zod validation, and a reusable earthy UI foundation.
+The Mobile Pilot 1 implementation stack is selected in ADR-0008 through ADR-0011. Phase 1 setup/reference behavior now exists under `apps/mobile`: one local farm profile, farmer-facing farm places, tracked crops, tracked materials, SQLite-backed local persistence, Zod validation, and a reusable earthy UI foundation. Separate countable-item setup has been retired; inventory counts are recorded against crops or materials so future photo-count workflows can build on the same crop/material foundations.
 
 Farm places are the implemented farmer-facing form of local location data. Each farm place has a type, a name, and an optional parent place so the app can represent simple structures such as fields containing beds and rows, greenhouses containing benches, or wash/pack areas containing coolers. This is not a GIS, map, geometry, acreage, bed-dimension, or crop-planning feature.
 
@@ -28,7 +28,7 @@ ADR-0012 pivots the farmer-testable implementation direction toward voice/photo-
 | Single device-local farm context | Included |
 | Minimal local farm setup | Included |
 | Minimal farm places needed for records | Included |
-| Minimal tracked crops/materials/countable items needed for records | Included |
+| Minimal tracked crops/materials needed for records | Included |
 | Manual harvest record | Included |
 | Manual material-use record | Included |
 | Manual inventory-count observation | Included |
@@ -37,6 +37,7 @@ ADR-0012 pivots the farmer-testable implementation direction toward voice/photo-
 | Optional photo attachments for farm events | Implemented for local farm notes |
 | Saved-note transcript drafts | Local persistence/UI/export path and on-device model download implemented; physical-device development-build validation still required |
 | Local farm-event timeline | Implemented |
+| Local farm work boards for planning tasks | Implemented as saved local planning views |
 | Local activity history for included records | Included |
 | Clear locally saved/device-local status | Included |
 | Practical export/backup of Mobile Pilot 1 data | Included for manual data and farm-note media package; transcript drafts included when present |

@@ -10,6 +10,7 @@ import type { Clock } from "../../ports/Clock";
 import type { ExportRepository, MobilePilotExportFile, RecoveryPackageMediaFile } from "../../ports/ExportRepository";
 import type { FarmReferenceRepository } from "../../ports/FarmReferenceRepository";
 import type { LocalRecordRepository } from "../../ports/LocalRecordRepository";
+import type { PlanningRepository } from "../../ports/PlanningRepository";
 import { serializeFarmEventRecoveryPackageManifest } from "../../../infrastructure/export/FarmEventRecoveryPackageExporter";
 import { buildMobilePilotRecoveryCopyPayload } from "./CreateHarvestRecoveryCopy";
 
@@ -22,6 +23,7 @@ export async function createFarmEventRecoveryPackage(
     farmNoteTranscriptRepository: FarmNoteTranscriptRepository;
     farmReferenceRepository: FarmReferenceRepository;
     localRecordRepository: LocalRecordRepository;
+    planningRepository?: PlanningRepository;
   },
 ): Promise<MobilePilotExportFile> {
   const createdAt = dependencies.clock.now().toISOString();

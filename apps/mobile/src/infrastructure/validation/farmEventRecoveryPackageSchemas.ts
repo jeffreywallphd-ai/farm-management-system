@@ -31,6 +31,7 @@ const farmEventSchema = z.object({
   eventType: z.enum(FARM_EVENT_TYPES),
   placeId: z.string().optional(),
   note: z.string().optional(),
+  needsOrganicReview: z.boolean().optional(),
   capturedAt: isoDateTimeString,
   createdAt: isoDateTimeString,
   privacy: z.literal("privateToFarm"),

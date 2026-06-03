@@ -25,20 +25,17 @@ function SetupRouteContent({ farm, database }: { farm: Farm; database: ReadyData
   const [locations, setLocations] = useState<FarmLocation[]>([]);
   const [crops, setCrops] = useState<TrackedItem[]>([]);
   const [materials, setMaterials] = useState<TrackedItem[]>([]);
-  const [countableItems, setCountableItems] = useState<TrackedItem[]>([]);
 
   const loadReferences = useCallback(async () => {
-    const [nextLocations, nextCrops, nextMaterials, nextCountableItems] = await Promise.all([
+    const [nextLocations, nextCrops, nextMaterials] = await Promise.all([
       listLocations(farm.id, database.farmReferenceRepository),
       listTrackedItems(farm.id, "crop", database.farmReferenceRepository),
       listTrackedItems(farm.id, "material", database.farmReferenceRepository),
-      listTrackedItems(farm.id, "countableItem", database.farmReferenceRepository),
     ]);
 
     setLocations(nextLocations);
     setCrops(nextCrops);
     setMaterials(nextMaterials);
-    setCountableItems(nextCountableItems);
   }, [database.farmReferenceRepository, farm.id]);
 
   useEffect(() => {
@@ -47,7 +44,6 @@ function SetupRouteContent({ farm, database }: { farm: Farm; database: ReadyData
 
   return (
     <FarmDashboardScreen
-      countableItems={countableItems}
       crops={crops}
       farm={farm}
       initialExpandedSection={parseSetupSection(params.section)}
@@ -64,10 +60,8 @@ function parseSetupSection(section?: string | string[]): SetupSectionId | undefi
 
   if (
     value === "farmPlaces" ||
-    value === "farmWork" ||
     value === "crops" ||
-    value === "materials" ||
-    value === "countableItems"
+    value === "materials"
   ) {
     return value;
   }

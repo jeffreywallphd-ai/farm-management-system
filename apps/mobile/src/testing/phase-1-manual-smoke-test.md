@@ -9,7 +9,7 @@ Use a development build on a physical device or emulator.
 5. Add one location.
 6. Add one crop.
 7. Add one material.
-8. Add one countable item.
+8. Add one material that can be counted later.
 9. Close and relaunch the app.
 10. Confirm all setup/reference data remains.
 11. Enable airplane mode and confirm the Phase 1 flows still work.

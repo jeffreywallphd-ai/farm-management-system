@@ -54,9 +54,9 @@ export interface FarmEvent {
   eventType: FarmEventType;
   placeId?: FarmLocationId;
   note?: string;
+  needsOrganicReview?: boolean;
   capturedAt: string;
   createdAt: string;
   privacy: PrivacyClassification;
   schemaVersion: 1;
 }
-

@@ -29,7 +29,7 @@ Helps agents handle product scope, farmer workflows, farm terminology, tracked i
 - First-slice scope is a narrow standalone mobile pilot.
 - The implemented Mobile Pilot 1 manual foundation includes `HarvestRecorded`, `MaterialUseRecorded`, and `InventoryCountRecorded`.
 - ADR-0012 accepts voice/photo-first farm-event capture as the next farmer-shareable pilot differentiator.
-- Phase 1 implements only the setup/reference data needed before those records: one local farm, farmer-facing farm places, crops, materials, and countable items.
+- Phase 1 implements only the setup/reference data needed before those records: one local farm, farmer-facing farm places, crops, and materials. Separate countable-item setup has been retired; count observations now target crops or materials.
 - Farm places are the Mobile Pilot 1 UI/domain term for local place references. They have a type and optional parent relationship, but do not imply GIS, maps, dimensions, planning, or spatial modeling.
 - Phase 3 implements the full manual Pilot 1 record set: `HarvestRecorded`, `MaterialUseRecorded`, and `InventoryCountRecorded`.
 - Capture-first farm events are not automatically structured operational records. Voice memos and photos are source captures until later reviewed or explicitly interpreted by separately authorized behavior.
