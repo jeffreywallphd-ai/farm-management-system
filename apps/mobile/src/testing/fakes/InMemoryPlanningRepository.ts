@@ -88,6 +88,13 @@ export class InMemoryPlanningRepository implements PlanningRepository {
     return records;
   }
 
+  async deleteGoal(farmId: FarmId, id: PlanningGoalId): Promise<void> {
+    this.goals.set(farmId, (this.goals.get(farmId) ?? []).filter((goal) => goal.id !== id));
+    this.tasks.set(farmId, (this.tasks.get(farmId) ?? []).map((task) => task.goalId === id ? { ...task, goalId: undefined } : task));
+    this.links.set(farmId, (this.links.get(farmId) ?? []).filter((link) => link.goalId !== id));
+    this.boards.set(farmId, (this.boards.get(farmId) ?? []).filter((board) => board.goalId !== id));
+  }
+
   async saveTask(task: PlanningTask): Promise<void> {
     const existing = this.tasks.get(task.farmId) ?? [];
     this.tasks.set(task.farmId, [
@@ -115,6 +122,11 @@ export class InMemoryPlanningRepository implements PlanningRepository {
       records = records.filter((task) => task.assignedFarmhandId === filters.assignedFarmhandId);
     }
     return records;
+  }
+
+  async deleteTask(farmId: FarmId, id: PlanningTaskId): Promise<void> {
+    this.tasks.set(farmId, (this.tasks.get(farmId) ?? []).filter((task) => task.id !== id));
+    this.links.set(farmId, (this.links.get(farmId) ?? []).filter((link) => link.taskId !== id));
   }
 
   async saveLink(link: PlanningLink): Promise<void> {

@@ -12,6 +12,6 @@ Single-choice option controls should use the shared dropdown-style `SelectField`
 
 Visual styling should stay reusable through `theme`, shared components, and project-owned assets in `apps/mobile/assets/images`. Decorative imagery should support field usability and atmosphere without changing workflows, hiding controls, or becoming repeated wallpaper across every card.
 
-Use `ThemedIcon` for app-owned line icons, button icons, navigation icons, and button arrows before adding one-off view-drawn glyphs. Headings should use the shared serif heading font from `theme.typography.headingFontFamily`, while body text, form labels, controls, buttons, and the app logo should remain sans serif for readability.
+Use `ThemedIcon` for app-owned line icons, button icons, navigation icons, and button arrows before adding one-off view-drawn glyphs. Page headings and card title headings should use the shared serif heading font from `theme.typography.headingFontFamily`; Android targets the `FazendioHeading` font family, which is bundled from the ignored local `assets/fonts/FazendioHeading.ttf` file when that file exists, and other platforms use Georgia. The app logo should use `theme.typography.logoFontFamily`. Body text, form labels, controls, and buttons should remain sans serif for readability.
 
 Do not implement AI capture, sync status, shared publication, authentication, or extra workflows here without later accepted scope.

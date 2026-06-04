@@ -1,7 +1,7 @@
 # Farm Planning Domain Rules
 
 - Status: accepted
-- Last reviewed: 2026-06-02
+- Last reviewed: 2026-06-04
 - Canonical for: local planning domain vocabulary and behavior
 - Related ADRs: [ADR-0015](../adr/ADR-0015-local-farm-planning-foundation.md)
 - Related docs: [Farm Planning and Roadmapping](../product/farm-planning-roadmapping.md), [Planning Architecture](../architecture/planning-architecture.md), [Organic Certification Domain Rules](organic-certification-rules.md)
@@ -62,6 +62,9 @@
 - Organic certification planning tasks use the shared planning foundation.
 - Organic Certification must still present a standalone certification experience.
 - Certification task status is readiness/work status, not a compliance finding.
+- Seeded certification tasks may include expected-evidence guidance in notes so farmers can see the concrete records, farm-note links, labels, logs, reports, or certifier instructions to gather.
+- Seeded certification subgoals should stay small enough that a farmer can understand the record set to gather. Broad regulatory areas may be split into separate planning subgoals when approvals, applications, compost logs, manure intervals, traceability, handling, mass-balance, OSP narratives, or prevention procedures need different evidence.
+- Template-owned certification goals are removed when a dedicated organic workflow takes over that work, such as evidence review or package generation. Farmer-created follow-up tasks may remain normal planning tasks.
 - Farm notes remain the source evidence layer. Planning tasks may link to notes, and organic evidence links may give notes certification meaning.
 
 ## Privacy Rule

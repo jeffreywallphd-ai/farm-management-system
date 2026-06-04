@@ -212,6 +212,15 @@ class CapturingExportRepository implements ExportRepository {
     };
   }
 
+  async writePdf(input: { fileName: string; bytes: Uint8Array }): Promise<MobilePilotExportFile> {
+    this.contents = String(input.bytes.length);
+    return {
+      uri: `memory://${input.fileName}`,
+      fileName: input.fileName,
+      mimeType: "application/pdf",
+    };
+  }
+
   async shareRecoveryCopy(file: MobilePilotExportFile): Promise<void> {
     this.sharedFile = file;
   }

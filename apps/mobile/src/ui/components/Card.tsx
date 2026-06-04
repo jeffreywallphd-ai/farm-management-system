@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
     borderColor: theme.colors.border,
   },
   warmCard: {
-    backgroundColor: theme.colors.surface,
+    backgroundColor: theme.colors.surfaceMuted,
     borderColor: theme.colors.border,
   },
 });

@@ -59,6 +59,25 @@ export class ExpoRecoveryCopyShareAdapter implements ExportRepository {
     };
   }
 
+  async writePdf(input: { fileName: string; bytes: Uint8Array }): Promise<MobilePilotExportFile> {
+    const baseDirectory = FileSystem.documentDirectory;
+
+    if (!baseDirectory) {
+      throw new Error("PDF export storage is unavailable on this device.");
+    }
+
+    const uri = `${baseDirectory}${input.fileName}`;
+    await FileSystem.writeAsStringAsync(uri, bytesToBase64(input.bytes), {
+      encoding: FileSystem.EncodingType.Base64,
+    });
+
+    return {
+      uri,
+      fileName: input.fileName,
+      mimeType: "application/pdf",
+    };
+  }
+
   async shareRecoveryCopy(file: MobilePilotExportFile): Promise<void> {
     const isAvailable = await Sharing.isAvailableAsync();
 
@@ -68,8 +87,8 @@ export class ExpoRecoveryCopyShareAdapter implements ExportRepository {
 
     await Sharing.shareAsync(file.uri, {
       mimeType: file.mimeType,
-      dialogTitle: "Save recovery copy",
-      UTI: file.mimeType === "application/zip" ? "public.zip-archive" : "public.json",
+      dialogTitle: file.mimeType === "application/pdf" ? "Save PDF report" : "Save recovery copy",
+      UTI: file.mimeType === "application/zip" ? "public.zip-archive" : file.mimeType === "application/pdf" ? "com.adobe.pdf" : "public.json",
     });
   }
 }

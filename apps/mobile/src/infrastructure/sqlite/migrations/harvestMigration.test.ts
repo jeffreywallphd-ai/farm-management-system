@@ -240,6 +240,7 @@ test("organic report package migration creates local package manifest storage on
   assert.match(sql, /CREATE TABLE IF NOT EXISTS organic_report_packages/);
   assert.match(sql, /manifest_json TEXT NOT NULL/);
   assert.match(sql, /package_text TEXT NOT NULL/);
+  assert.match(sql, /'renewalConversation'/);
   assert.match(sql, /report_names_json TEXT NOT NULL DEFAULT '\[\]'/);
   assert.doesNotMatch(sql, /server/i);
   assert.doesNotMatch(sql, /sync/i);
@@ -270,6 +271,9 @@ test("organic evidence link migration connects farm notes to organic records loc
   assert.match(sql, /ALTER TABLE farm_events ADD COLUMN needs_organic_review/);
   assert.match(sql, /CREATE TABLE IF NOT EXISTS organic_evidence_links/);
   assert.match(sql, /farm_event_id TEXT NOT NULL/);
+  assert.match(sql, /'inputApprovals'/);
+  assert.match(sql, /'handlingMassBalance'/);
+  assert.match(sql, /'ospRecordkeeping'/);
   assert.match(sql, /privacy TEXT NOT NULL CHECK \(privacy = 'privateToFarm'\)/);
   assert.doesNotMatch(sql, /server/i);
   assert.doesNotMatch(sql, /sync/i);

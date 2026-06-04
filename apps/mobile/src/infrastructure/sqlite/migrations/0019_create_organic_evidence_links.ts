@@ -1,7 +1,7 @@
 import type { Migration } from "./migrationRunner";
 
 const categoryCheck =
-  "('land', 'inputs', 'seeds', 'soil', 'pest', 'traceability', 'osp', 'inspection', 'advancedScope', 'general')";
+  "('profile', 'land', 'inputApprovals', 'inputApplications', 'seeds', 'soilFertility', 'compost', 'manure', 'pest', 'lotTraceability', 'handlingMassBalance', 'ospPractices', 'ospRecordkeeping', 'reports', 'advancedScope', 'general')";
 
 const recordTypeCheck =
   "('organicPlaceProfile', 'organicBoundaryEvidence', 'organicInput', 'organicInputApplication', 'seedLot', 'commercialAvailabilitySearch', 'organicPlantingEvent', 'soilFertilityPractice', 'compostBatch', 'compostTemperatureLog', 'manureApplication', 'cropRotationRecord', 'pestWeedDiseaseObservation', 'pestWeedDiseaseAction', 'plasticMulchRecord', 'organicLot', 'organicHandlingEvent', 'organicStorageRecord', 'organicSaleRecord', 'organicSystemPlanSection', 'organicInspectionReadinessItem', 'organicAdvancedScopeRecord', 'organicReportPackage')";

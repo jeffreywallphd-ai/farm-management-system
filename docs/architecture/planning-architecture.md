@@ -1,7 +1,7 @@
 # Planning Architecture
 
 - Status: accepted
-- Last reviewed: 2026-06-02
+- Last reviewed: 2026-06-04
 - Canonical for: local planning architecture boundaries
 - Related ADRs: [ADR-0015](../adr/ADR-0015-local-farm-planning-foundation.md), [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md), [ADR-0009](../adr/ADR-0009-mobile-pilot-1-local-persistence.md), [ADR-0010](../adr/ADR-0010-mobile-pilot-1-export-and-recovery-copy.md), [ADR-0011](../adr/ADR-0011-mobile-pilot-1-runtime-boundary-validation.md)
 - Related docs: [Farm Planning and Roadmapping](../product/farm-planning-roadmapping.md), [Farm Planning Domain Rules](../domain/farm-planning-rules.md), [Organic Certification Architecture](organic-certification-architecture.md)
@@ -36,6 +36,8 @@ Planning boards store local board title, scope, optional goal reference, optiona
 Organic Certification may create default certification planning goals and tasks from templates. Those records are normal planning records with certification source metadata. Organic Certification screens may filter and present those records in certification-specific language.
 
 Existing Organic System Plan section records remain OSP narrative records. New inspection-prep checklist behavior should use planning tasks rather than creating a second task system.
+
+Dedicated organic evidence-review and package-generation workflows should not be duplicated as seeded standing planning goals. When template-owned certification goals are retired, repository delete operations may remove those template records while preserving ordinary farmer-created tasks.
 
 ## Export Boundary
 

@@ -17,6 +17,15 @@ import { createOrganicSeedReport } from "./CreateOrganicSeedReports";
 import { createOrganicSoilReport } from "./CreateOrganicSoilReports";
 import { createOrganicSystemPlanReport } from "./CreateOrganicSystemPlanReports";
 import { createOrganicTraceabilityReport } from "./CreateOrganicTraceabilityReports";
+import { listOrganicEvidenceReview } from "./ListOrganicEvidence";
+
+export interface OrganicReportPackagePreview {
+  generatedAt: string;
+  manifest: Record<string, unknown>;
+  packageText: string;
+  reportEntries: Array<{ name: string; contents: string }>;
+  warnings: string[];
+}
 
 export async function createOrganicReportPackage(
   input: {
@@ -36,10 +45,53 @@ export async function createOrganicReportPackage(
   },
 ): Promise<OrganicReportPackage> {
   const parsed = organicReportPackageInputSchema.parse(input);
+  const preview = await createOrganicReportPackagePreview(input, dependencies);
+  const reportPackage: OrganicReportPackage = {
+    id: dependencies.idGenerator.newId(),
+    farmId: parsed.farmId,
+    packageType: parsed.packageType,
+    title: parsed.title,
+    generatedAt: preview.generatedAt,
+    reportNames: preview.reportEntries.map((entry) => entry.name),
+    manifestJson: JSON.stringify(preview.manifest),
+    packageText: preview.packageText,
+    notes: parsed.notes,
+    createdAt: preview.generatedAt,
+  };
+  await dependencies.repository.saveOrganicReportPackage(reportPackage);
+  return reportPackage;
+}
+
+export async function createOrganicReportPackagePreview(
+  input: {
+    farm: Farm;
+    farmId: string;
+    packageType: OrganicReportPackageType;
+    title: string;
+    notes?: string;
+  },
+  dependencies: {
+    clock: Clock;
+    farmEventRepository?: FarmEventRepository;
+    farmReferenceRepository: FarmReferenceRepository;
+    planningRepository?: PlanningRepository;
+    repository: OrganicCertificationRepository;
+  },
+): Promise<OrganicReportPackagePreview> {
+  const parsed = organicReportPackageInputSchema.parse(input);
   const reportEntries = await buildReports(input.farm, dependencies);
+  const evidenceReview = dependencies.farmEventRepository
+    ? await listOrganicEvidenceReview({ farmId: parsed.farmId }, { farmEventRepository: dependencies.farmEventRepository, repository: dependencies.repository })
+    : undefined;
+  const warnings = [
+    ...(evidenceReview?.groups.flatMap((group) => group.missingPrompts) ?? []),
+    ...(evidenceReview && evidenceReview.staleLinkCount > 0 ? [`${evidenceReview.staleLinkCount} linked evidence item${evidenceReview.staleLinkCount === 1 ? "" : "s"} no longer resolves to a saved farm note.`] : []),
+  ];
   const manifest = await buildManifest(input.farm, parsed.packageType, reportEntries.map((entry) => entry.name), {
+    evidenceReview,
     planningRepository: dependencies.planningRepository,
     repository: dependencies.repository,
+    warnings,
   });
   const generatedAt = dependencies.clock.now().toISOString();
   const packageText = [
@@ -49,25 +101,22 @@ export async function createOrganicReportPackage(
     `Generated: ${generatedAt}`,
     "Use: This local package organizes organic readiness reports for farmer and certifier review. It is not a certifier submission, legal determination, or compliance certificate.",
     "",
+    "Package review warnings",
+    warnings.length ? warnings.map((warning) => `- ${warning}`).join("\n") : "- No missing linked-evidence warnings were generated for the categories reviewed.",
+    "",
     "Manifest",
     JSON.stringify(manifest, null, 2),
     "",
     ...reportEntries.flatMap((entry) => [`--- ${entry.name} ---`, entry.contents, ""]),
   ].join("\n");
-  const reportPackage: OrganicReportPackage = {
-    id: dependencies.idGenerator.newId(),
-    farmId: parsed.farmId,
-    packageType: parsed.packageType,
-    title: parsed.title,
+
+  return {
     generatedAt,
-    reportNames: reportEntries.map((entry) => entry.name),
-    manifestJson: JSON.stringify(manifest),
+    manifest,
     packageText,
-    notes: parsed.notes,
-    createdAt: generatedAt,
+    reportEntries,
+    warnings,
   };
-  await dependencies.repository.saveOrganicReportPackage(reportPackage);
-  return reportPackage;
 }
 
 async function buildReports(
@@ -125,7 +174,12 @@ async function buildManifest(
   farm: Farm,
   packageType: string,
   reportNames: string[],
-  dependencies: { planningRepository?: PlanningRepository; repository: OrganicCertificationRepository },
+  dependencies: {
+    evidenceReview?: Awaited<ReturnType<typeof listOrganicEvidenceReview>>;
+    planningRepository?: PlanningRepository;
+    repository: OrganicCertificationRepository;
+    warnings?: string[];
+  },
 ): Promise<Record<string, unknown>> {
   const [
     placeProfiles,
@@ -188,6 +242,19 @@ async function buildManifest(
     farmId: farm.id,
     packageType,
     reportNames,
+    packageWarnings: dependencies.warnings ?? [],
+    evidenceReview: dependencies.evidenceReview ? {
+      totalLinks: dependencies.evidenceReview.totalLinks,
+      staleLinkCount: dependencies.evidenceReview.staleLinkCount,
+      missingCategoryCount: dependencies.evidenceReview.missingCategoryCount,
+      groups: dependencies.evidenceReview.groups.map((group) => ({
+        category: group.category,
+        label: group.label,
+        linkedEvidenceCount: group.links.length,
+        staleLinkCount: group.staleLinkCount,
+        missingPrompts: group.missingPrompts,
+      })),
+    } : undefined,
     recordCounts: {
       organicPlaceProfiles: placeProfiles.length,
       organicInputs: inputs.length,

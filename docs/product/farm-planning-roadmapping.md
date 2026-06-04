@@ -1,7 +1,7 @@
 # Farm Planning and Roadmapping
 
 - Status: accepted
-- Last reviewed: 2026-06-02
+- Last reviewed: 2026-06-04
 - Canonical for: local farm planning, roadmap, goal/subgoal, assignment-ready task, and work-board product behavior
 - Related ADRs: [ADR-0015](../adr/ADR-0015-local-farm-planning-foundation.md), [ADR-0001](../adr/ADR-0001-offline-first-field-operation.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](../adr/ADR-0005-data-portability-and-recoverability.md), [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md)
 - Related docs: [Organic Certification Readiness](organic-certification-readiness.md), [Field Workflows](field-workflows.md), [Farm Planning Domain Rules](../domain/farm-planning-rules.md), [Planning Architecture](../architecture/planning-architecture.md)
@@ -63,18 +63,25 @@ The certification area should create a certification goal with meaningful subgoa
 
 - Set up certification profile.
 - Document land and transition status.
-- Organize input and material records.
+- Review input approvals and restrictions.
+- Track input applications and evidence.
 - Organize seed and planting records.
-- Document soil fertility, compost, manure, and rotation practices.
+- Document soil fertility and crop rotation practices.
+- Manage compost evidence.
+- Track raw manure applications and harvest intervals.
 - Document pest, weed, disease, and mulch practices.
-- Prepare traceability and mass-balance records.
-- Draft or update Organic System Plan notes.
-- Prepare inspection evidence.
-- Generate certification or renewal package.
+- Prepare lot traceability records.
+- Review handling, storage, sales, and mass balance.
+- Draft OSP practices, inputs, and monitoring.
+- Document OSP recordkeeping and prevention procedures.
 
 Farmers may adjust target dates, desired start dates, due dates, priorities, assignments, and task statuses for certification goals and tasks.
 
 Certification may open a certification work board for the certification goal tree, but the farmer-facing Organic Certification area remains standalone. Certification boards use the same linked farm-event evidence layer rather than creating a separate evidence inbox.
+
+Certification template tasks should be specific action items with expected evidence in the task notes. They should cover recordkeeping/audit trail setup, land transition and buffers, input approval/source documentation, input application evidence, seed commercial availability, seedling and planting-stock status, soil fertility, hot compost and cold/unfinished compost review, raw manure intervals, pest hierarchy, lot traceability, handling and storage commingling prevention, sale claim wording, mass-balance review, and Organic System Plan sections. Evidence review, package preview, package warnings, and report package export are handled by dedicated Organic Certification workflows rather than seeded standing checklist goals. Template tasks remain editable local planning tasks and must not become automatic compliance scoring or certifier-submission workflow.
+
+The former `Prepare inspection evidence` and `Generate certification or renewal package` certification subgoals were transitional planning aids. Dedicated evidence-review and package-generation workflows now own that work, so those two seeded subgoals and their template-owned tasks are removed from the planning template rather than duplicated as both system workflow and manual checklist work. Evidence gaps that need farmer action may still create farmer-editable follow-up tasks, but the standing evidence/package checklist stays out of seeded goals.
 
 ## Non-Goals
 

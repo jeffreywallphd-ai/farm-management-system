@@ -177,10 +177,12 @@ export function OrganicSoilScreen({
     <Screen>
       <PageHeader eyebrow="Organic Certification" supportingText="Track soil-building practices, compost, manure intervals, and rotations locally." title="Organic soil" />
       <OrganicDashboardButton />
-      <OrganicEvidencePanel category="soil" farm={farm} farmEventRepository={farmEventRepository} repository={repository} />
+      <OrganicEvidencePanel category="soilFertility" farm={farm} farmEventRepository={farmEventRepository} repository={repository} />
+      <OrganicEvidencePanel category="compost" farm={farm} farmEventRepository={farmEventRepository} repository={repository} />
+      <OrganicEvidencePanel category="manure" farm={farm} farmEventRepository={farmEventRepository} repository={repository} />
       <Card>
         <SectionHeading title="Soil fertility practice" />
-        <OrganicFarmEventPrompt category="soil" />
+        <OrganicFarmEventPrompt category="soilFertility" />
         <SelectField label="Farm place" onChange={setPlaceId} options={placeOptions} value={placeId} />
         <SelectField label="Crop" onChange={setCropId} options={cropOptions} value={cropId} />
         <SelectField label="Practice type" onChange={(value) => setPracticeType(value as SoilFertilityPracticeType)} options={SOIL_FERTILITY_PRACTICE_TYPES.map((type) => ({ label: SOIL_FERTILITY_PRACTICE_TYPE_LABELS[type], value: type }))} value={practiceType} />
@@ -192,7 +194,7 @@ export function OrganicSoilScreen({
       </Card>
       <Card>
         <SectionHeading title="Compost batch" />
-        <OrganicFarmEventPrompt category="soil" />
+        <OrganicFarmEventPrompt category="compost" />
         <FormField label="Batch name" onChangeText={setBatchName} placeholder="Spring compost pile" value={batchName} />
         <FormField label="Ingredients" multiline onChangeText={setBatchIngredients} placeholder="Crop residue, leaves, manure" value={batchIngredients} />
         <SelectField label="Method" onChange={(value) => setBatchMethod(value as typeof batchMethod)} options={[{ label: "Not recorded", value: "" }, { label: "Windrow", value: "windrow" }, { label: "Static aerated pile", value: "staticAeratedPile" }, { label: "In-vessel", value: "inVessel" }, { label: "Other", value: "other" }]} value={batchMethod} />
@@ -204,7 +206,7 @@ export function OrganicSoilScreen({
       </Card>
       <Card>
         <SectionHeading title="Manure interval" />
-        <OrganicFarmEventPrompt category="soil" />
+        <OrganicFarmEventPrompt category="manure" />
         <DateField label="Application date" onChangeText={setManureDate} placeholder="YYYY-MM-DD or blank for now" value={manureDate} />
         <FormField label="Manure type" onChangeText={setManureType} placeholder="Optional" value={manureType} />
         <SelectField label="Edible portion contacts soil?" onChange={setManureContactSoil} options={[{ label: "No, 90-day interval", value: "false" }, { label: "Yes, 120-day interval", value: "true" }]} value={manureContactSoil} />
@@ -212,7 +214,7 @@ export function OrganicSoilScreen({
       </Card>
       <Card>
         <SectionHeading title="Crop rotation" />
-        <OrganicFarmEventPrompt category="soil" />
+        <OrganicFarmEventPrompt category="soilFertility" />
         <FormField label="Year" keyboardType="decimal-pad" onChangeText={setRotationYear} value={rotationYear} />
         <FormField label="Season" onChangeText={setRotationSeason} placeholder="Spring, summer, fall" value={rotationSeason} />
         <SelectField label="Previous crop" onChange={setPreviousCropId} options={cropOptions} value={previousCropId} />

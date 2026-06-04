@@ -6,6 +6,7 @@ import { AppHeader } from "./AppHeader";
 import { theme } from "../theme/theme";
 
 const footerHills = require("../../../assets/images/farm-footer-hills.png");
+const headerToContentSpacing = Math.round(theme.spacing.xl * 0.6);
 
 export function Screen({
   children,
@@ -65,7 +66,7 @@ const styles = StyleSheet.create({
   content: {
     flexGrow: 1,
     paddingHorizontal: theme.spacing.lg,
-    paddingTop: theme.spacing.xl,
+    paddingTop: headerToContentSpacing,
     paddingBottom: theme.spacing.xl + 42,
   },
   inner: {

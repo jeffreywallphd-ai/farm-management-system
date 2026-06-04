@@ -2,12 +2,32 @@ import { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 
-import { ThemedIcon } from "./ThemedIcon";
 import { pushRoute } from "../navigation";
 import { menuItems, type MenuRoute } from "../navigationMenu";
 import { theme } from "../theme/theme";
 
 const appDisplayName = "Fazendio";
+
+function HeaderMenuIcon({ isOpen }: { isOpen: boolean }) {
+  if (isOpen) {
+    return (
+      <View style={styles.menuIconFrame}>
+        <View style={[styles.menuIconLine, styles.menuIconCloseLineOne]} />
+        <View style={[styles.menuIconLine, styles.menuIconCloseLineTwo]} />
+      </View>
+    );
+  }
+
+  return (
+    <View style={styles.menuIconFrame}>
+      <View style={styles.hamburgerLines}>
+        <View style={styles.menuIconLine} />
+        <View style={styles.menuIconLine} />
+        <View style={styles.menuIconLine} />
+      </View>
+    </View>
+  );
+}
 
 export function AppHeader() {
   const router = useRouter();
@@ -35,7 +55,7 @@ export function AppHeader() {
           onPress={() => setIsOpen((current) => !current)}
           style={styles.menuButton}
         >
-          <ThemedIcon color={theme.colors.onPrimary} name={isOpen ? "close" : "menu"} size={36} />
+          <HeaderMenuIcon isOpen={isOpen} />
         </Pressable>
       </View>
       {isOpen ? (
@@ -75,8 +95,11 @@ const styles = StyleSheet.create({
     shadowRadius: 16,
   },
   container: {
-    backgroundColor: theme.colors.primary,
+    backgroundColor: theme.colors.background,
     zIndex: 10,
+  },
+  hamburgerLines: {
+    gap: 5,
   },
   menu: {
     backgroundColor: theme.colors.surface,
@@ -93,6 +116,30 @@ const styles = StyleSheet.create({
     minHeight: theme.spacing.touchTarget,
     minWidth: theme.spacing.touchTarget,
   },
+  menuIconCloseLineOne: {
+    left: 6,
+    position: "absolute",
+    top: 16,
+    transform: [{ rotate: "45deg" }],
+  },
+  menuIconCloseLineTwo: {
+    left: 6,
+    position: "absolute",
+    top: 16,
+    transform: [{ rotate: "-45deg" }],
+  },
+  menuIconFrame: {
+    alignItems: "center",
+    height: 36,
+    justifyContent: "center",
+    width: 36,
+  },
+  menuIconLine: {
+    backgroundColor: theme.colors.primarySoft,
+    borderRadius: 999,
+    height: 3,
+    width: 24,
+  },
   menuItem: {
     borderRadius: theme.radius.sm,
     minHeight: theme.spacing.primaryTouchTarget,
@@ -106,8 +153,9 @@ const styles = StyleSheet.create({
   },
   title: {
     color: theme.colors.onPrimary,
+    fontFamily: theme.typography.logoFontFamily,
     fontSize: 34,
-    fontWeight: "800",
+    fontWeight: theme.typography.headingFontWeight,
   },
   titleButton: {
     justifyContent: "center",

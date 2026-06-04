@@ -207,6 +207,29 @@ test("planning edits reject unknown local IDs instead of creating duplicate reco
 test("organic certification template creates standalone certification subgoals and preserves adjusted timelines", async () => {
   const deps = dependencies();
   await deps.farmReferenceRepository.createFarm(farm);
+  const retiredGoal = await savePlanningGoal(
+    {
+      farmId: farm.id,
+      title: "Prepare inspection evidence",
+      category: "organicCertification",
+      status: "planned",
+      source: "organicCertificationTemplate",
+      templateKey: "organicCertification:subgoal:inspection-evidence",
+    },
+    { clock: deps.clock, idGenerator: deps.idGenerator, repository: deps.planningRepository },
+  );
+  const retiredTask = await savePlanningTask(
+    {
+      farmId: farm.id,
+      goalId: retiredGoal.id,
+      title: "Connect farm events to certification requirements",
+      status: "notStarted",
+      priority: "high",
+      source: "organicCertificationTemplate",
+      templateKey: "organicCertification:task:inspection-evidence-1",
+    },
+    { clock: deps.clock, idGenerator: deps.idGenerator, repository: deps.planningRepository },
+  );
 
   const created = await ensureOrganicCertificationPlan(
     { farmId: farm.id, targetDate: "2026-09-01" },
@@ -214,8 +237,49 @@ test("organic certification template creates standalone certification subgoals a
   );
 
   assert.equal(created.goal.title, "Complete organic certification readiness");
-  assert.equal(created.subgoals.length, 10);
-  assert.equal(created.tasks.length, 20);
+  assert.equal(created.subgoals.length, 13);
+  assert.equal(created.tasks.length, 68);
+  const subgoalTitles = created.subgoals.map((goal) => goal.title);
+  assert.deepEqual(subgoalTitles, [
+    "Set up certification profile",
+    "Document land and transition status",
+    "Review input approvals and restrictions",
+    "Track input applications and evidence",
+    "Organize seed and planting records",
+    "Document soil fertility and crop rotation practices",
+    "Manage compost evidence",
+    "Track raw manure applications and harvest intervals",
+    "Document pest, weed, disease, and mulch practices",
+    "Prepare lot traceability records",
+    "Review handling, storage, sales, and mass balance",
+    "Draft OSP practices, inputs, and monitoring",
+    "Document OSP recordkeeping and prevention procedures",
+  ]);
+  assert.equal(created.tasks.some((task) => task.title === "Record hot compost evidence for windrow batches"), true);
+  assert.equal(
+    created.tasks.some((task) => task.notes?.includes("temperature logs showing 131-170 F for 15 days") && task.notes?.includes("at least five turns")),
+    true,
+  );
+  assert.equal(created.tasks.some((task) => task.title === "Flag cold compost or aged piles for review"), true);
+  assert.equal(created.tasks.some((task) => task.notes?.includes("90-day or 120-day earliest harvest date")), true);
+  assert.equal(created.tasks.some((task) => task.title === "Confirm certifier approval before use"), true);
+  assert.equal(created.tasks.some((task) => task.title === "Reconcile input applications with material-use records"), true);
+  assert.equal(created.tasks.some((task) => task.title === "Create lot records for products with organic claims"), true);
+  assert.equal(created.tasks.some((task) => task.title === "Review sale invoices and organic claim wording"), true);
+  assert.equal(created.tasks.some((task) => task.title === "Track OSP gaps as follow-up tasks"), true);
+  assert.equal(created.subgoals.some((goal) => goal.title === "Prepare inspection evidence"), false);
+  assert.equal(created.subgoals.some((goal) => goal.title === "Generate certification or renewal package"), false);
+  assert.equal(await deps.planningRepository.getGoal(farm.id, retiredGoal.id), null);
+  assert.equal(await deps.planningRepository.getTask(farm.id, retiredTask.id), null);
+
+  const compostGoal = created.subgoals.find((goal) => goal.title === "Manage compost evidence");
+  const manureGoal = created.subgoals.find((goal) => goal.title === "Track raw manure applications and harvest intervals");
+  const inputApplicationsGoal = created.subgoals.find((goal) => goal.title === "Track input applications and evidence");
+  const handlingGoal = created.subgoals.find((goal) => goal.title === "Review handling, storage, sales, and mass balance");
+  assert.equal(created.tasks.find((task) => task.title === "Record hot compost evidence for windrow batches")?.goalId, compostGoal?.id);
+  assert.equal(created.tasks.find((task) => task.title === "Review manure interval planning dates")?.goalId, manureGoal?.id);
+  assert.equal(created.tasks.find((task) => task.title === "Check input application evidence")?.goalId, inputApplicationsGoal?.id);
+  assert.equal(created.tasks.find((task) => task.title === "Run mass-balance review")?.goalId, handlingGoal?.id);
 
   const firstTask = created.tasks[0];
   await savePlanningTask(
@@ -228,8 +292,8 @@ test("organic certification template creates standalone certification subgoals a
     { clock: deps.clock, idGenerator: deps.idGenerator, repository: deps.planningRepository },
   );
 
-  assert.equal(rerun.tasks.length, 20);
-  assert.equal((await deps.planningRepository.listTasks(farm.id, { source: "organicCertificationTemplate" })).length, 20);
+  assert.equal(rerun.tasks.length, 68);
+  assert.equal((await deps.planningRepository.listTasks(farm.id, { source: "organicCertificationTemplate" })).length, 68);
   assert.equal((await deps.planningRepository.getTask(farm.id, firstTask.id))?.dueDate, "2026-08-15");
   assert.equal((await deps.planningRepository.getTask(farm.id, firstTask.id))?.status, "inProgress");
 });

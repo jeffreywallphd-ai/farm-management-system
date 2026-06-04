@@ -1,7 +1,7 @@
 # Organic Certification Domain Rules
 
 - Status: accepted
-- Last reviewed: 2026-06-02
+- Last reviewed: 2026-06-04
 - Canonical for: domain vocabulary and record meaning for USDA organic certification readiness features
 - Related ADRs: [ADR-0014](../adr/ADR-0014-organic-certification-readiness-module.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](../adr/ADR-0005-data-portability-and-recoverability.md)
 - Related docs: [Organic Certification Readiness](../product/organic-certification-readiness.md), [Farm Domain Glossary](glossary.md), [Privacy, Visibility, and Sharing Rules](privacy-visibility-and-sharing-rules.md), [Persistence and Attachment Storage](../architecture/persistence-and-attachment-storage.md)
@@ -20,6 +20,7 @@ This document defines the domain meaning of organic certification readiness reco
 | Organic operation profile | The local farm's user-entered certification context: current organic status, scopes, certifier information, annual update dates, inspection window, retention years, and notes. |
 | Organic certification scope | A national USDA/NOP scope category that may be relevant to the operation, such as crops, livestock, wild crops, handling, mushrooms, producer group, imports, or packaged product labeling. |
 | Organic Profile Report | A generated local report summarizing the organic operation profile and selected scopes for farmer/certifier preparation. |
+| Organic report package PDF | A user-exported local PDF rendering of a saved organic report package. It is a portable report artifact, not a submission, signature, certifier form, or compliance determination. |
 | Readiness status | An app status describing whether user-entered data appears present, partial, missing, or not applicable for a category. It is not a legal compliance finding. |
 | Certifier note | User-entered information from or for an accredited certifying agent. The app does not verify certifier identity or submit data. |
 | Organic evidence link | A farmer-confirmed local relationship between a saved farm note and an organic category or organic readiness record. It gives certification meaning to an existing note without copying or replacing the note. |
@@ -105,6 +106,7 @@ This document defines the domain meaning of organic certification readiness reco
 - Report packages are retained as local records so a farmer can see what was assembled at a point in time.
 - A report package is not a certifier submission, certification packet accepted by any agency, legal determination, or replacement for certifier-required forms.
 - Report packages should include linked farm-note evidence references where present. The package may reference the note, its local attachments, and farmer-written evidence notes, but it must not duplicate media files inside organic records.
+- Saved report packages may be exported as local PDFs through explicit farmer action. PDF export must not upload, submit, sign, certify, or imply certifier acceptance of the package.
 
 ## Farm-Note Evidence Rules
 
@@ -124,10 +126,22 @@ This document defines the domain meaning of organic certification readiness reco
 ## Certification Planning Rules
 
 - Organic Certification may seed local certification goals, subgoals, and tasks from the shared planning foundation.
+- Seeded certification subgoals should be split when the farmer needs different evidence records, review cadence, or certifier questions for the work. Input approval review should be separate from input application logs; soil fertility and rotation should be separate from compost-process evidence and raw-manure interval planning; lot traceability should be separate from handling/storage/sales mass-balance review; and OSP practice/input/monitoring narratives should be separate from OSP recordkeeping, commingling-prevention, and certifier follow-up procedures.
+- Seeded certification tasks should be actionable and evidence-oriented. Task notes may describe expected evidence such as labels, receipts, certifier notes, farm-note links, temperature logs, turn logs, transition dates, buffers, traceability records, OSP narratives, and report packages, but those notes are guidance for farmer/certifier review rather than proof of compliance.
+- Dedicated evidence-review and package-generation workflows replace the former seeded `Prepare inspection evidence` and `Generate certification or renewal package` goals. Template-owned manual checklist records for those goals should be removed rather than maintained in parallel.
 - Certification goals and tasks must remain editable by the farmer, including timeline and status fields.
 - Certification planning records are preparation aids. They must not be presented as certifier-approved work, legal assignments, or proof that a requirement has been satisfied.
 - Farm notes remain the source evidence records. Planning tasks may link to farm notes or organic records, but they must not duplicate audio, photos, or farm-note content into a separate evidence inbox.
 - Legacy inspection-readiness items may remain readable for compatibility, but new certification preparation work should use planning tasks unless canonical scope changes again.
+
+## Evidence Review and Package Rules
+
+- Evidence review workflows may group organic evidence links across multiple organic areas, but they must keep source records as the authoritative records.
+- One source evidence item may support multiple organic areas when the farmer confirms each relationship.
+- Package generation assembles local report text, summaries, manifest counts, evidence references, and explicit preparation warnings. It does not submit forms, upload files, sign records, approve labels, or certify compliance.
+- Package PDFs are generated from saved local package content and shared only through explicit farmer-controlled export/share actions.
+- Package generation should reference linked source media and documents by local metadata unless the farmer explicitly chooses an export action that bundles selected files.
+- Missing-evidence and stale-link prompts are preparation prompts, not compliance findings.
 
 ## Non-Determination Rule
 

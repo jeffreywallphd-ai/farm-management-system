@@ -1,4 +1,4 @@
-const serifHeadingFontFamily = "Georgia";
+const serifHeadingFontFamily = "FazendioHeading";
 
 export const typography = {
   bodyFontFamily: undefined,

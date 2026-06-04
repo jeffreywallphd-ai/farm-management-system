@@ -6,7 +6,9 @@ import type { FarmReferenceRepository } from "../../application/ports/FarmRefere
 import type { FarmEventRepository } from "../../application/ports/FarmEventRepository";
 import type { OrganicCertificationRepository } from "../../application/ports/OrganicCertificationRepository";
 import type { PlanningRepository } from "../../application/ports/PlanningRepository";
+import type { ExportRepository } from "../../application/ports/ExportRepository";
 import { createOrganicReportPackage } from "../../application/use-cases/manage-organic-certification/CreateOrganicReportPackage";
+import { createOrganicReportPackagePdf } from "../../application/use-cases/manage-organic-certification/CreateOrganicReportPackagePdf";
 import { listOrganicEvidenceLinkViews, type OrganicEvidenceLinkView } from "../../application/use-cases/manage-organic-certification/ListOrganicEvidence";
 import type { Farm } from "../../domain/farm/Farm";
 import type { OrganicOperationProfile } from "../../domain/organic/OrganicCertification";
@@ -33,12 +35,14 @@ export function OrganicReportPackagesScreen({
   farm,
   farmEventRepository,
   farmReferenceRepository,
+  exportRepository,
   planningRepository,
   repository,
 }: {
   farm: Farm;
   farmEventRepository: FarmEventRepository;
   farmReferenceRepository: FarmReferenceRepository;
+  exportRepository: ExportRepository;
   planningRepository: PlanningRepository;
   repository: OrganicCertificationRepository;
 }) {
@@ -77,6 +81,17 @@ export function OrganicReportPackagesScreen({
       await loadPackages();
     } catch (caught) {
       setError(caught instanceof z.ZodError ? caught.issues[0]?.message : "Organic report package could not be created.");
+    }
+  }
+
+  async function handleExportPdf(reportPackage: OrganicReportPackage) {
+    setError(undefined);
+    try {
+      const pdf = createOrganicReportPackagePdf(reportPackage);
+      const file = await exportRepository.writePdf({ fileName: pdf.fileName, bytes: pdf.bytes });
+      await exportRepository.shareRecoveryCopy(file);
+    } catch {
+      setError("Organic report package PDF could not be exported.");
     }
   }
 
@@ -121,6 +136,7 @@ export function OrganicReportPackagesScreen({
               <Text style={styles.detail}>{ORGANIC_REPORT_PACKAGE_TYPE_LABELS[item.packageType]} - {item.generatedAt}</Text>
               <Text style={styles.detail}>{item.reportNames.length} reports</Text>
               <Button label="Preview" onPress={() => setPreview(item.packageText)} size="large" variant="secondary" />
+              <Button label="Export PDF" onPress={() => handleExportPdf(item)} size="large" variant="secondary" />
             </View>
           ))
         )}

@@ -19,7 +19,20 @@ import { formatRecordDate } from "../formatters";
 import { pushRoute } from "../navigation";
 import { theme } from "../theme/theme";
 
-const renewalCategories = ["inputs", "seeds", "soil", "pest", "traceability", "osp", "inspection"] as const;
+const renewalCategories = [
+  "inputApprovals",
+  "inputApplications",
+  "seeds",
+  "soilFertility",
+  "compost",
+  "manure",
+  "pest",
+  "lotTraceability",
+  "handlingMassBalance",
+  "ospPractices",
+  "ospRecordkeeping",
+  "reports",
+] as const;
 
 export function OrganicRenewalScreen({
   farm,

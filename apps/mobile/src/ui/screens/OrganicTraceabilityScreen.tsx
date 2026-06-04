@@ -212,10 +212,11 @@ export function OrganicTraceabilityScreen({
     <Screen>
       <PageHeader eyebrow="Organic Certification" supportingText="Link harvest lots to handling, storage, sales, and mass-balance records kept locally." title="Organic traceability" />
       <OrganicDashboardButton />
-      <OrganicEvidencePanel category="traceability" farm={farm} farmEventRepository={farmEventRepository} repository={repository} />
+      <OrganicEvidencePanel category="lotTraceability" farm={farm} farmEventRepository={farmEventRepository} repository={repository} />
+      <OrganicEvidencePanel category="handlingMassBalance" farm={farm} farmEventRepository={farmEventRepository} repository={repository} />
       <Card>
         <SectionHeading detail="Lots are farmer-entered traceability records. Link an existing harvest record ID when useful." title="Harvest lot" />
-        <OrganicFarmEventPrompt category="traceability" />
+        <OrganicFarmEventPrompt category="lotTraceability" />
         {lots.map((lot) => (
           <View key={lot.id} style={styles.lotRow}>
             <View style={styles.lotText}>
@@ -282,7 +283,7 @@ export function OrganicTraceabilityScreen({
       </Card>
       <Card>
         <SectionHeading title="Handling, storage, and sales" />
-        <OrganicFarmEventPrompt category="traceability" />
+        <OrganicFarmEventPrompt category="handlingMassBalance" />
         {lots.length === 0 ? (
           <Text style={styles.lotDetail}>Save an organic lot before recording movement or sales.</Text>
         ) : (

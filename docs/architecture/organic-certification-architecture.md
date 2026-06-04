@@ -1,7 +1,7 @@
 # Organic Certification Architecture
 
 - Status: accepted
-- Last reviewed: 2026-06-02
+- Last reviewed: 2026-06-04
 - Canonical for: architecture boundaries for local organic certification readiness features
 - Related ADRs: [ADR-0014](../adr/ADR-0014-organic-certification-readiness-module.md), [ADR-0001](../adr/ADR-0001-offline-first-field-operation.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](../adr/ADR-0005-data-portability-and-recoverability.md), [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md), [ADR-0009](../adr/ADR-0009-mobile-pilot-1-local-persistence.md), [ADR-0010](../adr/ADR-0010-mobile-pilot-1-export-and-recovery-copy.md), [ADR-0011](../adr/ADR-0011-mobile-pilot-1-runtime-boundary-validation.md)
 - Related docs: [Organic Certification Readiness](../product/organic-certification-readiness.md), [Organic Certification Domain Rules](../domain/organic-certification-rules.md), [Offline-First Mobile Architecture](offline-first-mobile-architecture.md), [Persistence and Attachment Storage](persistence-and-attachment-storage.md), [Identity, Privacy, and Sharing](identity-privacy-and-sharing.md), [Mobile Pilot Data-Safety Requirements](../operations/mobile-pilot-data-safety-requirements.md)
@@ -105,7 +105,7 @@ These records store farmer-entered narratives, prompts, notes, local evidence re
 
 Phase 9 adds local SQLite storage for organic report package records.
 
-The app stores generated package text and manifest JSON locally. It does not create PDF/Word/Common OSP files, bundle media, sign records, submit packages, upload packages, or connect to certifier systems.
+The app stores generated package text and manifest JSON locally. Saved packages may be rendered to user-controlled local PDF exports. The module does not create Word/Common OSP files, bundle media, sign records, submit packages, upload packages, or connect to certifier systems.
 
 ## Phase 10 Storage Boundary
 
@@ -137,7 +137,7 @@ Organic export content is private and potentially sensitive. The app must not up
 
 ## Report Boundary
 
-Phase 1 reports are generated locally as structured text/data for in-app display and recovery/export inclusion. They are preparation aids for the farmer and certifier, not legal determinations.
+Reports and report packages are generated locally as structured text/data for in-app display, recovery/export inclusion, and explicit saved-package PDF export. They are preparation aids for the farmer and certifier, not legal determinations or submissions.
 
 ## Future Compatibility
 

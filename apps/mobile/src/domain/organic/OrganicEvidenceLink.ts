@@ -4,14 +4,20 @@ import type { PrivacyClassification } from "../privacy/PrivacyClassification";
 import type { IsoDateTimeString } from "../records/OperationalRecord";
 
 export const ORGANIC_EVIDENCE_CATEGORIES = [
+  "profile",
   "land",
-  "inputs",
+  "inputApprovals",
+  "inputApplications",
   "seeds",
-  "soil",
+  "soilFertility",
+  "compost",
+  "manure",
   "pest",
-  "traceability",
-  "osp",
-  "inspection",
+  "lotTraceability",
+  "handlingMassBalance",
+  "ospPractices",
+  "ospRecordkeeping",
+  "reports",
   "advancedScope",
   "general",
 ] as const;
@@ -19,14 +25,20 @@ export const ORGANIC_EVIDENCE_CATEGORIES = [
 export type OrganicEvidenceCategory = (typeof ORGANIC_EVIDENCE_CATEGORIES)[number];
 
 export const ORGANIC_EVIDENCE_CATEGORY_LABELS: Record<OrganicEvidenceCategory, string> = {
+  profile: "Certification profile",
   land: "Land and places",
-  inputs: "Inputs and materials",
+  inputApprovals: "Input approvals and restrictions",
+  inputApplications: "Input applications",
   seeds: "Seeds and planting",
-  soil: "Soil, compost, and manure",
+  soilFertility: "Soil fertility and rotations",
+  compost: "Compost evidence",
+  manure: "Raw manure intervals",
   pest: "Pest, weed, and disease",
-  traceability: "Traceability and sales",
-  osp: "Organic system plan",
-  inspection: "Inspection readiness",
+  lotTraceability: "Lot traceability",
+  handlingMassBalance: "Handling, storage, sales, and mass balance",
+  ospPractices: "OSP practices, inputs, and monitoring",
+  ospRecordkeeping: "OSP recordkeeping and prevention",
+  reports: "Reports and packages",
   advancedScope: "Advanced scope",
   general: "General organic evidence",
 };

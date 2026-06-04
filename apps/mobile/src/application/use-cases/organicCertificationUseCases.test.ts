@@ -12,12 +12,14 @@ import { createOrganicSeedReport } from "./manage-organic-certification/CreateOr
 import { createOrganicSoilReport } from "./manage-organic-certification/CreateOrganicSoilReports";
 import { createOrganicSystemPlanReport } from "./manage-organic-certification/CreateOrganicSystemPlanReports";
 import { createOrganicTraceabilityReport } from "./manage-organic-certification/CreateOrganicTraceabilityReports";
-import { createOrganicReportPackage } from "./manage-organic-certification/CreateOrganicReportPackage";
+import { createOrganicReportPackage, createOrganicReportPackagePreview } from "./manage-organic-certification/CreateOrganicReportPackage";
+import { createOrganicReportPackagePdf } from "./manage-organic-certification/CreateOrganicReportPackagePdf";
 import { createOrganicFarmNoteEvidenceReport } from "./manage-organic-certification/CreateOrganicFarmNoteEvidenceReport";
 import { ensureOrganicCertificationPlan } from "./manage-planning/CreateOrganicCertificationPlan";
 import { getOrganicCertificationDashboard } from "./manage-organic-certification/GetOrganicCertificationDashboard";
 import {
   listOrganicEvidenceLinksForFarmNote,
+  listOrganicEvidenceReview,
   listOrganicReviewQueue,
 } from "./manage-organic-certification/ListOrganicEvidence";
 import { saveOrganicAdvancedScopeRecord } from "./manage-organic-certification/ManageOrganicAdvancedScopes";
@@ -927,7 +929,7 @@ test("organic system plan sections and planning-backed inspection preparation ca
   await savePlanningTask(
     {
       farmId: farm.id,
-      goalId: certificationPlan.subgoals.find((goal) => goal.title.includes("inspection"))?.id,
+      goalId: certificationPlan.subgoals.find((goal) => goal.title === "Document OSP recordkeeping and prevention procedures")?.id,
       title: "Gather inspector map notes",
       notes: "Use linked farm notes and OSP section references.",
       status: "inProgress",
@@ -954,7 +956,7 @@ test("organic system plan sections and planning-backed inspection preparation ca
     { clock: deps.clock, planningRepository: deps.planningRepository, repository: deps.repository },
   );
   assert.match(checklist, /Organic Inspection Preparation Tasks/);
-  assert.match(checklist, /Connect farm events to certification requirements/);
+  assert.doesNotMatch(checklist, /Connect farm events to certification requirements/);
   assert.match(checklist, /Gather inspector map notes/);
   assert.match(checklist, /Lot-to-sale records are ready/);
 
@@ -1098,6 +1100,135 @@ test("farm notes can be linked as organic evidence without duplicating source ca
     },
   );
   assert.equal(payload.organicEvidenceLinks[0].farmEventId, recorded.event.id);
+});
+
+test("organic evidence review groups split categories and flags missing or stale links", async () => {
+  const deps = dependencies();
+  const farmReferenceRepository = new InMemoryFarmReferenceRepository();
+  await farmReferenceRepository.createFarm(farm);
+  const farmEventRepository = new InMemoryFarmEventRepository({ locations: [] });
+  const recorded = await recordFarmEvent(
+    {
+      farmId: farm.id,
+      eventType: "fieldObservation",
+      note: "Compost and manure review note.",
+      attachments: [{ kind: "voiceMemo", localUri: "file:///local/soil.m4a" }],
+    },
+    {
+      clock: deps.clock,
+      farmEventRepository,
+      farmReferenceRepository,
+      idGenerator: deps.idGenerator,
+    },
+  );
+
+  await saveOrganicEvidenceLink(
+    {
+      farmId: farm.id,
+      farmEventId: recorded.event.id,
+      category: "compost",
+      linkedRecordType: "compostBatch",
+      linkedRecordId: "compost-1",
+      evidenceRole: "monitoring",
+      notes: "Temperature log discussed.",
+    },
+    { clock: deps.clock, farmEventRepository, idGenerator: deps.idGenerator, repository: deps.repository },
+  );
+  await saveOrganicEvidenceLink(
+    {
+      farmId: farm.id,
+      farmEventId: recorded.event.id,
+      category: "manure",
+      linkedRecordType: "manureApplication",
+      linkedRecordId: "manure-1",
+      evidenceRole: "supportingNote",
+      notes: "Reviewed 120-day interval.",
+    },
+    { clock: deps.clock, farmEventRepository, idGenerator: deps.idGenerator, repository: deps.repository },
+  );
+  await deps.repository.saveOrganicEvidenceLink({
+    id: "stale-link",
+    farmId: farm.id,
+    farmEventId: "missing-event",
+    category: "inputApprovals",
+    linkedRecordType: "organicInput",
+    linkedRecordId: "input-1",
+    evidenceRole: "labelOrReceipt",
+    privacy: "privateToFarm",
+    createdAt: "2026-06-02T12:00:00.000Z",
+    updatedAt: "2026-06-02T12:00:00.000Z",
+  });
+
+  const review = await listOrganicEvidenceReview(
+    { farmId: farm.id, categories: ["compost", "manure", "inputApprovals", "lotTraceability"] },
+    { farmEventRepository, repository: deps.repository },
+  );
+
+  assert.equal(review.totalLinks, 3);
+  assert.equal(review.staleLinkCount, 1);
+  assert.equal(review.groups.find((group) => group.category === "compost")?.links.length, 1);
+  assert.equal(review.groups.find((group) => group.category === "manure")?.links.length, 1);
+  assert.equal(review.groups.find((group) => group.category === "inputApprovals")?.staleLinkCount, 1);
+  assert.match(review.groups.find((group) => group.category === "lotTraceability")?.missingPrompts[0] ?? "", /Lot traceability/);
+});
+
+test("organic package preview includes evidence warnings before saving and PDF export bytes", async () => {
+  const deps = dependencies();
+  const farmReferenceRepository = new InMemoryFarmReferenceRepository();
+  await farmReferenceRepository.createFarm(farm);
+  const farmEventRepository = new InMemoryFarmEventRepository({ locations: [] });
+  await saveOrganicOperationProfile(
+    { farmId: farm.id, organicStatus: "certified", certifierName: "Good Certifier", recordRetentionYears: 5, enabledScopes: ["crops"] },
+    deps,
+  );
+  const recorded = await recordFarmEvent(
+    {
+      farmId: farm.id,
+      eventType: "fieldObservation",
+      note: "Input approval label photo.",
+      attachments: [{ kind: "voiceMemo", localUri: "file:///local/input.m4a" }],
+    },
+    {
+      clock: deps.clock,
+      farmEventRepository,
+      farmReferenceRepository,
+      idGenerator: deps.idGenerator,
+    },
+  );
+  await saveOrganicEvidenceLink(
+    {
+      farmId: farm.id,
+      farmEventId: recorded.event.id,
+      category: "inputApprovals",
+      evidenceRole: "labelOrReceipt",
+      notes: "Input label reviewed.",
+    },
+    { clock: deps.clock, farmEventRepository, idGenerator: deps.idGenerator, repository: deps.repository },
+  );
+
+  const preview = await createOrganicReportPackagePreview(
+    { farm, farmId: farm.id, packageType: "renewalConversation", title: "Renewal conversation package" },
+    { clock: deps.clock, farmEventRepository, farmReferenceRepository, planningRepository: deps.planningRepository, repository: deps.repository },
+  );
+
+  assert.equal(preview.manifest.packageType, "renewalConversation");
+  assert.match(preview.packageText, /Package review warnings/);
+  assert.match(preview.packageText, /No linked evidence has been added for/);
+  assert.equal(Array.isArray(preview.manifest.packageWarnings), true);
+  assert.equal(JSON.parse(JSON.stringify(preview.manifest)).evidenceReview.totalLinks, 1);
+
+  const savedPackage = await createOrganicReportPackage(
+    { farm, farmId: farm.id, packageType: "renewalConversation", title: "Renewal conversation package" },
+    { ...deps, farmEventRepository, farmReferenceRepository },
+  );
+  const pdf = createOrganicReportPackagePdf(savedPackage);
+  const pdfText = new TextDecoder().decode(pdf.bytes);
+
+  assert.equal(pdf.mimeType, "application/pdf");
+  assert.match(pdf.fileName, /^renewal-conversation-package-2026-06-02\.pdf$/);
+  assert.match(pdfText, /^%PDF-1\.4/);
+  assert.match(pdfText, /Renewal conversation package/);
+  assert.match(pdfText, /%%EOF/);
 });
 
 test("organic advanced scope records can be edited, reported, and exported", async () => {

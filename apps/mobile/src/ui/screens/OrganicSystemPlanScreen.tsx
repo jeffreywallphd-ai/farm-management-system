@@ -158,10 +158,11 @@ export function OrganicSystemPlanScreen({
     <Screen>
       <PageHeader eyebrow="Organic Certification" supportingText="Draft local OSP notes and inspection-preparation tasks for certifier review." title="Organic system plan" />
       <OrganicDashboardButton />
-      <OrganicEvidencePanel category="osp" farm={farm} farmEventRepository={farmEventRepository} repository={repository} />
+      <OrganicEvidencePanel category="ospPractices" farm={farm} farmEventRepository={farmEventRepository} repository={repository} />
+      <OrganicEvidencePanel category="ospRecordkeeping" farm={farm} farmEventRepository={farmEventRepository} repository={repository} />
       <Card>
         <SectionHeading detail="Use your certifier's forms for formal submission. These local notes help gather the pieces." title="OSP section" />
-        <OrganicFarmEventPrompt category="osp" />
+        <OrganicFarmEventPrompt category="ospPractices" />
         {sections.map((section) => (
           <View key={section.id} style={styles.row}>
             <View style={styles.textBlock}>

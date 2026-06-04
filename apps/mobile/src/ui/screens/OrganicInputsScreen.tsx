@@ -225,10 +225,11 @@ export function OrganicInputsScreen({
         title="Organic inputs"
       />
       <OrganicDashboardButton />
-      <OrganicEvidencePanel category="inputs" farm={farm} farmEventRepository={farmEventRepository} repository={repository} />
+      <OrganicEvidencePanel category="inputApprovals" farm={farm} farmEventRepository={farmEventRepository} repository={repository} />
+      <OrganicEvidencePanel category="inputApplications" farm={farm} farmEventRepository={farmEventRepository} repository={repository} />
       <Card>
         <SectionHeading detail="Approval status is farmer-entered. Confirm input acceptability with your certifier." title="Organic input details" />
-        <OrganicFarmEventPrompt category="inputs" />
+        <OrganicFarmEventPrompt category="inputApprovals" />
         {inputs.map((input) => (
           <View key={input.id} style={styles.inputRow}>
             <View style={styles.inputText}>
@@ -311,7 +312,7 @@ export function OrganicInputsScreen({
       </Card>
       <Card>
         <SectionHeading detail="Use this for organic input applications that need place, crop, amount, reason, and evidence context." title="Input application" />
-        <OrganicFarmEventPrompt category="inputs" />
+        <OrganicFarmEventPrompt category="inputApplications" />
         {inputs.length === 0 ? (
           <Text style={styles.inputDetail}>Save an organic input before recording applications.</Text>
         ) : (

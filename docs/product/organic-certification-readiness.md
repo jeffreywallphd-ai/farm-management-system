@@ -1,7 +1,7 @@
 # Organic Certification Readiness
 
 - Status: accepted
-- Last reviewed: 2026-06-02
+- Last reviewed: 2026-06-04
 - Canonical for: USDA organic certification readiness product scope and phase sequencing
 - Related ADRs: [ADR-0014](../adr/ADR-0014-organic-certification-readiness-module.md), [ADR-0001](../adr/ADR-0001-offline-first-field-operation.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](../adr/ADR-0005-data-portability-and-recoverability.md), [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md), [ADR-0009](../adr/ADR-0009-mobile-pilot-1-local-persistence.md), [ADR-0010](../adr/ADR-0010-mobile-pilot-1-export-and-recovery-copy.md), [ADR-0011](../adr/ADR-0011-mobile-pilot-1-runtime-boundary-validation.md)
 - Related docs: [Product Vision and Scope](product-vision-and-scope.md), [Initial Vertical Slice](initial-vertical-slice.md), [Mobile Pilot 1 Implementation Scope](mobile-pilot-1-implementation-scope.md), [Organic Certification Domain Rules](../domain/organic-certification-rules.md), [Organic Certification Architecture](../architecture/organic-certification-architecture.md), [Mobile Pilot Data-Safety Requirements](../operations/mobile-pilot-data-safety-requirements.md)
@@ -48,7 +48,55 @@ This keeps daily farm work and certification work together. Marking a note for o
 
 Organic Certification uses the shared local farm planning foundation for certification goals, subgoals, and preparation tasks, while remaining a standalone feature area in the mobile UX.
 
-The certification area should seed a practical certification plan with meaningful subgoals for profile setup, land context, input review, seed and planting records, soil fertility, pest hierarchy, traceability, Organic System Plan drafting, inspection preparation, reports, and advanced scopes where relevant. Farmers may adjust timelines and task status locally. These planning records organize work for certification preparation; they do not determine compliance, submit records, assign legal responsibility, create worker accounts, or replace certifier instructions.
+The certification area should seed a practical certification plan with meaningful subgoals for profile setup, land context, input approvals and restrictions, input applications, seed and planting records, soil fertility and rotations, compost evidence, raw manure intervals, pest hierarchy, lot traceability, handling/storage/sales mass balance, Organic System Plan practices and monitoring, Organic System Plan recordkeeping and prevention procedures, inspection preparation, reports, and advanced scopes where relevant. Farmers may adjust timelines and task status locally. These planning records organize work for certification preparation; they do not determine compliance, submit records, assign legal responsibility, create worker accounts, or replace certifier instructions.
+
+Seeded certification tasks should be concrete enough for a farmer to act on without translating broad regulatory categories themselves. Task notes should describe expected evidence for certifier review, including record retention and audit trail setup, three-year prohibited-substance history, boundaries and buffers, input composition/source/location documentation, seed labels and commercial availability searches, compost process evidence, raw manure interval planning, pest-prevention hierarchy, plastic mulch removal, lot traceability, commingling-prevention practices, OSP narratives, linked farm-note evidence, and local report/recovery exports. Compost-related tasks should distinguish hot compost process evidence from cold/unfinished or aged material that needs certifier review or raw-manure interval planning. These tasks remain planning aids and must not be presented as compliance findings.
+
+## Evidence Linking and Package Automation
+
+Dedicated evidence-review and package-generation workflows now guide inspection evidence and package assembly directly. The certification planning template no longer seeds the former `Prepare inspection evidence` and `Generate certification or renewal package` subgoals because package warnings and evidence-review prompts cover that work without duplicating it as standing manual checklist goals.
+
+Implemented behavior:
+
+1. Cross-area evidence linking foundation.
+   - Provide a shared local evidence-link workflow from farm notes, organic records, OSP sections, reports, and planning tasks.
+   - Allow one evidence item to support more than one organic area without copying audio, photos, transcripts, or documents.
+   - Store evidence role, organic area, linked record type, linked record ID, farmer notes, and timestamps.
+   - Include link metadata in recovery copies.
+   - Required verification: link creation/edit/removal, multi-area linking, source farm-note retention, no media duplication, and recovery-copy payload coverage.
+
+2. Evidence review screens by organic area.
+   - Add an evidence review view grouped by profile, land, input approvals, input applications, seeds, soil fertility, compost, manure, pest hierarchy, lot traceability, handling/mass balance, OSP practices, OSP recordkeeping, reports, and advanced scopes when enabled.
+   - Show linked evidence, missing-evidence prompts, stale or unresolved references, and source-record navigation.
+   - Keep all prompts as organization aids. Do not label a requirement satisfied or noncompliant.
+   - Required verification: grouping, missing-evidence messaging, stale-link handling, non-determination language, and local-only behavior.
+
+3. Package preview and assembly.
+   - Add package intents such as inspection prep, annual update, renewal conversation, and archive copy.
+   - Generate a package preview from implemented organic reports, selected evidence links, source record summaries, manifest counts, package date, and non-determination language.
+   - Show missing evidence and unresolved follow-up before save.
+   - Save package text and manifest locally without submitting, uploading, signing, or claiming certifier acceptance.
+   - Required verification: report inclusion, manifest counts, evidence reference rendering, missing-evidence warnings, saved package persistence, and recovery-copy inclusion.
+
+4. Replace transitional planning goals.
+   - Remove the seeded `Prepare inspection evidence` and `Generate certification or renewal package` subgoals from the certification template.
+   - Delete template-owned tasks under those two goals during the implementation change, since no farmer data is expected before release. If farmer-entered data exists later, preserve farmer-created non-template tasks and only retire template-owned records.
+   - Move any remaining follow-up work into system-generated prompts, package warnings, or farmer-created tasks instead of a standing manual checklist.
+   - Expected template result: the base certification template drops from 15 subgoals to 13 subgoals, with evidence review and package generation handled by dedicated organic workflows.
+   - Required verification: template creation without the two goals, no duplicate replacement tasks, recovery export still includes planning data, and package/evidence screens cover the removed work.
+
+Future extension:
+
+5. Optional intentional media bundle.
+   - Add an explicit export action that can include selected source media files referenced by package evidence links.
+   - Make media inclusion opt-in and local/user-controlled.
+   - Keep recovery copies and package exports private unless the farmer intentionally shares the generated file.
+   - Required verification: selected-media inclusion, omitted-media behavior, private filenames where needed, and no background upload.
+
+6. Farmer and certifier-workflow validation.
+   - Test package preview and evidence review with farmers and certifier-facing workflows before broadening package types.
+   - Record whether farmers understand missing-evidence prompts as preparation help rather than compliance scores.
+   - Use validation findings to refine grouping, package naming, and evidence prompts before adding advanced-scope package variants.
 
 ## Phase Sequence
 
@@ -419,14 +467,16 @@ Phase 9 adds local organic reporting package generation.
 Included:
 
 - Organic report package records with type, title, generated date, manifest JSON, report names, generated package text, and notes.
-- A package generator that combines implemented organic reports into one local inspection/annual-update/archive package text.
+- A package generator that combines implemented organic reports into one local inspection, annual-update, renewal-conversation, or archive package text.
+- Package preview warnings for missing evidence categories and stale evidence links before save.
 - Linked farm-note evidence references in package manifests and report text where present.
+- User-controlled local PDF export for saved report packages.
 - Organic Report Package screen linked from the Organic Certification dashboard and hamburger menu.
 - Recovery export inclusion for saved report package records.
 
 Excluded from Phase 9:
 
-- Certifier submission, electronic signatures, PDF/Word/Common OSP file generation, media bundling, cloud sync, certifier portal integration, automatic compliance scoring, accounts, analytics, or automatic AI extraction.
+- Certifier submission, electronic signatures, Word/Common OSP file generation, media bundling, cloud sync, certifier portal integration, automatic compliance scoring, accounts, analytics, or automatic AI extraction.
 
 ## Official Phase 9 Requirement Anchors
 
@@ -439,8 +489,9 @@ Phase 9 is complete when:
 
 - A local organic report package can be generated from implemented reports.
 - The package includes a manifest and clear non-submission/non-determination language.
+- Saved report packages can be exported as local PDFs through explicit farmer action.
 - Generated packages are stored locally and included in recovery export.
-- Tests cover package generation, migration shape, and export payloads.
+- Tests cover package preview warnings, package generation, PDF export bytes, migration shape, and export payloads.
 
 ## Phase 10 Scope
 

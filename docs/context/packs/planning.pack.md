@@ -2,7 +2,7 @@
 
 - Pack name: `planning`
 - Status: active
-- Last reviewed: 2026-06-03
+- Last reviewed: 2026-06-04
 - Authority posture: Derived context aid only; canonical docs and accepted ADRs govern.
 
 ## Purpose
@@ -35,6 +35,8 @@ Helps agents implement local farm planning, goals, subgoals, assignment-ready ta
 - Farm setup owns the week-start preference. Calendar pickers, schedule day order, and Week Of calculations should use that shared local preference.
 - Farmhand task-board views belong in the shared Farm work boards screen as All/farmhand filtering over planning tasks; do not create a separate farmhand task-board system.
 - Organic Certification should use planning records while remaining a standalone certification feature.
+- Organic certification template subgoals should be split when approvals, applications, compost logs, manure intervals, traceability, handling, mass-balance, OSP narratives, or prevention procedures need different evidence.
+- Remove template-owned certification goals when dedicated organic workflows replace them; evidence review and package generation should not remain as duplicate standing manual goals. The certification template no longer seeds the former evidence-prep or package-generation goals.
 - The generic Planning screen should offer Create a goal with tasks, Create a single task, and Review planned work as the primary choices.
 - Goal-with-tasks mode should stay focused on one highest-level goal tree; single-task mode should show only a task form; review mode should list goals and non-goal tasks without forms by default.
 - Editing a goal from review mode should expose the focused goal tree so the selected goal, subgoals, and associated tasks can be edited inline near the relevant item.

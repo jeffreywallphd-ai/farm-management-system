@@ -2,7 +2,7 @@
 
 - Pack name: `organic-certification`
 - Status: active
-- Last reviewed: 2026-06-02
+- Last reviewed: 2026-06-04
 - Authority posture: Derived context aid only; canonical docs and accepted ADRs govern.
 
 ## Purpose
@@ -21,6 +21,8 @@ Helps agents implement USDA organic certification readiness features without ove
 - The module organizes evidence and reports for farmer/certifier preparation. It does not certify farms or make legal determinations.
 - Voice/photo farm notes are the source capture layer for certification evidence. Use organic evidence links to relate notes to organic categories or records instead of creating a separate evidence inbox or copying media.
 - Organic Certification uses the shared local planning foundation for certification goals, subgoals, and tasks while remaining a standalone certification feature.
+- Certification planning templates should split broad regulatory areas into smaller subgoals when evidence differs, including input approval vs application, soil fertility vs compost vs manure intervals, lot traceability vs handling/mass balance, and OSP practices vs recordkeeping/prevention procedures.
+- Dedicated evidence-review and package-generation workflows replace the former transitional seeded `Prepare inspection evidence` and `Generate certification or renewal package` goals.
 - Certification work boards may display certification planning tasks by status, but they must use the shared planning-board foundation and linked farm events rather than a separate certification task or evidence system.
 - Use official USDA/eCFR sources for each phase before implementation.
 - Keep all records local/offline-first unless intentionally exported by the user.
@@ -77,9 +79,9 @@ Phase 8 does not submit certifier forms, generate Common OSP files, integrate wi
 
 ## Phase 9 Summary
 
-Phase 9 includes local organic report package records, generated package text, package manifest data, linked farm-note evidence references, package UI, and recovery-copy inclusion.
+Phase 9 includes local organic report package records, generated package text, package manifest data, package preview warnings, linked farm-note evidence references, package UI, local PDF export for saved packages, and recovery-copy inclusion.
 
-Phase 9 does not submit packages, generate signed certifier files, bundle media, connect to portals, score compliance, or add cloud/sync/accounts/AI extraction.
+Phase 9 does not submit packages, generate signed certifier files, bundle media, connect to portals, score compliance, or add cloud/sync/accounts/AI extraction. PDF export is explicit and local/user-controlled.
 
 ## Phase 10 Summary
 

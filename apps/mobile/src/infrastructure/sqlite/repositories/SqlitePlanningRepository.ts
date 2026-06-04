@@ -220,6 +220,13 @@ export class SqlitePlanningRepository implements PlanningRepository {
     return goals;
   }
 
+  async deleteGoal(farmId: FarmId, id: PlanningGoalId): Promise<void> {
+    await this.database.runAsync("UPDATE planning_tasks SET goal_id = NULL WHERE farm_id = ? AND goal_id = ?;", [farmId, id]);
+    await this.database.runAsync("DELETE FROM planning_links WHERE farm_id = ? AND goal_id = ?;", [farmId, id]);
+    await this.database.runAsync("DELETE FROM planning_boards WHERE farm_id = ? AND goal_id = ?;", [farmId, id]);
+    await this.database.runAsync("DELETE FROM planning_goals WHERE farm_id = ? AND id = ?;", [farmId, id]);
+  }
+
   async saveTask(task: PlanningTask): Promise<void> {
     await this.database.runAsync(
       `INSERT INTO planning_tasks (
@@ -306,6 +313,11 @@ export class SqlitePlanningRepository implements PlanningRepository {
     if (filters?.source) tasks = tasks.filter((task) => task.source === filters.source);
     if (filters?.assignedFarmhandId) tasks = tasks.filter((task) => task.assignedFarmhandId === filters.assignedFarmhandId);
     return tasks;
+  }
+
+  async deleteTask(farmId: FarmId, id: PlanningTaskId): Promise<void> {
+    await this.database.runAsync("DELETE FROM planning_links WHERE farm_id = ? AND task_id = ?;", [farmId, id]);
+    await this.database.runAsync("DELETE FROM planning_tasks WHERE farm_id = ? AND id = ?;", [farmId, id]);
   }
 
   async saveLink(link: PlanningLink): Promise<void> {

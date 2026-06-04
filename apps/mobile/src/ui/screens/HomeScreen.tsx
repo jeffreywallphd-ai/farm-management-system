@@ -36,11 +36,11 @@ export function HomeScreen({ farmName }: { farmName: Farm["name"] }) {
           />
         </View>
       </Card>
-      <Card>
+      <Card variant="warm">
         <View style={styles.taskAction}>
           <View style={styles.cardHeadingRow}>
             <HomeIcon kind="tasks" />
-            <Text style={styles.prompt}>Track/Manage Farm Tasks</Text>
+            <Text style={styles.prompt}>Track Farm Tasks</Text>
           </View>
           <Text style={styles.description}>Move planned work through task boards and record farm events from task cards.</Text>
           <Button icon="board" label="Manage Tasks" onPress={() => pushRoute(router, "/planning/boards")} size="hero" />

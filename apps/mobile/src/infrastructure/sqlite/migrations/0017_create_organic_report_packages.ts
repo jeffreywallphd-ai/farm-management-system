@@ -7,7 +7,7 @@ export const createOrganicReportPackages: Migration = {
     `CREATE TABLE IF NOT EXISTS organic_report_packages (
       id TEXT PRIMARY KEY NOT NULL,
       farm_id TEXT NOT NULL,
-      package_type TEXT NOT NULL CHECK (package_type IN ('inspectionPrep', 'annualUpdate', 'recordsArchive')),
+      package_type TEXT NOT NULL CHECK (package_type IN ('inspectionPrep', 'annualUpdate', 'renewalConversation', 'recordsArchive')),
       title TEXT NOT NULL,
       generated_at TEXT NOT NULL,
       report_names_json TEXT NOT NULL DEFAULT '[]',

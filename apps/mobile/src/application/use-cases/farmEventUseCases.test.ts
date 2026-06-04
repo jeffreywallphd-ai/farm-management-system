@@ -730,5 +730,9 @@ class CapturingExportRepository implements ExportRepository {
     return { uri: `memory://${input.fileName}`, fileName: input.fileName, mimeType: "application/zip" };
   }
 
+  async writePdf(input: { fileName: string }): Promise<MobilePilotExportFile> {
+    return { uri: `memory://${input.fileName}`, fileName: input.fileName, mimeType: "application/pdf" };
+  }
+
   async shareRecoveryCopy(): Promise<void> {}
 }

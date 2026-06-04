@@ -1,7 +1,7 @@
 export interface MobilePilotExportFile {
   uri: string;
   fileName: string;
-  mimeType: "application/json" | "application/zip";
+  mimeType: "application/json" | "application/zip" | "application/pdf";
 }
 
 export interface RecoveryPackageMediaFile {
@@ -16,5 +16,6 @@ export interface ExportRepository {
     metadataContents: string;
     mediaFiles: RecoveryPackageMediaFile[];
   }): Promise<MobilePilotExportFile>;
+  writePdf(input: { fileName: string; bytes: Uint8Array }): Promise<MobilePilotExportFile>;
   shareRecoveryCopy(file: MobilePilotExportFile): Promise<void>;
 }

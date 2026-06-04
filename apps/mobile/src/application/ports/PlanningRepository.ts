@@ -22,9 +22,11 @@ export interface PlanningRepository {
   saveGoal(goal: PlanningGoal): Promise<void>;
   getGoal(farmId: FarmId, id: PlanningGoalId): Promise<PlanningGoal | null>;
   listGoals(farmId: FarmId, filters?: { category?: PlanningGoalCategory; source?: PlanningSource; parentGoalId?: PlanningGoalId | null }): Promise<PlanningGoal[]>;
+  deleteGoal(farmId: FarmId, id: PlanningGoalId): Promise<void>;
   saveTask(task: PlanningTask): Promise<void>;
   getTask(farmId: FarmId, id: PlanningTaskId): Promise<PlanningTask | null>;
   listTasks(farmId: FarmId, filters?: { goalId?: PlanningGoalId; source?: PlanningSource; assignedFarmhandId?: FarmhandId }): Promise<PlanningTask[]>;
+  deleteTask(farmId: FarmId, id: PlanningTaskId): Promise<void>;
   saveLink(link: PlanningLink): Promise<void>;
   listLinks(farmId: FarmId, filters?: { goalId?: PlanningGoalId; taskId?: PlanningTaskId }): Promise<PlanningLink[]>;
 }
