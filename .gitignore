@@ -34,6 +34,7 @@ tmp/
 node_modules/
 package-lock.json
 .npm-cache/
+**/.npm-cache/
 .expo-home/
 .expo/
 dist/
