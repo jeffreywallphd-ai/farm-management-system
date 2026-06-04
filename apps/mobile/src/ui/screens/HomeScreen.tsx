@@ -43,7 +43,7 @@ export function HomeScreen({ farmName }: { farmName: Farm["name"] }) {
             <Text style={styles.prompt}>Track/Manage Farm Tasks</Text>
           </View>
           <Text style={styles.description}>Move planned work through task boards and record farm events from task cards.</Text>
-          <Button icon="grid" label="Manage Tasks" onPress={() => pushRoute(router, "/planning/boards")} size="hero" />
+          <Button icon="board" label="Manage Tasks" onPress={() => pushRoute(router, "/planning/boards")} size="hero" />
         </View>
       </Card>
       <Card>
@@ -54,7 +54,7 @@ export function HomeScreen({ farmName }: { farmName: Farm["name"] }) {
           </View>
           <Text style={styles.description}>Create goals, subgoals, single tasks, and short-term work plans.</Text>
           <Button
-            icon="clipboard"
+            icon="task"
             label="Plan Work"
             onPress={() => pushRoute(router, "/planning")}
             size="large"
@@ -87,10 +87,10 @@ export function HomeScreen({ farmName }: { farmName: Farm["name"] }) {
 function HomeIcon({ kind, tone = "default" }: { kind: "record" | "tasks" | "plan" | "setup"; tone?: "default" | "light" }) {
   const isLight = tone === "light";
   const iconNameByKind: Record<typeof kind, ThemedIconName> = {
-    plan: "clipboard",
+    plan: "task",
     record: "microphone",
     setup: "leaf",
-    tasks: "grid",
+    tasks: "board",
   };
   const color = isLight ? theme.colors.onPrimary : theme.colors.primary;
   const accentColor = isLight ? theme.colors.primarySoft : theme.colors.secondary;
@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
     color: theme.colors.onPrimary,
     fontFamily: theme.typography.headingFontFamily,
     fontSize: theme.typography.heading,
-    fontWeight: "800",
+    fontWeight: theme.typography.headingFontWeight,
     lineHeight: 30,
   },
   featuredDescription: {
@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
     color: theme.colors.primary,
     fontFamily: theme.typography.headingFontFamily,
     fontSize: theme.typography.heading,
-    fontWeight: "800",
+    fontWeight: theme.typography.headingFontWeight,
     lineHeight: 30,
   },
   description: {

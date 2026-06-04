@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-import { ThemedIcon, type ThemedIconName } from "./ThemedIcon";
+import { getThemedIconForText, ThemedIcon, type ThemedIconName } from "./ThemedIcon";
 import { theme } from "../theme/theme";
 
 export function Button({
@@ -22,6 +22,8 @@ export function Button({
 }) {
   const iconColor = variant === "secondary" ? theme.colors.primary : theme.colors.onPrimary;
   const iconSize = size === "hero" ? 32 : size === "large" ? 26 : 22;
+  const resolvedIcon = icon ?? getThemedIconForText(label, "leaf");
+  const resolvedTrailingIcon = trailingIcon ?? "arrowRight";
 
   return (
     <Pressable
@@ -38,7 +40,7 @@ export function Button({
       ]}
     >
       <View style={styles.content}>
-        {icon ? <ThemedIcon color={iconColor} name={icon} size={iconSize} /> : null}
+        <ThemedIcon color={iconColor} name={resolvedIcon} size={iconSize} />
         <Text
           style={[
             styles.label,
@@ -49,7 +51,7 @@ export function Button({
         >
           {label}
         </Text>
-        {trailingIcon ? <ThemedIcon color={iconColor} name={trailingIcon} size={iconSize} /> : null}
+        {resolvedTrailingIcon ? <ThemedIcon color={iconColor} name={resolvedTrailingIcon} size={iconSize} /> : null}
       </View>
     </Pressable>
   );
@@ -69,9 +71,9 @@ const styles = StyleSheet.create({
     paddingVertical: theme.spacing.lg,
   },
   heroButton: {
-    minHeight: 112,
+    minHeight: 86,
     paddingHorizontal: theme.spacing.xl,
-    paddingVertical: theme.spacing.xl,
+    paddingVertical: theme.spacing.lg,
   },
   primary: {
     backgroundColor: theme.colors.primary,
@@ -100,14 +102,16 @@ const styles = StyleSheet.create({
   content: {
     alignItems: "center",
     flexDirection: "row",
-    gap: theme.spacing.sm,
+    gap: theme.spacing.md,
     justifyContent: "center",
+    width: "100%",
   },
   label: {
+    flex: 1,
     flexShrink: 1,
     fontSize: theme.typography.body,
     fontWeight: "700",
-    textAlign: "center",
+    textAlign: "left",
   },
   largeLabel: {
     fontSize: theme.typography.section,

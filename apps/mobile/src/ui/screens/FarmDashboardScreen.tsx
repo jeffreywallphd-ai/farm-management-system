@@ -260,7 +260,7 @@ const styles = StyleSheet.create({
     color: theme.colors.textPrimary,
     fontFamily: theme.typography.headingFontFamily,
     fontSize: theme.typography.body,
-    fontWeight: "800",
+    fontWeight: theme.typography.headingFontWeight,
   },
   geometrySection: {
     gap: theme.spacing.md,
@@ -279,13 +279,13 @@ const styles = StyleSheet.create({
     color: theme.colors.textPrimary,
     fontFamily: theme.typography.headingFontFamily,
     fontSize: theme.typography.body,
-    fontWeight: "800",
+    fontWeight: theme.typography.headingFontWeight,
   },
   placeTitle: {
     color: theme.colors.textPrimary,
     fontFamily: theme.typography.headingFontFamily,
     fontSize: theme.typography.body,
-    fontWeight: "800",
+    fontWeight: theme.typography.headingFontWeight,
   },
   placeDetail: {
     color: theme.colors.textSecondary,

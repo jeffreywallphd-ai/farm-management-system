@@ -19,7 +19,7 @@ const styles = StyleSheet.create({
     color: theme.colors.primary,
     fontFamily: theme.typography.headingFontFamily,
     fontSize: theme.typography.section,
-    fontWeight: "800",
+    fontWeight: theme.typography.headingFontWeight,
   },
   detail: {
     color: theme.colors.textSecondary,

@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
     color: theme.colors.textPrimary,
     fontFamily: theme.typography.headingFontFamily,
     fontSize: theme.typography.section,
-    fontWeight: "800",
+    fontWeight: theme.typography.headingFontWeight,
     lineHeight: 26,
   },
   pickerGrid: {
