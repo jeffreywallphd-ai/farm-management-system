@@ -345,6 +345,7 @@ const styles = StyleSheet.create({
   },
   fullScreenTitle: {
     color: theme.colors.textPrimary,
+    fontFamily: theme.typography.headingFontFamily,
     fontSize: theme.typography.section,
     fontWeight: "800",
     lineHeight: 28,
@@ -422,6 +423,7 @@ const styles = StyleSheet.create({
   },
   fallbackTitle: {
     color: theme.colors.textPrimary,
+    fontFamily: theme.typography.headingFontFamily,
     fontSize: theme.typography.body,
     fontWeight: "800",
   },

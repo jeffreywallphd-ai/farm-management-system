@@ -67,14 +67,14 @@ const styles = StyleSheet.create({
     gap: theme.spacing.sm,
   },
   label: {
-    color: theme.colors.textPrimary,
+    color: theme.colors.primary,
     fontSize: theme.typography.small,
     fontWeight: "700",
   },
   dropdownButton: {
     backgroundColor: theme.colors.dropdownSurface,
     borderColor: theme.colors.dropdownBorder,
-    borderRadius: theme.radius.md,
+    borderRadius: theme.radius.lg,
     borderWidth: 1,
     gap: theme.spacing.xs,
     justifyContent: "center",
@@ -105,8 +105,8 @@ const styles = StyleSheet.create({
     padding: theme.spacing.md,
   },
   selectedOption: {
-    backgroundColor: theme.colors.accent,
-    borderColor: theme.colors.accentPressed,
+    backgroundColor: theme.colors.primarySoft,
+    borderColor: theme.colors.secondary,
   },
   optionText: {
     color: theme.colors.textPrimary,
@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
   selectedOptionText: {
-    color: theme.colors.onAccent,
+    color: theme.colors.primary,
   },
   error: {
     color: theme.colors.error,

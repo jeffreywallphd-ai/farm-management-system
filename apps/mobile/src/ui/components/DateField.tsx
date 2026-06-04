@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
     gap: theme.spacing.sm,
   },
   label: {
-    color: theme.colors.textPrimary,
+    color: theme.colors.primary,
     fontSize: theme.typography.small,
     fontWeight: "700",
   },
@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
   input: {
     backgroundColor: theme.colors.surface,
     borderColor: theme.colors.border,
-    borderRadius: theme.radius.md,
+    borderRadius: theme.radius.lg,
     borderWidth: 1,
     color: theme.colors.textPrimary,
     fontSize: theme.typography.body,
@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
   modalCard: {
     backgroundColor: theme.colors.surface,
     borderColor: theme.colors.border,
-    borderRadius: theme.radius.md,
+    borderRadius: theme.radius.lg,
     borderWidth: 1,
     gap: theme.spacing.md,
     padding: theme.spacing.lg,
@@ -162,6 +162,7 @@ const styles = StyleSheet.create({
   },
   monthTitle: {
     color: theme.colors.textPrimary,
+    fontFamily: theme.typography.headingFontFamily,
     fontSize: theme.typography.section,
     fontWeight: "700",
     textAlign: "center",

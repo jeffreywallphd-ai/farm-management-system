@@ -12,8 +12,10 @@ export function EmptyState({ text }: { text: string }) {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: theme.colors.surfaceMuted,
-    borderRadius: theme.radius.md,
+    backgroundColor: theme.colors.primarySubtle,
+    borderColor: theme.colors.border,
+    borderRadius: theme.radius.lg,
+    borderWidth: 1,
     padding: theme.spacing.md,
   },
   text: {

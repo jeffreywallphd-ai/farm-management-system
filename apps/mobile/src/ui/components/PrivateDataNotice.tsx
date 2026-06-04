@@ -22,6 +22,7 @@ const styles = StyleSheet.create({
   },
   title: {
     color: theme.colors.primary,
+    fontFamily: theme.typography.headingFontFamily,
     fontSize: theme.typography.body,
     fontWeight: "800",
   },

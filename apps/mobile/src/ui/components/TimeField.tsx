@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
     gap: theme.spacing.sm,
   },
   label: {
-    color: theme.colors.textPrimary,
+    color: theme.colors.primary,
     fontSize: theme.typography.small,
     fontWeight: "700",
   },
@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
   displayField: {
     backgroundColor: theme.colors.surface,
     borderColor: theme.colors.border,
-    borderRadius: theme.radius.md,
+    borderRadius: theme.radius.lg,
     borderWidth: 1,
     flex: 1,
     justifyContent: "center",
@@ -137,13 +137,14 @@ const styles = StyleSheet.create({
   modalCard: {
     backgroundColor: theme.colors.surface,
     borderColor: theme.colors.border,
-    borderRadius: theme.radius.md,
+    borderRadius: theme.radius.lg,
     borderWidth: 1,
     gap: theme.spacing.md,
     padding: theme.spacing.lg,
   },
   modalTitle: {
     color: theme.colors.textPrimary,
+    fontFamily: theme.typography.headingFontFamily,
     fontSize: theme.typography.section,
     fontWeight: "800",
     lineHeight: 26,

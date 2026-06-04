@@ -952,6 +952,7 @@ const styles = StyleSheet.create({
   },
   itemTitle: {
     color: theme.colors.textPrimary,
+    fontFamily: theme.typography.headingFontFamily,
     fontSize: theme.typography.section,
     fontWeight: "800",
     lineHeight: 26,

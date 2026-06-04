@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
   dropdownButton: {
     backgroundColor: theme.colors.dropdownSurface,
     borderColor: theme.colors.dropdownBorder,
-    borderRadius: theme.radius.md,
+    borderRadius: theme.radius.lg,
     borderWidth: 1,
     gap: theme.spacing.xs,
     justifyContent: "center",
@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
   input: {
     backgroundColor: theme.colors.surface,
     borderColor: theme.colors.border,
-    borderRadius: theme.radius.md,
+    borderRadius: theme.radius.lg,
     borderWidth: 1,
     color: theme.colors.textPrimary,
     fontSize: theme.typography.body,
@@ -142,7 +142,7 @@ const styles = StyleSheet.create({
     paddingVertical: theme.spacing.md,
   },
   label: {
-    color: theme.colors.textPrimary,
+    color: theme.colors.primary,
     fontSize: theme.typography.small,
     fontWeight: "700",
   },
@@ -170,10 +170,10 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
   selectedOption: {
-    backgroundColor: theme.colors.accent,
-    borderColor: theme.colors.accentPressed,
+    backgroundColor: theme.colors.primarySoft,
+    borderColor: theme.colors.secondary,
   },
   selectedOptionText: {
-    color: theme.colors.onAccent,
+    color: theme.colors.primary,
   },
 });

@@ -802,6 +802,7 @@ const styles = StyleSheet.create({
   },
   planTitle: {
     color: theme.colors.textPrimary,
+    fontFamily: theme.typography.headingFontFamily,
     fontSize: theme.typography.section,
     fontWeight: "800",
     lineHeight: 26,

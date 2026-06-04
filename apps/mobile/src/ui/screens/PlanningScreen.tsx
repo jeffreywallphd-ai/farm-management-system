@@ -1197,6 +1197,7 @@ const styles = StyleSheet.create({
   },
   subheading: {
     color: theme.colors.textPrimary,
+    fontFamily: theme.typography.headingFontFamily,
     fontSize: theme.typography.body,
     fontWeight: "800",
     lineHeight: 24,
@@ -1214,6 +1215,7 @@ const styles = StyleSheet.create({
   },
   title: {
     color: theme.colors.textPrimary,
+    fontFamily: theme.typography.headingFontFamily,
     fontSize: theme.typography.section,
     fontWeight: "800",
     lineHeight: 26,

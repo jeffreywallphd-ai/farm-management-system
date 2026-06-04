@@ -20,6 +20,7 @@ const styles = StyleSheet.create({
   },
   title: {
     color: theme.colors.onPrimary,
+    fontFamily: theme.typography.headingFontFamily,
     fontSize: theme.typography.body,
     fontWeight: "800",
   },

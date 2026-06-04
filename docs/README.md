@@ -11,6 +11,12 @@ Documentation is part of the product-development control system for this open-so
 - Make major decisions traceable.
 - Support safe evolution of offline, privacy-sensitive, and AI-assisted workflows.
 
+## Product Name
+
+The current app product name is Fazendio.
+
+To avoid documentation churn and brand-name scattering, this is the only documentation file that should record or repeat the product name. Other documentation should describe the project generically as the small-farm support platform, the mobile pilot, the app, or the relevant feature area unless a future naming decision explicitly changes this rule.
+
 ## Documentation Areas and Authority
 
 | Directory | Role | Canonical? |

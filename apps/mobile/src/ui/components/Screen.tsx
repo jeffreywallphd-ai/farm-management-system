@@ -1,9 +1,11 @@
 import type { ReactNode, RefObject } from "react";
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from "react-native";
+import { Image, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { AppHeader } from "./AppHeader";
 import { theme } from "../theme/theme";
+
+const footerHills = require("../../../assets/images/farm-footer-hills.png");
 
 export function Screen({
   children,
@@ -21,6 +23,9 @@ export function Screen({
     >
       <SafeAreaView style={styles.safeArea}>
         <AppHeader />
+        <View pointerEvents="none" style={styles.footerImageFrame}>
+          <Image accessible={false} resizeMode="stretch" source={footerHills} style={styles.footerImage} />
+        </View>
         <ScrollView
           contentContainerStyle={styles.content}
           keyboardShouldPersistTaps="handled"
@@ -42,13 +47,26 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
   },
+  footerImageFrame: {
+    bottom: 0,
+    height: 88,
+    left: 0,
+    opacity: 0.72,
+    position: "absolute",
+    right: 0,
+  },
+  footerImage: {
+    height: "100%",
+    width: "100%",
+  },
   scrollView: {
     flex: 1,
   },
   content: {
     flexGrow: 1,
     paddingHorizontal: theme.spacing.lg,
-    paddingVertical: theme.spacing.xl,
+    paddingTop: theme.spacing.xl,
+    paddingBottom: theme.spacing.xl + 42,
   },
   inner: {
     width: "100%",

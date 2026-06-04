@@ -1,20 +1,28 @@
-import { Pressable, StyleSheet, Text } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
+import { ThemedIcon, type ThemedIconName } from "./ThemedIcon";
 import { theme } from "../theme/theme";
 
 export function Button({
+  icon,
   label,
   onPress,
+  trailingIcon,
   variant = "primary",
   size = "standard",
   disabled = false,
 }: {
+  icon?: ThemedIconName;
   label: string;
   onPress: () => void;
+  trailingIcon?: ThemedIconName;
   variant?: "primary" | "secondary";
   size?: "standard" | "large" | "hero";
   disabled?: boolean;
 }) {
+  const iconColor = variant === "secondary" ? theme.colors.primary : theme.colors.onPrimary;
+  const iconSize = size === "hero" ? 32 : size === "large" ? 26 : 22;
+
   return (
     <Pressable
       accessibilityRole="button"
@@ -29,16 +37,20 @@ export function Button({
         disabled && styles.disabled,
       ]}
     >
-      <Text
-        style={[
-          styles.label,
-          size === "large" ? styles.largeLabel : null,
-          size === "hero" ? styles.heroLabel : null,
-          variant === "secondary" ? styles.secondaryLabel : styles.primaryLabel,
-        ]}
-      >
-        {label}
-      </Text>
+      <View style={styles.content}>
+        {icon ? <ThemedIcon color={iconColor} name={icon} size={iconSize} /> : null}
+        <Text
+          style={[
+            styles.label,
+            size === "large" ? styles.largeLabel : null,
+            size === "hero" ? styles.heroLabel : null,
+            variant === "secondary" ? styles.secondaryLabel : styles.primaryLabel,
+          ]}
+        >
+          {label}
+        </Text>
+        {trailingIcon ? <ThemedIcon color={iconColor} name={trailingIcon} size={iconSize} /> : null}
+      </View>
     </Pressable>
   );
 }
@@ -46,7 +58,7 @@ export function Button({
 const styles = StyleSheet.create({
   button: {
     alignItems: "center",
-    borderRadius: theme.radius.md,
+    borderRadius: theme.radius.lg,
     minHeight: theme.spacing.touchTarget,
     justifyContent: "center",
     paddingHorizontal: theme.spacing.lg,
@@ -63,12 +75,19 @@ const styles = StyleSheet.create({
   },
   primary: {
     backgroundColor: theme.colors.primary,
+    borderColor: theme.colors.primaryPressed,
+    borderWidth: 1,
+    elevation: 2,
+    shadowColor: "#0A1E15",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.16,
+    shadowRadius: 10,
   },
   primaryPressed: {
     backgroundColor: theme.colors.primaryPressed,
   },
   secondary: {
-    backgroundColor: theme.colors.surface,
+    backgroundColor: theme.colors.surfaceTint,
     borderColor: theme.colors.secondary,
     borderWidth: 1,
   },
@@ -78,7 +97,14 @@ const styles = StyleSheet.create({
   disabled: {
     opacity: 0.55,
   },
+  content: {
+    alignItems: "center",
+    flexDirection: "row",
+    gap: theme.spacing.sm,
+    justifyContent: "center",
+  },
   label: {
+    flexShrink: 1,
     fontSize: theme.typography.body,
     fontWeight: "700",
     textAlign: "center",

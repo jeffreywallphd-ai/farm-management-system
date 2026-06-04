@@ -474,6 +474,7 @@ const styles = StyleSheet.create({
   },
   eventTitle: {
     color: theme.colors.textPrimary,
+    fontFamily: theme.typography.headingFontFamily,
     fontSize: theme.typography.body,
     fontWeight: "800",
     lineHeight: 24,
@@ -549,6 +550,7 @@ const styles = StyleSheet.create({
   },
   taskTitle: {
     color: theme.colors.textPrimary,
+    fontFamily: theme.typography.headingFontFamily,
     fontSize: theme.typography.section,
     fontWeight: "800",
     lineHeight: 26,

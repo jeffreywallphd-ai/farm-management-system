@@ -2,9 +2,12 @@ import { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 
+import { ThemedIcon } from "./ThemedIcon";
 import { pushRoute } from "../navigation";
 import { menuItems, type MenuRoute } from "../navigationMenu";
 import { theme } from "../theme/theme";
+
+const appDisplayName = "Fazendio";
 
 export function AppHeader() {
   const router = useRouter();
@@ -24,7 +27,7 @@ export function AppHeader() {
           onPress={() => handleNavigate("/home")}
           style={styles.titleButton}
         >
-          <Text style={styles.title}>Farm Notes</Text>
+          <Text style={styles.title}>{appDisplayName}</Text>
         </Pressable>
         <Pressable
           accessibilityLabel={isOpen ? "Close menu" : "Open menu"}
@@ -32,7 +35,7 @@ export function AppHeader() {
           onPress={() => setIsOpen((current) => !current)}
           style={styles.menuButton}
         >
-          {isOpen ? <CloseMenuGlyph /> : <HamburgerMenuGlyph />}
+          <ThemedIcon color={theme.colors.onPrimary} name={isOpen ? "close" : "menu"} size={36} />
         </Pressable>
       </View>
       {isOpen ? (
@@ -53,35 +56,23 @@ export function AppHeader() {
   );
 }
 
-function HamburgerMenuGlyph() {
-  return (
-    <View style={styles.hamburgerIcon}>
-      <View style={styles.hamburgerLine} />
-      <View style={styles.hamburgerLine} />
-      <View style={styles.hamburgerLine} />
-    </View>
-  );
-}
-
-function CloseMenuGlyph() {
-  return (
-    <View style={styles.closeIcon}>
-      <View style={[styles.closeLine, styles.closeLineForward]} />
-      <View style={[styles.closeLine, styles.closeLineBackward]} />
-    </View>
-  );
-}
-
 const styles = StyleSheet.create({
   bar: {
     alignItems: "center",
     backgroundColor: theme.colors.primary,
     borderBottomColor: theme.colors.border,
     borderBottomWidth: 1,
+    borderBottomLeftRadius: theme.radius.xl,
+    borderBottomRightRadius: theme.radius.xl,
+    elevation: 4,
     flexDirection: "row",
     justifyContent: "space-between",
     minHeight: theme.spacing.primaryTouchTarget,
     paddingHorizontal: theme.spacing.lg,
+    shadowColor: "#0A1E15",
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.18,
+    shadowRadius: 16,
   },
   container: {
     backgroundColor: theme.colors.primary,
@@ -90,7 +81,10 @@ const styles = StyleSheet.create({
   menu: {
     backgroundColor: theme.colors.surface,
     borderBottomColor: theme.colors.border,
+    borderBottomLeftRadius: theme.radius.lg,
+    borderBottomRightRadius: theme.radius.lg,
     borderBottomWidth: 1,
+    marginHorizontal: theme.spacing.sm,
     padding: theme.spacing.sm,
   },
   menuButton: {
@@ -98,36 +92,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     minHeight: theme.spacing.touchTarget,
     minWidth: theme.spacing.touchTarget,
-  },
-  hamburgerIcon: {
-    gap: 5,
-    justifyContent: "center",
-    width: 28,
-  },
-  hamburgerLine: {
-    backgroundColor: theme.colors.onPrimary,
-    borderRadius: 2,
-    height: 3,
-    width: 28,
-  },
-  closeIcon: {
-    alignItems: "center",
-    height: 28,
-    justifyContent: "center",
-    width: 28,
-  },
-  closeLine: {
-    backgroundColor: theme.colors.onPrimary,
-    borderRadius: 2,
-    height: 3,
-    position: "absolute",
-    width: 30,
-  },
-  closeLineForward: {
-    transform: [{ rotate: "45deg" }],
-  },
-  closeLineBackward: {
-    transform: [{ rotate: "-45deg" }],
   },
   menuItem: {
     borderRadius: theme.radius.sm,
@@ -142,7 +106,7 @@ const styles = StyleSheet.create({
   },
   title: {
     color: theme.colors.onPrimary,
-    fontSize: theme.typography.title,
+    fontSize: 34,
     fontWeight: "800",
   },
   titleButton: {

@@ -10,4 +10,8 @@ When editing existing records from a list, timeline, dashboard, setup, planning,
 
 Single-choice option controls should use the shared dropdown-style `SelectField` or searchable dropdown `SearchableSelectField` instead of always-visible option button groups. Keep true multi-select workflows as explicit multi-select controls.
 
+Visual styling should stay reusable through `theme`, shared components, and project-owned assets in `apps/mobile/assets/images`. Decorative imagery should support field usability and atmosphere without changing workflows, hiding controls, or becoming repeated wallpaper across every card.
+
+Use `ThemedIcon` for app-owned line icons, button icons, navigation icons, and button arrows before adding one-off view-drawn glyphs. Headings should use the shared serif heading font from `theme.typography.headingFontFamily`, while body text, form labels, controls, buttons, and the app logo should remain sans serif for readability.
+
 Do not implement AI capture, sync status, shared publication, authentication, or extra workflows here without later accepted scope.

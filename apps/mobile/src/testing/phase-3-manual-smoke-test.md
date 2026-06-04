@@ -6,7 +6,7 @@ Use this checklist on a physical Android test device before farmer distribution 
 2. Confirm no warnings appear for `AppBootstrap.tsx`, `FarmRouteGate.tsx`, or `DatabaseProvider.tsx` as route files.
 3. Confirm no `Couldn't find any screens for the navigator` error occurs.
 4. Confirm the initial dashboard or setup screen renders.
-5. Confirm the `Farm Notes` header is visible.
+5. Confirm the app header is visible.
 6. Open and close the hamburger menu.
 7. Confirm the menu navigates to `Quick record farm events`, `Farm planning`, `Manage farm tasks`, `Farm setup`, and `Organic certification`.
 8. Start with a fresh local database.

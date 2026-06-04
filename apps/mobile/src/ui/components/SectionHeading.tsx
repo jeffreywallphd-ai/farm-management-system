@@ -16,7 +16,8 @@ const styles = StyleSheet.create({
     gap: theme.spacing.xs,
   },
   title: {
-    color: theme.colors.textPrimary,
+    color: theme.colors.primary,
+    fontFamily: theme.typography.headingFontFamily,
     fontSize: theme.typography.section,
     fontWeight: "800",
   },
