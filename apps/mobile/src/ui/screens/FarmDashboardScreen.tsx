@@ -203,23 +203,12 @@ export function FarmDashboardScreen({
         />
       </CollapsibleCard>
       <CollapsibleCard
-        detail="Controls calendar pickers, day order, and farmhand Week Of dates across the app."
-        isExpanded={expandedSection === "scheduleWeek"}
-        onToggle={() => toggle("scheduleWeek")}
-        title="Schedule week setup"
+        detail="Choose starter goals and tasks for the work this farm actually does."
+        isExpanded={expandedSection === "farmWorkPacks"}
+        onToggle={() => toggle("farmWorkPacks")}
+        title="Starter work packs"
       >
-        <SelectField
-          error={datePreferences.error}
-          label="Week starts on"
-          onChange={(value) => {
-            void datePreferences.saveWeekStartsOn(Number(value) as WeekStartsOn);
-          }}
-          options={[
-            { label: "Sunday", value: "0" },
-            { label: "Monday", value: "1" },
-          ]}
-          value={String(datePreferences.weekStartsOn)}
-        />
+        <FarmWorkPackSetup farmId={farm.id} planningRepository={planningRepository} />
       </CollapsibleCard>
       <CollapsibleCard
         detail="Show or hide organic certification planning and boards for this farm."
@@ -232,15 +221,7 @@ export function FarmDashboardScreen({
           organicCertificationRepository={organicCertificationRepository}
           planningRepository={planningRepository}
         />
-      </CollapsibleCard>
-      <CollapsibleCard
-        detail="Choose starter goals and tasks for the work this farm actually does."
-        isExpanded={expandedSection === "farmWorkPacks"}
-        onToggle={() => toggle("farmWorkPacks")}
-        title="Starter work packs"
-      >
-        <FarmWorkPackSetup farmId={farm.id} planningRepository={planningRepository} />
-      </CollapsibleCard>
+      </CollapsibleCard>      
       <CollapsibleCard
         detail={`${locations.length} saved place${locations.length === 1 ? "" : "s"}`}
         isExpanded={expandedSection === "farmPlaces"}
@@ -286,6 +267,25 @@ export function FarmDashboardScreen({
           />
         </CollapsibleCard>
       ))}
+      <CollapsibleCard
+        detail="Controls calendar pickers, day order, and farmhand Week Of dates across the app."
+        isExpanded={expandedSection === "scheduleWeek"}
+        onToggle={() => toggle("scheduleWeek")}
+        title="Schedule week setup"
+      >
+        <SelectField
+          error={datePreferences.error}
+          label="Week starts on"
+          onChange={(value) => {
+            void datePreferences.saveWeekStartsOn(Number(value) as WeekStartsOn);
+          }}
+          options={[
+            { label: "Sunday", value: "0" },
+            { label: "Monday", value: "1" },
+          ]}
+          value={String(datePreferences.weekStartsOn)}
+        />
+      </CollapsibleCard>
     </Screen>
   );
 }
