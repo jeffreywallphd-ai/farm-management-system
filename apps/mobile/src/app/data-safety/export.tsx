@@ -12,6 +12,8 @@ export default function RecoveryCopyExportRoute() {
           exportRepository={exportRepository}
           farm={farm}
           farmEventRepository={database.farmEventRepository}
+          farmhandRepository={database.farmhandRepository}
+          farmMapRepository={database.farmMapRepository}
           farmNoteTranscriptRepository={database.farmNoteTranscriptRepository}
           farmReferenceRepository={database.farmReferenceRepository}
           localRecordRepository={database.localRecordRepository}

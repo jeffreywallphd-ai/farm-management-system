@@ -5,7 +5,10 @@ export interface CalendarDay {
   isToday: boolean;
 }
 
+export type WeekStartsOn = 0 | 1;
+
 const datePattern = /^(\d{4})-(\d{2})-(\d{2})$/;
+const weekdayLabelsByIndex = ["S", "M", "T", "W", "T", "F", "S"];
 
 export function formatDateInput(date: Date): string {
   const year = date.getFullYear();
@@ -39,9 +42,16 @@ export function shiftMonth(year: number, month: number, offset: number): { year:
   return { year: date.getFullYear(), month: date.getMonth() };
 }
 
-export function buildCalendarWeeks(year: number, month: number, today = new Date()): CalendarDay[] {
+export function weekdayLabels(weekStartsOn: WeekStartsOn = 0): string[] {
+  return weekStartsOn === 1
+    ? ["M", "T", "W", "T", "F", "S", "S"]
+    : weekdayLabelsByIndex;
+}
+
+export function buildCalendarWeeks(year: number, month: number, today = new Date(), weekStartsOn: WeekStartsOn = 0): CalendarDay[] {
   const firstOfMonth = new Date(year, month, 1);
-  const start = new Date(year, month, 1 - firstOfMonth.getDay());
+  const offset = (firstOfMonth.getDay() - weekStartsOn + 7) % 7;
+  const start = new Date(year, month, 1 - offset);
   const todayText = formatDateInput(today);
 
   return Array.from({ length: 42 }, (_, index) => {

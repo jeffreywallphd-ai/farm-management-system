@@ -1,5 +1,5 @@
 import type { FarmId } from "../../../domain/farm/Farm";
-import type { PlanningBoard, PlanningBoardId, PlanningGoal, PlanningLink, PlanningPeriod, PlanningTask } from "../../../domain/planning/Planning";
+import type { PlanningBoard, PlanningBoardId, PlanningGoal, PlanningLink, PlanningTask } from "../../../domain/planning/Planning";
 import type { PlanningRepository } from "../../ports/PlanningRepository";
 
 export interface PlanningGoalView {
@@ -12,7 +12,6 @@ export interface PlanningOverview {
   goals: PlanningGoal[];
   rootGoals: PlanningGoal[];
   boards: PlanningBoard[];
-  periods: PlanningPeriod[];
   tasks: PlanningTask[];
   openTasks: PlanningTask[];
 }
@@ -28,10 +27,9 @@ export async function getPlanningOverview(
   input: { farmId: FarmId },
   dependencies: { repository: PlanningRepository },
 ): Promise<PlanningOverview> {
-  const [goals, boards, periods, tasks] = await Promise.all([
+  const [goals, boards, tasks] = await Promise.all([
     dependencies.repository.listGoals(input.farmId),
     dependencies.repository.listBoards(input.farmId),
-    dependencies.repository.listPeriods(input.farmId),
     dependencies.repository.listTasks(input.farmId),
   ]);
 
@@ -39,7 +37,6 @@ export async function getPlanningOverview(
     goals,
     rootGoals: goals.filter((goal) => !goal.parentGoalId),
     boards,
-    periods,
     tasks,
     openTasks: tasks.filter((task) => task.status !== "done" && task.status !== "canceled"),
   };

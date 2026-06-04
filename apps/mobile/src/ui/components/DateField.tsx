@@ -3,9 +3,9 @@ import { Modal, Pressable, StyleSheet, Text, TextInput, View } from "react-nativ
 
 import { theme } from "../theme/theme";
 import { Button } from "./Button";
-import { buildCalendarWeeks, monthTitle, parseDateInput, shiftMonth } from "./DateFieldModel";
-
-const weekdays = ["S", "M", "T", "W", "T", "F", "S"];
+import { PickerIconButton } from "./PickerIconButton";
+import { useDatePreferences } from "../datePreferences";
+import { buildCalendarWeeks, monthTitle, parseDateInput, shiftMonth, weekdayLabels } from "./DateFieldModel";
 
 export function DateField({
   label,
@@ -20,11 +20,13 @@ export function DateField({
   error?: string;
   placeholder?: string;
 }) {
+  const { weekStartsOn } = useDatePreferences();
   const initialDate = parseDateInput(value) ?? new Date();
   const [isPickerOpen, setIsPickerOpen] = useState(false);
   const [visibleMonth, setVisibleMonth] = useState({ year: initialDate.getFullYear(), month: initialDate.getMonth() });
   const selectedDate = parseDateInput(value);
-  const days = useMemo(() => buildCalendarWeeks(visibleMonth.year, visibleMonth.month), [visibleMonth.month, visibleMonth.year]);
+  const days = useMemo(() => buildCalendarWeeks(visibleMonth.year, visibleMonth.month, new Date(), weekStartsOn), [visibleMonth.month, visibleMonth.year, weekStartsOn]);
+  const weekdays = useMemo(() => weekdayLabels(weekStartsOn), [weekStartsOn]);
 
   function openPicker() {
     const nextDate = parseDateInput(value) ?? new Date();
@@ -55,7 +57,7 @@ export function DateField({
           style={[styles.input, error ? styles.inputError : null]}
           value={value}
         />
-        <Button label="Pick date" onPress={openPicker} size="large" variant="secondary" />
+        <PickerIconButton accessibilityLabel={`Pick ${label}`} icon="calendar" onPress={openPicker} />
       </View>
       {error ? <Text style={styles.error}>{error}</Text> : null}
       <Modal animationType="fade" onRequestClose={() => setIsPickerOpen(false)} transparent visible={isPickerOpen}>
@@ -116,6 +118,8 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
   inputRow: {
+    alignItems: "center",
+    flexDirection: "row",
     gap: theme.spacing.sm,
   },
   input: {
@@ -125,6 +129,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     color: theme.colors.textPrimary,
     fontSize: theme.typography.body,
+    flex: 1,
     minHeight: theme.spacing.touchTarget,
     paddingHorizontal: theme.spacing.md,
     paddingVertical: theme.spacing.md,

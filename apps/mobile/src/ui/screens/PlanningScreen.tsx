@@ -1,14 +1,26 @@
 import type { ReactNode } from "react";
-import { useEffect, useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  AudioModule,
+  RecordingPresets,
+  setAudioModeAsync,
+  useAudioPlayer,
+  useAudioPlayerStatus,
+  useAudioRecorder,
+  useAudioRecorderState,
+} from "expo-audio";
+import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import { z } from "zod";
 
+import type { FarmhandRepository } from "../../application/ports/FarmhandRepository";
 import type { PlanningRepository } from "../../application/ports/PlanningRepository";
 import { getPlanningOverview } from "../../application/use-cases/manage-planning/ListPlanning";
 import { savePlanningGoal, savePlanningTask } from "../../application/use-cases/manage-planning/ManagePlanning";
 import type { Farm } from "../../domain/farm/Farm";
 import type { FarmLocation } from "../../domain/farm/FarmLocation";
+import type { Farmhand } from "../../domain/farmhand/Farmhand";
 import {
   PLANNING_GOAL_CATEGORIES,
   PLANNING_GOAL_CATEGORY_LABELS,
@@ -21,11 +33,14 @@ import {
   type PlanningGoal,
   type PlanningGoalCategory,
   type PlanningGoalStatus,
-  type PlanningPeriod,
   type PlanningTask,
+  type PlanningTaskInstructionPhoto,
+  type PlanningTaskInstructionVoiceMemo,
   type PlanningTaskPriority,
   type PlanningTaskStatus,
 } from "../../domain/planning/Planning";
+import { ExpoPhotoAttachmentStorageRepository } from "../../infrastructure/media/ExpoPhotoAttachmentStorageRepository";
+import { ExpoVoiceMemoStorageRepository } from "../../infrastructure/media/ExpoVoiceMemoStorageRepository";
 import { systemClock } from "../../infrastructure/system/clock";
 import { localIdGenerator } from "../../infrastructure/system/idGenerator";
 import { Button } from "../components/Button";
@@ -43,16 +58,40 @@ import { theme } from "../theme/theme";
 import { pushRoute } from "../navigation";
 import {
   findRootGoalId,
+  getPlanningEditScrollY,
   selectFocusedGoalScope,
   selectPlanningReviewLists,
   type PlanningMode,
 } from "./PlanningScreenModel";
 
-export function PlanningScreen({ farm, locations, repository }: { farm: Farm; locations: FarmLocation[]; repository: PlanningRepository }) {
+interface TaskInstructionVoiceMemoDraft extends PlanningTaskInstructionVoiceMemo {
+  isPersisted: boolean;
+}
+
+interface TaskInstructionPhotoDraft extends PlanningTaskInstructionPhoto {
+  originalFileName?: string;
+  isPersisted: boolean;
+}
+
+export function PlanningScreen({
+  farm,
+  farmhandRepository,
+  farmhands,
+  locations,
+  repository,
+}: {
+  farm: Farm;
+  farmhandRepository?: FarmhandRepository;
+  farmhands: Farmhand[];
+  locations: FarmLocation[];
+  repository: PlanningRepository;
+}) {
   const router = useRouter();
+  const scrollViewRef = useRef<ScrollView | null>(null);
+  const scrollContentRef = useRef<View | null>(null);
+  const taskRowRefs = useRef<Record<string, View | null>>({});
   const [mode, setMode] = useState<PlanningMode>("review");
   const [goals, setGoals] = useState<PlanningGoal[]>([]);
-  const [periods, setPeriods] = useState<PlanningPeriod[]>([]);
   const [tasks, setTasks] = useState<PlanningTask[]>([]);
   const [error, setError] = useState<string | undefined>();
   const [focusedRootGoalId, setFocusedRootGoalId] = useState("");
@@ -70,23 +109,37 @@ export function PlanningScreen({ farm, locations, repository }: { farm: Farm; lo
   const [taskTitle, setTaskTitle] = useState("");
   const [taskNotes, setTaskNotes] = useState("");
   const [taskGoalId, setTaskGoalId] = useState("");
-  const [taskPeriodId, setTaskPeriodId] = useState("");
   const [taskPlaceId, setTaskPlaceId] = useState("");
   const [taskStatus, setTaskStatus] = useState<PlanningTaskStatus>("notStarted");
   const [taskPriority, setTaskPriority] = useState<PlanningTaskPriority>("normal");
+  const [taskPlannedStartDate, setTaskPlannedStartDate] = useState("");
   const [taskDueDate, setTaskDueDate] = useState("");
-  const [taskResponsiblePerson, setTaskResponsiblePerson] = useState("");
+  const [taskAssignedFarmhandId, setTaskAssignedFarmhandId] = useState("");
+  const [taskInstructionVoiceMemo, setTaskInstructionVoiceMemo] = useState<TaskInstructionVoiceMemoDraft | undefined>();
+  const [taskInstructionPhotos, setTaskInstructionPhotos] = useState<TaskInstructionPhotoDraft[]>([]);
+  const [pendingScrollTaskId, setPendingScrollTaskId] = useState("");
+  const [taskEditReturnGoalId, setTaskEditReturnGoalId] = useState("");
+  const photoAttachmentStorageRepository = useMemo(() => new ExpoPhotoAttachmentStorageRepository(), []);
+  const voiceMemoStorageRepository = useMemo(() => new ExpoVoiceMemoStorageRepository(), []);
 
   async function loadPlanning() {
     const overview = await getPlanningOverview({ farmId: farm.id }, { repository });
     setGoals(overview.goals);
-    setPeriods(overview.periods);
     setTasks(overview.tasks);
   }
 
   useEffect(() => {
     loadPlanning().catch(() => setError("Planning records could not be loaded from this device."));
   }, [farm.id, repository]);
+
+  useEffect(() => {
+    if (!pendingScrollTaskId || editingTaskId !== pendingScrollTaskId) {
+      return undefined;
+    }
+
+    const timeout = setTimeout(() => scrollTaskRowToTop(pendingScrollTaskId), 80);
+    return () => clearTimeout(timeout);
+  }, [editingTaskId, pendingScrollTaskId]);
 
   function errorMessage(caught: unknown, fallback: string): string {
     return caught instanceof z.ZodError ? caught.issues[0]?.message ?? fallback : fallback;
@@ -108,12 +161,46 @@ export function PlanningScreen({ farm, locations, repository }: { farm: Farm; lo
     setTaskTitle("");
     setTaskNotes("");
     setTaskGoalId(nextGoalId);
-    setTaskPeriodId("");
     setTaskPlaceId("");
     setTaskStatus("notStarted");
     setTaskPriority("normal");
+    setTaskPlannedStartDate("");
     setTaskDueDate("");
-    setTaskResponsiblePerson("");
+    setTaskAssignedFarmhandId("");
+    setTaskInstructionVoiceMemo(undefined);
+    setTaskInstructionPhotos([]);
+    setPendingScrollTaskId("");
+    setTaskEditReturnGoalId("");
+  }
+
+  function restoreGoalEdit(goalId: string, nextMode: PlanningMode) {
+    const goal = goals.find((candidate) => candidate.id === goalId);
+    if (!goal) return;
+    beginEditGoal(goal, nextMode);
+  }
+
+  function cancelTaskEdit(nextGoalId = "") {
+    const returnGoalId = taskEditReturnGoalId;
+    const returnMode = mode;
+    resetTaskForm(nextGoalId);
+    if (returnGoalId) {
+      restoreGoalEdit(returnGoalId, returnMode);
+    }
+  }
+
+  function scrollTaskRowToTop(taskId: string) {
+    const taskRow = taskRowRefs.current[taskId];
+    const scrollContent = scrollContentRef.current;
+    const scrollView = scrollViewRef.current;
+    if (!taskRow || !scrollContent || !scrollView) return;
+
+    taskRow.measureLayout(
+      scrollContent,
+      (_x, y) => {
+        scrollView.scrollTo({ animated: true, y: getPlanningEditScrollY(y, theme.spacing.sm) });
+      },
+      () => undefined,
+    );
   }
 
   function startCreateGoalWithTasks() {
@@ -140,8 +227,8 @@ export function PlanningScreen({ farm, locations, repository }: { farm: Farm; lo
     resetTaskForm();
   }
 
-  function beginEditGoal(goal: PlanningGoal) {
-    setMode("createGoal");
+  function beginEditGoal(goal: PlanningGoal, nextMode: PlanningMode = "createGoal") {
+    setMode(nextMode);
     setFocusedRootGoalId(findRootGoalId(goal, goals));
     setEditingGoalId(goal.id);
     setGoalTitle(goal.title);
@@ -154,9 +241,12 @@ export function PlanningScreen({ farm, locations, repository }: { farm: Farm; lo
     resetTaskForm(goal.id);
   }
 
-  function beginEditTask(task: PlanningTask) {
+  function beginEditTask(task: PlanningTask, preserveMode = false) {
     setError(undefined);
-    if (task.goalId) {
+    setTaskEditReturnGoalId(preserveMode && editingGoalId ? editingGoalId : "");
+    if (preserveMode) {
+      setFocusedRootGoalId(task.goalId ? findRootGoalId(goals.find((candidate) => candidate.id === task.goalId) ?? { ...task, category: "general", source: "farmer", sortOrder: 0 } as unknown as PlanningGoal, goals) : "");
+    } else if (task.goalId) {
       const goal = goals.find((candidate) => candidate.id === task.goalId);
       if (goal) {
         setMode("createGoal");
@@ -170,12 +260,15 @@ export function PlanningScreen({ farm, locations, repository }: { farm: Farm; lo
     setTaskTitle(task.title);
     setTaskNotes(task.notes ?? "");
     setTaskGoalId(task.goalId ?? "");
-    setTaskPeriodId(task.periodId ?? "");
     setTaskPlaceId(task.placeId ?? "");
     setTaskStatus(task.status);
     setTaskPriority(task.priority);
+    setTaskPlannedStartDate(task.plannedStartDate ?? "");
     setTaskDueDate(task.dueDate ?? "");
-    setTaskResponsiblePerson(task.responsiblePerson ?? "");
+    setTaskAssignedFarmhandId(task.assignedFarmhandId ?? "");
+    setTaskInstructionVoiceMemo(task.instructionVoiceMemo ? { ...task.instructionVoiceMemo, isPersisted: true } : undefined);
+    setTaskInstructionPhotos((task.instructionPhotos ?? []).map((photo) => ({ ...photo, isPersisted: true })));
+    setPendingScrollTaskId(task.id);
     resetGoalForm();
   }
 
@@ -213,26 +306,31 @@ export function PlanningScreen({ farm, locations, repository }: { farm: Farm; lo
   async function handleSaveTask() {
     setError(undefined);
     try {
-      const goalIdForMode = mode === "singleTask" ? "" : taskGoalId || focusedRootGoalId;
-      const placeIdForMode = mode === "createGoal" ? taskPlaceId || defaultTaskPlaceId(goalIdForMode, goals) : taskPlaceId;
+      const isGoalScopedTaskSave = mode === "createGoal" || Boolean(mode === "review" && focusedRootGoalId && taskGoalId);
+      const goalIdForMode = mode === "singleTask" ? "" : isGoalScopedTaskSave ? taskGoalId || focusedRootGoalId : "";
+      const placeIdForMode = isGoalScopedTaskSave ? taskPlaceId || defaultTaskPlaceId(goalIdForMode, goals) : taskPlaceId;
+      const instructionVoiceMemo = await persistTaskInstructionVoiceMemo(taskInstructionVoiceMemo, voiceMemoStorageRepository);
+      const instructionPhotos = await persistTaskInstructionPhotos(taskInstructionPhotos, photoAttachmentStorageRepository);
       await savePlanningTask(
         {
           farmId: farm.id,
           id: editingTaskId || undefined,
           goalId: goalIdForMode,
-          periodId: taskPeriodId,
           placeId: placeIdForMode,
           title: taskTitle,
           notes: taskNotes,
           status: taskStatus,
           priority: taskPriority,
+          plannedStartDate: taskPlannedStartDate,
           dueDate: taskDueDate,
-          responsiblePerson: taskResponsiblePerson,
+          assignedFarmhandId: taskAssignedFarmhandId,
+          instructionVoiceMemo,
+          instructionPhotos,
         },
-        { clock: systemClock, idGenerator: localIdGenerator, repository },
+        { clock: systemClock, farmhandRepository, idGenerator: localIdGenerator, repository },
       );
-      resetTaskForm(mode === "createGoal" ? goalIdForMode : "");
-      setTaskPlaceId(mode === "createGoal" ? placeIdForMode : "");
+      resetTaskForm(isGoalScopedTaskSave ? goalIdForMode : "");
+      setTaskPlaceId(isGoalScopedTaskSave ? placeIdForMode : "");
       await loadPlanning();
     } catch (caught) {
       setError(errorMessage(caught, "Task could not be saved."));
@@ -248,6 +346,7 @@ export function PlanningScreen({ farm, locations, repository }: { farm: Farm; lo
   );
   const placeDisplays = buildFarmPlaceDisplays(locations);
   const allPlaceOptions = toPlaceOptions(placeDisplays, "No place");
+  const isGoalScopedTaskForm = mode === "createGoal" || Boolean(mode === "review" && focusedRootGoalId && taskGoalId);
   const taskPlaceOptions = placeOptionsForTask(taskGoalId || focusedRootGoalId, goals, locations, placeDisplays);
   const goalPlaceOptions = placeOptionsForGoal(parentGoalId || (focusedRootGoal && !editingGoalId ? focusedRootGoal.id : ""), goals, locations, placeDisplays);
   const creationParentOptions = focusedRootGoal ? parentGoalOptions : [{ label: "No parent goal", value: "" }, ...parentGoalOptions];
@@ -265,14 +364,13 @@ export function PlanningScreen({ farm, locations, repository }: { farm: Farm; lo
       <SearchableSelectField label="Farm place" onChange={setGoalPlaceId} options={goalPlaceOptions} placeholder="Search places" value={goalPlaceId} />
       <DateField label="Target date" onChangeText={setGoalTargetDate} placeholder="YYYY-MM-DD or leave blank" value={goalTargetDate} />
       <Button label="Save goal changes" onPress={handleSaveGoal} size="large" />
-      <Button label="Cancel goal edit" onPress={resetGoalForm} size="large" variant="secondary" />
     </View>
   ) : null;
   const taskEditForm = editingTaskId ? (
     <View style={styles.inlineEdit}>
       <FormField label="Task title" onChangeText={setTaskTitle} placeholder="Call certifier, repair gate, seed carrots" value={taskTitle} />
       <FormField label="Notes" multiline onChangeText={setTaskNotes} placeholder="What needs doing?" value={taskNotes} />
-      {mode === "createGoal" ? (
+      {isGoalScopedTaskForm ? (
         <>
           <SelectField label="Goal" onChange={setTaskGoalId} options={taskGoalOptions} value={taskGoalId || focusedRootGoalId} />
           <SearchableSelectField label="Farm place" onChange={setTaskPlaceId} options={taskPlaceOptions} placeholder="Search places" value={taskPlaceId || defaultTaskPlaceId(taskGoalId || focusedRootGoalId, goals)} />
@@ -281,25 +379,32 @@ export function PlanningScreen({ farm, locations, repository }: { farm: Farm; lo
         <SearchableSelectField label="Farm place" onChange={setTaskPlaceId} options={allPlaceOptions} placeholder="Search places" value={taskPlaceId} />
       )}
       <TaskFields
-        periods={periods}
+        farmhands={farmhands}
+        onAssignedFarmhandChange={setTaskAssignedFarmhandId}
+        taskAssignedFarmhandId={taskAssignedFarmhandId}
         taskDueDate={taskDueDate}
-        taskPeriodId={taskPeriodId}
+        taskPlannedStartDate={taskPlannedStartDate}
         taskPriority={taskPriority}
-        taskResponsiblePerson={taskResponsiblePerson}
         taskStatus={taskStatus}
         onDueDateChange={setTaskDueDate}
-        onPeriodChange={setTaskPeriodId}
+        onPlannedStartDateChange={setTaskPlannedStartDate}
         onPriorityChange={(value) => setTaskPriority(value as PlanningTaskPriority)}
-        onResponsiblePersonChange={setTaskResponsiblePerson}
         onStatusChange={(value) => setTaskStatus(value as PlanningTaskStatus)}
       />
+      <TaskInstructionMediaFields
+        error={error}
+        photos={taskInstructionPhotos}
+        voiceMemo={taskInstructionVoiceMemo}
+        onError={setError}
+        onPhotosChange={setTaskInstructionPhotos}
+        onVoiceMemoChange={setTaskInstructionVoiceMemo}
+      />
       <Button label="Save task changes" onPress={handleSaveTask} size="large" />
-      <Button label="Cancel task edit" onPress={() => resetTaskForm(focusedRootGoalId)} size="large" variant="secondary" />
     </View>
   ) : null;
 
   return (
-    <Screen>
+    <Screen contentRef={scrollContentRef} scrollViewRef={scrollViewRef}>
       <PageHeader
         eyebrow="Planning"
         supportingText="Turn bigger farm goals into work you can do this day, week, season, or year."
@@ -321,11 +426,17 @@ export function PlanningScreen({ farm, locations, repository }: { farm: Farm; lo
               <GoalBlock
                 editingGoalId={editingGoalId}
                 editingTaskId={editingTaskId}
+                farmhands={farmhands}
                 goal={focusedRootGoal}
                 goalEditForm={goalEditForm}
                 goals={focusedGoals}
                 onEditGoal={beginEditGoal}
                 onEditTask={beginEditTask}
+                onCancelGoalEdit={resetGoalForm}
+                onCancelTaskEdit={() => cancelTaskEdit(focusedRootGoalId)}
+                onTaskRowRef={(taskId, node) => {
+                  taskRowRefs.current[taskId] = node;
+                }}
                 taskEditForm={taskEditForm}
                 tasks={focusedTasks}
               />
@@ -356,17 +467,25 @@ export function PlanningScreen({ farm, locations, repository }: { farm: Farm; lo
                     <SelectField label="Goal" onChange={setTaskGoalId} options={taskGoalOptions} value={taskGoalId || focusedRootGoal.id} />
                     <SearchableSelectField label="Farm place" onChange={setTaskPlaceId} options={taskPlaceOptions} placeholder="Search places" value={taskPlaceId || defaultTaskPlaceId(taskGoalId || focusedRootGoal.id, goals)} />
                     <TaskFields
-                      periods={periods}
+                      farmhands={farmhands}
+                      onAssignedFarmhandChange={setTaskAssignedFarmhandId}
+                      taskAssignedFarmhandId={taskAssignedFarmhandId}
                       taskDueDate={taskDueDate}
-                      taskPeriodId={taskPeriodId}
+                      taskPlannedStartDate={taskPlannedStartDate}
                       taskPriority={taskPriority}
-                      taskResponsiblePerson={taskResponsiblePerson}
                       taskStatus={taskStatus}
                       onDueDateChange={setTaskDueDate}
-                      onPeriodChange={setTaskPeriodId}
+                      onPlannedStartDateChange={setTaskPlannedStartDate}
                       onPriorityChange={(value) => setTaskPriority(value as PlanningTaskPriority)}
-                      onResponsiblePersonChange={setTaskResponsiblePerson}
                       onStatusChange={(value) => setTaskStatus(value as PlanningTaskStatus)}
+                    />
+                    <TaskInstructionMediaFields
+                      error={error}
+                      photos={taskInstructionPhotos}
+                      voiceMemo={taskInstructionVoiceMemo}
+                      onError={setError}
+                      onPhotosChange={setTaskInstructionPhotos}
+                      onVoiceMemoChange={setTaskInstructionVoiceMemo}
                     />
                     <Button label="Save task" onPress={handleSaveTask} size="large" />
                   </>
@@ -392,21 +511,29 @@ export function PlanningScreen({ farm, locations, repository }: { farm: Farm; lo
             value={taskPlaceId}
           />
           <TaskFields
-            periods={periods}
+            farmhands={farmhands}
+            onAssignedFarmhandChange={setTaskAssignedFarmhandId}
+            taskAssignedFarmhandId={taskAssignedFarmhandId}
             taskDueDate={taskDueDate}
-            taskPeriodId={taskPeriodId}
+            taskPlannedStartDate={taskPlannedStartDate}
             taskPriority={taskPriority}
-            taskResponsiblePerson={taskResponsiblePerson}
             taskStatus={taskStatus}
             onDueDateChange={setTaskDueDate}
-            onPeriodChange={setTaskPeriodId}
+            onPlannedStartDateChange={setTaskPlannedStartDate}
             onPriorityChange={(value) => setTaskPriority(value as PlanningTaskPriority)}
-            onResponsiblePersonChange={setTaskResponsiblePerson}
             onStatusChange={(value) => setTaskStatus(value as PlanningTaskStatus)}
+          />
+          <TaskInstructionMediaFields
+            error={error}
+            photos={taskInstructionPhotos}
+            voiceMemo={taskInstructionVoiceMemo}
+            onError={setError}
+            onPhotosChange={setTaskInstructionPhotos}
+            onVoiceMemoChange={setTaskInstructionVoiceMemo}
           />
           {error ? <Text style={styles.error}>{error}</Text> : null}
           <Button label={editingTaskId ? "Save task changes" : "Save task"} onPress={handleSaveTask} size="large" />
-          {editingTaskId ? <Button label="Cancel task edit" onPress={resetTaskForm} size="large" variant="secondary" /> : null}
+          {editingTaskId ? <Button label="Cancel edit" onPress={() => cancelTaskEdit()} size="large" variant="secondary" /> : null}
         </Card>
       ) : null}
 
@@ -418,25 +545,60 @@ export function PlanningScreen({ farm, locations, repository }: { farm: Farm; lo
           </Card>
           <Card>
             <SectionHeading title="Goals" />
-            {rootGoals.length ? rootGoals.map((goal) => (
-              <ReviewRow
-                detail={`${PLANNING_GOAL_STATUS_LABELS[goal.status]}${goal.targetDate ? ` - target ${goal.targetDate}` : ""}`}
-                key={goal.id}
-                onPress={() => beginEditGoal(goal)}
-                title={goal.title}
-              />
-            )) : <EmptyState text="No goals yet." />}
+            {rootGoals.length ? rootGoals.map((goal) => {
+              const isFocusedGoalTree = focusedRootGoalId === goal.id && Boolean(editingGoalId || editingTaskId);
+              const isEditingRootGoal = editingGoalId === goal.id;
+              return (
+                <ReviewRow
+                  detail={`${PLANNING_GOAL_STATUS_LABELS[goal.status]}${goal.targetDate ? ` - target ${goal.targetDate}` : ""}`}
+                  editForm={isFocusedGoalTree ? (
+                    <View style={styles.reviewEditScope}>
+                      {isEditingRootGoal ? goalEditForm : null}
+                      <GoalChildrenAndTasks
+                        editingGoalId={editingGoalId}
+                        editingTaskId={editingTaskId}
+                        farmhands={farmhands}
+                        goal={goal}
+                        goalEditForm={goalEditForm}
+                        goals={focusedGoals}
+                        onEditGoal={(selectedGoal) => beginEditGoal(selectedGoal, "review")}
+                        onEditTask={(selectedTask) => beginEditTask(selectedTask, true)}
+                        onCancelGoalEdit={resetGoalForm}
+                        onCancelTaskEdit={() => cancelTaskEdit(focusedRootGoalId)}
+                        taskEditForm={taskEditForm}
+                        tasks={focusedTasks}
+                        onTaskRowRef={(taskId, node) => {
+                          taskRowRefs.current[taskId] = node;
+                        }}
+                      />
+                    </View>
+                  ) : null}
+                  editLabel={isEditingRootGoal ? "Cancel edit" : "Edit goal"}
+                  key={goal.id}
+                  onEdit={() => isEditingRootGoal ? resetGoalForm() : beginEditGoal(goal, "review")}
+                  title={goal.title}
+                />
+              );
+            }) : <EmptyState text="No goals yet." />}
           </Card>
           <Card>
             <SectionHeading title="Non-goal tasks" />
-            {nonGoalTasks.length ? nonGoalTasks.map((task) => (
-              <ReviewRow
-                detail={`${PLANNING_TASK_STATUS_LABELS[task.status]} - ${PLANNING_TASK_PRIORITY_LABELS[task.priority]}${task.dueDate ? ` - due ${task.dueDate}` : ""}`}
-                key={task.id}
-                onPress={() => beginEditTask(task)}
-                title={task.title}
-              />
-            )) : <EmptyState text="No non-goal tasks yet." />}
+            {nonGoalTasks.length ? nonGoalTasks.map((task) => {
+              const isEditingThisTask = editingTaskId === task.id;
+              return (
+                <ReviewRow
+                  detail={`${PLANNING_TASK_STATUS_LABELS[task.status]} - ${PLANNING_TASK_PRIORITY_LABELS[task.priority]}${task.dueDate ? ` - due ${task.dueDate}` : ""}${task.assignedFarmhandId ? ` - ${farmhandName(task.assignedFarmhandId, farmhands)}` : ""}`}
+                  editForm={isEditingThisTask ? taskEditForm : null}
+                  editLabel={isEditingThisTask ? "Cancel edit" : "Edit task"}
+                  key={task.id}
+                  onEdit={() => isEditingThisTask ? cancelTaskEdit() : beginEditTask(task, true)}
+                  rowRef={(node) => {
+                    taskRowRefs.current[task.id] = node;
+                  }}
+                  title={task.title}
+                />
+              );
+            }) : <EmptyState text="No non-goal tasks yet." />}
           </Card>
         </>
       ) : null}
@@ -447,44 +609,192 @@ export function PlanningScreen({ farm, locations, repository }: { farm: Farm; lo
 }
 
 function TaskFields({
-  periods,
+  farmhands,
+  onAssignedFarmhandChange,
+  taskAssignedFarmhandId,
   taskDueDate,
-  taskPeriodId,
+  taskPlannedStartDate,
   taskPriority,
-  taskResponsiblePerson,
   taskStatus,
   onDueDateChange,
-  onPeriodChange,
+  onPlannedStartDateChange,
   onPriorityChange,
-  onResponsiblePersonChange,
   onStatusChange,
 }: {
-  periods: PlanningPeriod[];
+  farmhands: Farmhand[];
+  onAssignedFarmhandChange: (value: string) => void;
+  taskAssignedFarmhandId: string;
   taskDueDate: string;
-  taskPeriodId: string;
+  taskPlannedStartDate: string;
   taskPriority: PlanningTaskPriority;
-  taskResponsiblePerson: string;
   taskStatus: PlanningTaskStatus;
   onDueDateChange: (value: string) => void;
-  onPeriodChange: (value: string) => void;
+  onPlannedStartDateChange: (value: string) => void;
   onPriorityChange: (value: string) => void;
-  onResponsiblePersonChange: (value: string) => void;
   onStatusChange: (value: string) => void;
 }) {
   return (
     <>
-      <SelectField label="Planning period" onChange={onPeriodChange} options={[{ label: "No period", value: "" }, ...periods.map((period) => ({ label: period.label, value: period.id }))]} value={taskPeriodId} />
       <SelectField label="Status" onChange={onStatusChange} options={PLANNING_TASK_STATUSES.map((status) => ({ label: PLANNING_TASK_STATUS_LABELS[status], value: status }))} value={taskStatus} />
       <SelectField label="Priority" onChange={onPriorityChange} options={PLANNING_TASK_PRIORITIES.map((priority) => ({ label: PLANNING_TASK_PRIORITY_LABELS[priority], value: priority }))} value={taskPriority} />
+      <DateField label="Desired start date" onChangeText={onPlannedStartDateChange} placeholder="YYYY-MM-DD or leave blank" value={taskPlannedStartDate} />
       <DateField label="Due date" onChangeText={onDueDateChange} placeholder="YYYY-MM-DD or leave blank" value={taskDueDate} />
-      <FormField label="Responsible person" onChangeText={onResponsiblePersonChange} placeholder="Optional local name" value={taskResponsiblePerson} />
+      <SelectField
+        label="Assigned farmhand"
+        onChange={onAssignedFarmhandChange}
+        options={[
+          { label: "No assigned farmhand", value: "" },
+          ...farmhands.map((farmhand) => ({
+            label: farmhand.status === "inactive" ? `${farmhand.name} (inactive)` : farmhand.name,
+            value: farmhand.id,
+          })),
+        ]}
+        value={taskAssignedFarmhandId}
+      />
     </>
+  );
+}
+
+function TaskInstructionMediaFields({
+  error,
+  photos,
+  voiceMemo,
+  onError,
+  onPhotosChange,
+  onVoiceMemoChange,
+}: {
+  error?: string;
+  photos: TaskInstructionPhotoDraft[];
+  voiceMemo?: TaskInstructionVoiceMemoDraft;
+  onError: (message: string | undefined) => void;
+  onPhotosChange: (photos: TaskInstructionPhotoDraft[]) => void;
+  onVoiceMemoChange: (voiceMemo: TaskInstructionVoiceMemoDraft | undefined) => void;
+}) {
+  const recorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
+  const recorderState = useAudioRecorderState(recorder);
+  const player = useAudioPlayer(voiceMemo?.localUri);
+  const playerStatus = useAudioPlayerStatus(player);
+
+  async function handleStartRecording() {
+    onError(undefined);
+    const permission = await AudioModule.requestRecordingPermissionsAsync();
+    if (!permission.granted) {
+      onError("Microphone permission is needed to record task instructions.");
+      return;
+    }
+
+    await setAudioModeAsync({
+      allowsRecording: true,
+      playsInSilentMode: true,
+    });
+    await recorder.prepareToRecordAsync();
+    recorder.record();
+  }
+
+  async function handleStopRecording() {
+    await recorder.stop();
+    await setAudioModeAsync({
+      allowsRecording: false,
+      playsInSilentMode: true,
+    });
+
+    if (!recorder.uri) {
+      onError("The task instruction recording could not be saved. Try recording again.");
+      return;
+    }
+
+    onVoiceMemoChange({
+      localUri: recorder.uri,
+      durationMs: recorderState.durationMillis,
+      isPersisted: false,
+    });
+  }
+
+  function handlePlayPause() {
+    if (!voiceMemo) return;
+    if (playerStatus.playing) {
+      player.pause();
+      return;
+    }
+
+    player.seekTo(0);
+    player.play();
+  }
+
+  async function handleTakePhoto() {
+    onError(undefined);
+    const permission = await ImagePicker.requestCameraPermissionsAsync();
+    if (!permission.granted) {
+      onError("Camera permission is needed to add an instruction photo.");
+      return;
+    }
+
+    addPickedPhotos(await ImagePicker.launchCameraAsync({ mediaTypes: ["images"], quality: 0.8 }));
+  }
+
+  async function handleChoosePhotos() {
+    onError(undefined);
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permission.granted) {
+      onError("Photo permission is needed to add instruction photos.");
+      return;
+    }
+
+    addPickedPhotos(await ImagePicker.launchImageLibraryAsync({ allowsMultipleSelection: true, mediaTypes: ["images"], quality: 0.8 }));
+  }
+
+  function addPickedPhotos(result: ImagePicker.ImagePickerResult) {
+    if (result.canceled) return;
+    onPhotosChange([
+      ...photos,
+      ...result.assets.map((asset) => ({
+        localUri: asset.uri,
+        originalFileName: asset.fileName ?? undefined,
+        width: asset.width,
+        height: asset.height,
+        mimeType: asset.mimeType,
+        isPersisted: false,
+      })),
+    ]);
+  }
+
+  return (
+    <View style={styles.mediaBlock}>
+      <SectionHeading detail="Optional voice or photo instructions stay on this device and appear on the task board." title="Task instructions" />
+      {recorderState.isRecording ? (
+        <Button label="Stop recording instructions" onPress={handleStopRecording} size="large" />
+      ) : (
+        <Button label={voiceMemo ? "Record new instructions" : "Record instructions"} onPress={handleStartRecording} size="large" variant="secondary" />
+      )}
+      {voiceMemo ? (
+        <View style={styles.mediaActions}>
+          <Button label={playerStatus.playing ? "Pause instructions" : "Play instructions"} onPress={handlePlayPause} size="large" variant="secondary" />
+          <Button label="Remove recording" onPress={() => onVoiceMemoChange(undefined)} size="large" variant="secondary" />
+        </View>
+      ) : null}
+      <View style={styles.mediaActions}>
+        <Button label="Take instruction photo" onPress={handleTakePhoto} size="large" variant="secondary" />
+        <Button label="Choose instruction photos" onPress={handleChoosePhotos} size="large" variant="secondary" />
+      </View>
+      {photos.length ? (
+        <View style={styles.photoGrid}>
+          {photos.map((photo) => (
+            <View key={photo.localUri} style={styles.photoTile}>
+              <Image source={{ uri: photo.localUri }} style={styles.photoPreview} />
+              <Button label="Remove photo" onPress={() => onPhotosChange(photos.filter((candidate) => candidate.localUri !== photo.localUri))} size="large" variant="secondary" />
+            </View>
+          ))}
+        </View>
+      ) : null}
+      {error ? <Text style={styles.error}>{error}</Text> : null}
+    </View>
   );
 }
 
 function GoalBlock({
   editingGoalId,
   editingTaskId,
+  farmhands,
   goal,
   goalEditForm,
   goals,
@@ -494,9 +804,13 @@ function GoalBlock({
   tasks,
   onEditGoal,
   onEditTask,
+  onCancelGoalEdit,
+  onCancelTaskEdit,
+  onTaskRowRef,
 }: {
   editingGoalId: string;
   editingTaskId: string;
+  farmhands: Farmhand[];
   goal: PlanningGoal;
   goalEditForm: ReactNode;
   goals: PlanningGoal[];
@@ -506,6 +820,9 @@ function GoalBlock({
   tasks: PlanningTask[];
   onEditGoal: (goal: PlanningGoal) => void;
   onEditTask: (task: PlanningTask) => void;
+  onCancelGoalEdit: () => void;
+  onCancelTaskEdit: () => void;
+  onTaskRowRef: (taskId: string, node: View | null) => void;
 }) {
   if (visitedGoalIds.has(goal.id)) {
     return null;
@@ -514,76 +831,182 @@ function GoalBlock({
   nextVisitedGoalIds.add(goal.id);
   const children = goals.filter((candidate) => candidate.parentGoalId === goal.id);
   const goalTasks = tasks.filter((task) => task.goalId === goal.id);
+  const isEditingThisGoal = editingGoalId === goal.id;
 
   return (
     <View style={[styles.goalBlock, depth > 0 ? styles.nestedGoalBlock : null]}>
-      {editingGoalId === goal.id ? goalEditForm : (
+      {!isEditingThisGoal ? (
         <>
           <Text style={styles.title}>{goal.title}</Text>
           <Text style={styles.detail}>
             {PLANNING_GOAL_STATUS_LABELS[goal.status]} - {PLANNING_GOAL_CATEGORY_LABELS[goal.category]}
             {goal.targetDate ? ` - target ${goal.targetDate}` : ""}
           </Text>
-          {children.length === 0 && goalTasks.length === 0 ? (
-            <Text style={styles.warning}>Leaf goals should have at least one task.</Text>
-          ) : null}
-          <Button label={depth > 0 ? "Edit subgoal" : "Edit goal"} onPress={() => onEditGoal(goal)} size="large" variant="secondary" />
         </>
-      )}
+      ) : null}
+      {children.length === 0 && goalTasks.length === 0 ? (
+        <Text style={styles.warning}>Leaf goals should have at least one task.</Text>
+      ) : null}
+      <Button
+        label={isEditingThisGoal ? "Cancel edit" : depth > 0 ? "Edit subgoal" : "Edit goal"}
+        onPress={() => isEditingThisGoal ? onCancelGoalEdit() : onEditGoal(goal)}
+        size="large"
+        variant="secondary"
+      />
+      {isEditingThisGoal ? goalEditForm : null}
+      <GoalChildrenAndTasks
+        depth={depth}
+        editingGoalId={editingGoalId}
+        editingTaskId={editingTaskId}
+        farmhands={farmhands}
+        goal={goal}
+        goalEditForm={goalEditForm}
+        goals={goals}
+        onCancelGoalEdit={onCancelGoalEdit}
+        onCancelTaskEdit={onCancelTaskEdit}
+        onEditGoal={onEditGoal}
+        onEditTask={onEditTask}
+        onTaskRowRef={onTaskRowRef}
+        taskEditForm={taskEditForm}
+        tasks={tasks}
+        visitedGoalIds={nextVisitedGoalIds}
+      />
+    </View>
+  );
+}
+
+function GoalChildrenAndTasks({
+  editingGoalId,
+  editingTaskId,
+  farmhands,
+  goal,
+  goalEditForm,
+  goals,
+  depth = 0,
+  visitedGoalIds = new Set<string>(),
+  taskEditForm,
+  tasks,
+  onEditGoal,
+  onEditTask,
+  onCancelGoalEdit,
+  onCancelTaskEdit,
+  onTaskRowRef,
+}: {
+  editingGoalId: string;
+  editingTaskId: string;
+  farmhands: Farmhand[];
+  goal: PlanningGoal;
+  goalEditForm: ReactNode;
+  goals: PlanningGoal[];
+  depth?: number;
+  visitedGoalIds?: Set<string>;
+  taskEditForm: ReactNode;
+  tasks: PlanningTask[];
+  onEditGoal: (goal: PlanningGoal) => void;
+  onEditTask: (task: PlanningTask) => void;
+  onCancelGoalEdit: () => void;
+  onCancelTaskEdit: () => void;
+  onTaskRowRef: (taskId: string, node: View | null) => void;
+}) {
+  const children = goals.filter((candidate) => candidate.parentGoalId === goal.id);
+  const goalTasks = tasks.filter((task) => task.goalId === goal.id);
+
+  return (
+    <>
+      {children.length ? <Text style={styles.subheading}>Subgoals</Text> : null}
       {children.map((child) => (
         <GoalBlock
           depth={depth + 1}
           editingGoalId={editingGoalId}
           editingTaskId={editingTaskId}
+          farmhands={farmhands}
           goal={child}
           goalEditForm={goalEditForm}
           goals={goals}
           key={child.id}
+          onCancelGoalEdit={onCancelGoalEdit}
+          onCancelTaskEdit={onCancelTaskEdit}
           onEditGoal={onEditGoal}
           onEditTask={onEditTask}
+          onTaskRowRef={onTaskRowRef}
           taskEditForm={taskEditForm}
           tasks={tasks}
-          visitedGoalIds={nextVisitedGoalIds}
+          visitedGoalIds={visitedGoalIds}
         />
       ))}
-      {goalTasks.map((task) => (
-        <TaskRow
-          editForm={editingTaskId === task.id ? taskEditForm : null}
-          key={task.id}
-          task={task}
-          onEdit={() => onEditTask(task)}
-        />
-      ))}
-    </View>
+      {goalTasks.length ? <Text style={styles.subheading}>Goal Tasks</Text> : null}
+      {goalTasks.map((task) => {
+        const isEditingThisTask = editingTaskId === task.id;
+        return (
+          <TaskRow
+            editForm={isEditingThisTask ? taskEditForm : null}
+            farmhands={farmhands}
+            isEditing={isEditingThisTask}
+            key={task.id}
+            onEdit={() => isEditingThisTask ? onCancelTaskEdit() : onEditTask(task)}
+            rowRef={(node) => onTaskRowRef(task.id, node)}
+            task={task}
+          />
+        );
+      })}
+    </>
   );
 }
 
-function TaskRow({ editForm, task, onEdit }: { editForm: ReactNode; task: PlanningTask; onEdit: () => void }) {
-  if (editForm) {
-    return <View style={styles.taskRow}>{editForm}</View>;
-  }
-
+function TaskRow({
+  editForm,
+  farmhands,
+  isEditing,
+  rowRef,
+  task,
+  onEdit,
+}: {
+  editForm: ReactNode;
+  farmhands: Farmhand[];
+  isEditing: boolean;
+  rowRef?: (node: View | null) => void;
+  task: PlanningTask;
+  onEdit: () => void;
+}) {
   return (
-    <View style={styles.taskRow}>
+    <View collapsable={false} ref={rowRef} style={styles.taskRow}>
       <View style={styles.textBlock}>
         <Text style={styles.body}>{task.title}</Text>
         <Text style={styles.detail}>
           {PLANNING_TASK_STATUS_LABELS[task.status]} - {PLANNING_TASK_PRIORITY_LABELS[task.priority]}
+          {task.plannedStartDate ? ` - start ${task.plannedStartDate}` : ""}
           {task.dueDate ? ` - due ${task.dueDate}` : ""}
-          {task.responsiblePerson ? ` - ${task.responsiblePerson}` : ""}
+          {task.assignedFarmhandId ? ` - ${farmhandName(task.assignedFarmhandId, farmhands)}` : ""}
         </Text>
       </View>
-      <Button label="Edit task" onPress={onEdit} size="large" variant="secondary" />
+      <Button label={isEditing ? "Cancel edit" : "Edit task"} onPress={onEdit} size="large" variant="secondary" />
+      {editForm}
     </View>
   );
 }
 
-function ReviewRow({ detail, onPress, title }: { detail: string; onPress: () => void; title: string }) {
+function ReviewRow({
+  detail,
+  editForm,
+  editLabel,
+  onEdit,
+  rowRef,
+  title,
+}: {
+  detail: string;
+  editForm: ReactNode;
+  editLabel: string;
+  onEdit: () => void;
+  rowRef?: (node: View | null) => void;
+  title: string;
+}) {
   return (
-    <Pressable accessibilityRole="button" onPress={onPress} style={styles.reviewRow}>
+    <View collapsable={false} ref={rowRef} style={styles.reviewRow}>
       <Text style={styles.body}>{title}</Text>
       <Text style={styles.detail}>{detail}</Text>
-    </Pressable>
+      <Button label={editLabel} onPress={onEdit} size="large" variant="secondary" />
+      {editForm}
+    </View>
   );
 }
 
@@ -596,6 +1019,60 @@ function toPlaceOptions(displays: FarmPlaceDisplay[], noPlaceLabel?: string): Se
       value: display.place.id,
     })),
   ];
+}
+
+async function persistTaskInstructionVoiceMemo(
+  voiceMemo: TaskInstructionVoiceMemoDraft | undefined,
+  repository: ExpoVoiceMemoStorageRepository,
+): Promise<PlanningTaskInstructionVoiceMemo | undefined> {
+  if (!voiceMemo) return undefined;
+  if (voiceMemo.isPersisted) {
+    return {
+      localUri: voiceMemo.localUri,
+      durationMs: voiceMemo.durationMs,
+      fileSizeBytes: voiceMemo.fileSizeBytes,
+    };
+  }
+
+  const persisted = await repository.persistVoiceMemoFile({
+    temporaryUri: voiceMemo.localUri,
+    fileName: `planning-task-instructions-${Date.now()}`,
+  });
+  return {
+    localUri: persisted.localUri,
+    durationMs: voiceMemo.durationMs,
+    fileSizeBytes: persisted.fileSizeBytes,
+  };
+}
+
+async function persistTaskInstructionPhotos(
+  photos: TaskInstructionPhotoDraft[],
+  repository: ExpoPhotoAttachmentStorageRepository,
+): Promise<PlanningTaskInstructionPhoto[]> {
+  return Promise.all(photos.map(async (photo, index) => {
+    if (photo.isPersisted) {
+      return {
+        localUri: photo.localUri,
+        width: photo.width,
+        height: photo.height,
+        mimeType: photo.mimeType,
+        fileSizeBytes: photo.fileSizeBytes,
+      };
+    }
+
+    return repository.persistPhotoAttachment({
+      temporaryUri: photo.localUri,
+      originalFileName: photo.originalFileName,
+      width: photo.width,
+      height: photo.height,
+      mimeType: photo.mimeType,
+      fileName: `planning-task-instruction-photo-${Date.now()}-${index + 1}`,
+    });
+  }));
+}
+
+function farmhandName(farmhandId: string, farmhands: Farmhand[]): string {
+  return farmhands.find((farmhand) => farmhand.id === farmhandId)?.name ?? "Assigned farmhand";
 }
 
 function placeOptionsForGoal(
@@ -676,6 +1153,17 @@ const styles = StyleSheet.create({
   inlineEdit: {
     gap: theme.spacing.sm,
   },
+  mediaActions: {
+    gap: theme.spacing.sm,
+  },
+  mediaBlock: {
+    backgroundColor: theme.colors.surfaceMuted,
+    borderColor: theme.colors.border,
+    borderRadius: theme.radius.sm,
+    borderWidth: 1,
+    gap: theme.spacing.sm,
+    padding: theme.spacing.sm,
+  },
   modeActions: {
     gap: theme.spacing.sm,
   },
@@ -691,6 +1179,28 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     minHeight: theme.spacing.primaryTouchTarget,
     padding: theme.spacing.md,
+  },
+  reviewEditScope: {
+    gap: theme.spacing.sm,
+    paddingTop: theme.spacing.xs,
+  },
+  photoGrid: {
+    gap: theme.spacing.sm,
+  },
+  photoPreview: {
+    aspectRatio: 4 / 3,
+    borderRadius: theme.radius.sm,
+    width: "100%",
+  },
+  photoTile: {
+    gap: theme.spacing.xs,
+  },
+  subheading: {
+    color: theme.colors.textPrimary,
+    fontSize: theme.typography.body,
+    fontWeight: "800",
+    lineHeight: 24,
+    marginTop: theme.spacing.xs,
   },
   taskRow: {
     borderColor: theme.colors.border,

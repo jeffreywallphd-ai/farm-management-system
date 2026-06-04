@@ -8,6 +8,10 @@ import { recordHarvest } from "./record-harvest/RecordHarvest";
 import { recordInventoryCount } from "./record-inventory-count/RecordInventoryCount";
 import { recordMaterialUse } from "./record-material-use/RecordMaterialUse";
 import type { ExportRepository, MobilePilotExportFile } from "../ports/ExportRepository";
+import {
+  MOBILE_PILOT_APP_DATA_SCHEMA_VERSION,
+  MOBILE_PILOT_RECOVERY_COPY_EXPORT_VERSION,
+} from "../../domain/export/MobilePilotRecoveryCopy";
 import { serializeRecoveryCopy } from "../../infrastructure/export/JsonRecoveryCopyExporter";
 import { InMemoryFarmReferenceRepository } from "../../testing/fakes/InMemoryFarmReferenceRepository";
 import { InMemoryLocalRecordRepository } from "../../testing/fakes/InMemoryLocalRecordRepository";
@@ -151,8 +155,8 @@ test("expanded recovery copy includes all implemented manual records", async () 
   await createMobilePilotRecoveryCopy({ farmId: deps.farm.id }, { ...deps, exportRepository });
   const payload = JSON.parse(exportRepository.contents);
 
-  assert.equal(payload.exportVersion, 16);
-  assert.equal(payload.appDataSchemaVersion, 17);
+  assert.equal(payload.exportVersion, MOBILE_PILOT_RECOVERY_COPY_EXPORT_VERSION);
+  assert.equal(payload.appDataSchemaVersion, MOBILE_PILOT_APP_DATA_SCHEMA_VERSION);
   assert.equal(payload.harvestRecords.length, 1);
   assert.equal(payload.materialUseRecords.length, 1);
   assert.equal(payload.inventoryCountRecords.length, 1);
@@ -168,11 +172,15 @@ test("expanded recovery copy rejects malformed manual record payloads", async ()
 
   assert.throws(() =>
     serializeRecoveryCopy({
-      exportVersion: 16,
+      exportVersion: MOBILE_PILOT_RECOVERY_COPY_EXPORT_VERSION,
       createdAt,
-      appDataSchemaVersion: 17,
+      appDataSchemaVersion: MOBILE_PILOT_APP_DATA_SCHEMA_VERSION,
       farm: deps.farm,
       locations: [deps.location],
+      farmPlaceGeometries: [],
+      farmhands: [],
+      farmhandRecurringSchedules: [],
+      farmhandWeeklyScheduleBlocks: [],
       trackedItems: [deps.crop, deps.material],
       harvestRecords: [],
       organicCertificationScopes: [],
@@ -202,7 +210,6 @@ test("expanded recovery copy rejects malformed manual record payloads", async ()
       organicEvidenceLinks: [],
       planningGoals: [],
       planningBoards: [],
-      planningPeriods: [],
       planningTasks: [],
       planningLinks: [],
       materialUseRecords: [

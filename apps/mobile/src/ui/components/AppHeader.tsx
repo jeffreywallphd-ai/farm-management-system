@@ -3,22 +3,14 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 
 import { pushRoute } from "../navigation";
+import { menuItems, type MenuRoute } from "../navigationMenu";
 import { theme } from "../theme/theme";
-
-const menuItems = [
-  { label: "Home", route: "/home" },
-  { label: "Quick record farm events", route: "/farm-events/new" },
-  { label: "Farm planning", route: "/planning" },
-  { label: "Manage farm tasks", route: "/planning/boards" },
-  { label: "Farm setup", route: "/setup" },
-  { label: "Organic certification", route: "/organic" },
-] as const;
 
 export function AppHeader() {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
 
-  function handleNavigate(route: (typeof menuItems)[number]["route"]) {
+  function handleNavigate(route: MenuRoute) {
     setIsOpen(false);
     pushRoute(router, route);
   }
@@ -40,7 +32,7 @@ export function AppHeader() {
           onPress={() => setIsOpen((current) => !current)}
           style={styles.menuButton}
         >
-          <Text style={styles.menuIcon}>{isOpen ? "Close" : "Menu"}</Text>
+          {isOpen ? <CloseMenuGlyph /> : <HamburgerMenuGlyph />}
         </Pressable>
       </View>
       {isOpen ? (
@@ -57,6 +49,25 @@ export function AppHeader() {
           ))}
         </View>
       ) : null}
+    </View>
+  );
+}
+
+function HamburgerMenuGlyph() {
+  return (
+    <View style={styles.hamburgerIcon}>
+      <View style={styles.hamburgerLine} />
+      <View style={styles.hamburgerLine} />
+      <View style={styles.hamburgerLine} />
+    </View>
+  );
+}
+
+function CloseMenuGlyph() {
+  return (
+    <View style={styles.closeIcon}>
+      <View style={[styles.closeLine, styles.closeLineForward]} />
+      <View style={[styles.closeLine, styles.closeLineBackward]} />
     </View>
   );
 }
@@ -86,12 +97,37 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     minHeight: theme.spacing.touchTarget,
-    minWidth: theme.spacing.primaryTouchTarget,
+    minWidth: theme.spacing.touchTarget,
   },
-  menuIcon: {
-    color: theme.colors.onPrimary,
-    fontSize: theme.typography.body,
-    fontWeight: "700",
+  hamburgerIcon: {
+    gap: 5,
+    justifyContent: "center",
+    width: 28,
+  },
+  hamburgerLine: {
+    backgroundColor: theme.colors.onPrimary,
+    borderRadius: 2,
+    height: 3,
+    width: 28,
+  },
+  closeIcon: {
+    alignItems: "center",
+    height: 28,
+    justifyContent: "center",
+    width: 28,
+  },
+  closeLine: {
+    backgroundColor: theme.colors.onPrimary,
+    borderRadius: 2,
+    height: 3,
+    position: "absolute",
+    width: 30,
+  },
+  closeLineForward: {
+    transform: [{ rotate: "45deg" }],
+  },
+  closeLineBackward: {
+    transform: [{ rotate: "-45deg" }],
   },
   menuItem: {
     borderRadius: theme.radius.sm,

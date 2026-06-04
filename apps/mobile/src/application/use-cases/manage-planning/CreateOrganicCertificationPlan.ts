@@ -114,7 +114,7 @@ const CERTIFICATION_SUBGOALS: TemplateSubgoal[] = [
 ];
 
 export async function ensureOrganicCertificationPlan(
-  input: { farmId: FarmId; targetDate?: string; periodId?: string },
+  input: { farmId: FarmId; targetDate?: string },
   dependencies: { clock: Clock; idGenerator: IdGenerator; repository: PlanningRepository },
 ): Promise<{ goal: PlanningGoal; subgoals: PlanningGoal[]; tasks: PlanningTask[] }> {
   const existingGoals = await dependencies.repository.listGoals(input.farmId, {
@@ -172,7 +172,6 @@ export async function ensureOrganicCertificationPlan(
         {
           farmId: input.farmId,
           goalId: subgoal.id,
-          periodId: input.periodId,
           title: taskTemplate.title,
           notes: taskTemplate.notes,
           status: "notStarted",

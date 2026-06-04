@@ -49,6 +49,7 @@ function SetupRouteContent({ farm, database }: { farm: Farm; database: ReadyData
       initialExpandedSection={parseSetupSection(params.section)}
       locations={locations}
       materials={materials}
+      farmMapRepository={database.farmMapRepository}
       onReferenceSaved={loadReferences}
       repository={database.farmReferenceRepository}
     />
@@ -59,7 +60,10 @@ function parseSetupSection(section?: string | string[]): SetupSectionId | undefi
   const value = Array.isArray(section) ? section[0] : section;
 
   if (
+    value === "farmProfile" ||
     value === "farmPlaces" ||
+    value === "farmMapLocation" ||
+    value === "scheduleWeek" ||
     value === "crops" ||
     value === "materials"
   ) {

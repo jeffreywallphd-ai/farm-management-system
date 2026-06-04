@@ -6,6 +6,8 @@ import {
 import type { FarmId } from "../../../domain/farm/Farm";
 import type { Clock } from "../../ports/Clock";
 import type { ExportRepository, MobilePilotExportFile } from "../../ports/ExportRepository";
+import type { FarmhandRepository } from "../../ports/FarmhandRepository";
+import type { FarmMapRepository } from "../../ports/FarmMapRepository";
 import type { FarmReferenceRepository } from "../../ports/FarmReferenceRepository";
 import type { LocalRecordRepository } from "../../ports/LocalRecordRepository";
 import type { OrganicCertificationRepository } from "../../ports/OrganicCertificationRepository";
@@ -18,6 +20,8 @@ export async function createMobilePilotRecoveryCopy(
     clock: Clock;
     exportRepository: ExportRepository;
     farmReferenceRepository: FarmReferenceRepository;
+    farmMapRepository?: FarmMapRepository;
+    farmhandRepository?: FarmhandRepository;
     localRecordRepository: LocalRecordRepository;
     organicCertificationRepository?: OrganicCertificationRepository;
     planningRepository?: PlanningRepository;
@@ -42,6 +46,8 @@ export async function buildMobilePilotRecoveryCopyPayload(
   dependencies: {
     clock: Clock;
     farmReferenceRepository: FarmReferenceRepository;
+    farmMapRepository?: FarmMapRepository;
+    farmhandRepository?: FarmhandRepository;
     localRecordRepository: LocalRecordRepository;
     organicCertificationRepository?: OrganicCertificationRepository;
     planningRepository?: PlanningRepository;
@@ -55,6 +61,12 @@ export async function buildMobilePilotRecoveryCopyPayload(
 
   const [
     locations,
+    farmMapSettings,
+    farmPlaceGeometries,
+    farmhands,
+    farmhandScheduleSettings,
+    farmhandRecurringSchedules,
+    farmhandWeeklyScheduleBlocks,
     trackedItems,
     harvestRecords,
     materialUseRecords,
@@ -87,11 +99,16 @@ export async function buildMobilePilotRecoveryCopyPayload(
     organicEvidenceLinks,
     planningGoals,
     planningBoards,
-    planningPeriods,
     planningTasks,
     planningLinks,
   ] = await Promise.all([
     dependencies.farmReferenceRepository.listLocations(input.farmId),
+    dependencies.farmMapRepository?.getByFarmId(input.farmId) ?? Promise.resolve(undefined),
+    dependencies.farmMapRepository?.getGeometriesByFarmId(input.farmId, { includeArchived: true }) ?? Promise.resolve([]),
+    dependencies.farmhandRepository?.listFarmhands(input.farmId) ?? Promise.resolve([]),
+    dependencies.farmhandRepository?.getScheduleSettings(input.farmId) ?? Promise.resolve(undefined),
+    dependencies.farmhandRepository?.listRecurringSchedules(input.farmId) ?? Promise.resolve([]),
+    dependencies.farmhandRepository?.listWeeklyScheduleBlocks(input.farmId) ?? Promise.resolve([]),
     dependencies.farmReferenceRepository.listTrackedItems(input.farmId),
     dependencies.localRecordRepository.listHarvestRecordsForExport(input.farmId),
     dependencies.localRecordRepository.listMaterialUseRecordsForExport(input.farmId),
@@ -124,7 +141,6 @@ export async function buildMobilePilotRecoveryCopyPayload(
     dependencies.organicCertificationRepository?.listOrganicEvidenceLinks(input.farmId) ?? Promise.resolve([]),
     dependencies.planningRepository?.listGoals(input.farmId) ?? Promise.resolve([]),
     dependencies.planningRepository?.listBoards(input.farmId) ?? Promise.resolve([]),
-    dependencies.planningRepository?.listPeriods(input.farmId) ?? Promise.resolve([]),
     dependencies.planningRepository?.listTasks(input.farmId) ?? Promise.resolve([]),
     dependencies.planningRepository?.listLinks(input.farmId) ?? Promise.resolve([]),
   ]);
@@ -136,6 +152,12 @@ export async function buildMobilePilotRecoveryCopyPayload(
     appDataSchemaVersion: MOBILE_PILOT_APP_DATA_SCHEMA_VERSION,
     farm,
     locations,
+    farmMapSettings: farmMapSettings ?? undefined,
+    farmPlaceGeometries,
+    farmhands,
+    farmhandScheduleSettings: farmhandScheduleSettings ?? undefined,
+    farmhandRecurringSchedules,
+    farmhandWeeklyScheduleBlocks,
     trackedItems,
     harvestRecords,
     materialUseRecords,
@@ -168,7 +190,6 @@ export async function buildMobilePilotRecoveryCopyPayload(
     organicEvidenceLinks,
     planningGoals,
     planningBoards,
-    planningPeriods,
     planningTasks,
     planningLinks,
   };

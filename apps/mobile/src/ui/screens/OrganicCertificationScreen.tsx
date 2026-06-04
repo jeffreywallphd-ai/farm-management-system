@@ -24,13 +24,11 @@ import {
 import {
   PLANNING_GOAL_STATUS_LABELS,
   PLANNING_GOAL_STATUSES,
-  PLANNING_PERIOD_TYPE_LABELS,
   PLANNING_TASK_PRIORITY_LABELS,
   PLANNING_TASK_STATUS_LABELS,
   PLANNING_TASK_STATUSES,
   type PlanningGoal,
   type PlanningGoalStatus,
-  type PlanningPeriod,
   type PlanningTask,
   type PlanningTaskStatus,
 } from "../../domain/planning/Planning";
@@ -67,7 +65,6 @@ export function OrganicCertificationScreen({
   const [error, setError] = useState<string | undefined>();
   const [report, setReport] = useState<string | undefined>();
   const [certificationGoals, setCertificationGoals] = useState<PlanningGoal[]>([]);
-  const [certificationPeriods, setCertificationPeriods] = useState<PlanningPeriod[]>([]);
   const [certificationTasks, setCertificationTasks] = useState<PlanningTask[]>([]);
   const [editingGoalId, setEditingGoalId] = useState("");
   const [editingGoalTargetDate, setEditingGoalTargetDate] = useState("");
@@ -75,7 +72,6 @@ export function OrganicCertificationScreen({
   const [editingTaskId, setEditingTaskId] = useState("");
   const [editingTaskDueDate, setEditingTaskDueDate] = useState("");
   const [editingTaskStatus, setEditingTaskStatus] = useState<PlanningTaskStatus>("notStarted");
-  const [editingTaskPeriodId, setEditingTaskPeriodId] = useState("");
   const [isProfileExpanded, setIsProfileExpanded] = useState(false);
 
   const [organicStatus, setOrganicStatus] = useState<OrganicOperationStatus>("transitioning");
@@ -122,14 +118,12 @@ export function OrganicCertificationScreen({
   }, [farm.id, planningRepository, repository]);
 
   async function loadCertificationPlanning() {
-    const [goals, periods, templateTasks, farmerCertificationTasks] = await Promise.all([
+    const [goals, templateTasks, farmerCertificationTasks] = await Promise.all([
       planningRepository.listGoals(farm.id, { category: "organicCertification", source: "organicCertificationTemplate" }),
-      planningRepository.listPeriods(farm.id),
       planningRepository.listTasks(farm.id, { source: "organicCertificationTemplate" }),
       planningRepository.listTasks(farm.id, { source: "organicCertification" }),
     ]);
     setCertificationGoals(goals);
-    setCertificationPeriods(periods);
     setCertificationTasks(uniqueById([...templateTasks, ...farmerCertificationTasks]));
   }
 
@@ -188,14 +182,13 @@ export function OrganicCertificationScreen({
     setEditingTaskId(task.id);
     setEditingTaskDueDate(task.dueDate ?? "");
     setEditingTaskStatus(task.status);
-    setEditingTaskPeriodId(task.periodId ?? "");
   }
 
   async function handleSaveCertificationTaskTimeline() {
     const task = certificationTasks.find((candidate) => candidate.id === editingTaskId);
     if (!task) return;
     await savePlanningTask(
-      { ...task, dueDate: editingTaskDueDate, status: editingTaskStatus, periodId: editingTaskPeriodId },
+      { ...task, dueDate: editingTaskDueDate, status: editingTaskStatus },
       { clock: systemClock, idGenerator: localIdGenerator, repository: planningRepository },
     );
     setEditingTaskId("");
@@ -337,7 +330,6 @@ export function OrganicCertificationScreen({
             editingGoalTargetDate={editingGoalTargetDate}
             editingTaskDueDate={editingTaskDueDate}
             editingTaskId={editingTaskId}
-            editingTaskPeriodId={editingTaskPeriodId}
             editingTaskStatus={editingTaskStatus}
             goals={certificationGoals}
             onEditGoal={beginEditCertificationGoal}
@@ -348,9 +340,7 @@ export function OrganicCertificationScreen({
             onSaveGoal={handleSaveCertificationGoalTimeline}
             onSaveTask={handleSaveCertificationTaskTimeline}
             onTaskDueDateChange={setEditingTaskDueDate}
-            onTaskPeriodChange={setEditingTaskPeriodId}
             onTaskStatusChange={(value) => setEditingTaskStatus(value as PlanningTaskStatus)}
-            periods={certificationPeriods}
             tasks={certificationTasks}
           />
           <Card>
@@ -470,7 +460,6 @@ function CertificationPlanningCard({
   editingGoalTargetDate,
   editingTaskDueDate,
   editingTaskId,
-  editingTaskPeriodId,
   editingTaskStatus,
   goals,
   onEditGoal,
@@ -481,9 +470,7 @@ function CertificationPlanningCard({
   onSaveGoal,
   onSaveTask,
   onTaskDueDateChange,
-  onTaskPeriodChange,
   onTaskStatusChange,
-  periods,
   tasks,
 }: {
   editingGoalId: string;
@@ -491,7 +478,6 @@ function CertificationPlanningCard({
   editingGoalTargetDate: string;
   editingTaskDueDate: string;
   editingTaskId: string;
-  editingTaskPeriodId: string;
   editingTaskStatus: PlanningTaskStatus;
   goals: PlanningGoal[];
   onEditGoal: (goal: PlanningGoal) => void;
@@ -502,9 +488,7 @@ function CertificationPlanningCard({
   onSaveGoal: () => void;
   onSaveTask: () => void;
   onTaskDueDateChange: (value: string) => void;
-  onTaskPeriodChange: (value: string) => void;
   onTaskStatusChange: (value: string) => void;
-  periods: PlanningPeriod[];
   tasks: PlanningTask[];
 }) {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -527,6 +511,15 @@ function CertificationPlanningCard({
             {rootGoal.targetDate ? ` - target ${rootGoal.targetDate}` : ""}
           </Text>
           <Button label="Adjust overall timeline" onPress={() => onEditGoal(rootGoal)} size="large" variant="secondary" />
+          {editingGoalId === rootGoal.id ? (
+            <CertificationGoalEditForm
+              editingGoalStatus={editingGoalStatus}
+              editingGoalTargetDate={editingGoalTargetDate}
+              onGoalStatusChange={onGoalStatusChange}
+              onGoalTargetDateChange={onGoalTargetDateChange}
+              onSaveGoal={onSaveGoal}
+            />
+          ) : null}
           <Button label="Open certification work board" onPress={() => onOpenBoard(rootGoal.id)} size="large" />
         </View>
       ) : (
@@ -540,6 +533,15 @@ function CertificationPlanningCard({
             {goal.targetDate ? ` - target ${goal.targetDate}` : ""}
           </Text>
           <Button label="Adjust subgoal timeline" onPress={() => onEditGoal(goal)} size="large" variant="secondary" />
+          {editingGoalId === goal.id ? (
+            <CertificationGoalEditForm
+              editingGoalStatus={editingGoalStatus}
+              editingGoalTargetDate={editingGoalTargetDate}
+              onGoalStatusChange={onGoalStatusChange}
+              onGoalTargetDateChange={onGoalTargetDateChange}
+              onSaveGoal={onSaveGoal}
+            />
+          ) : null}
           {tasks.filter((task) => task.goalId === goal.id).slice(0, 3).map((task) => (
             <View key={task.id} style={styles.taskBlock}>
               <Text style={styles.body}>{task.title}</Text>
@@ -548,29 +550,67 @@ function CertificationPlanningCard({
                 {task.dueDate ? ` - due ${task.dueDate}` : ""}
               </Text>
               <Button label="Adjust task" onPress={() => onEditTask(task)} size="large" variant="secondary" />
+              {editingTaskId === task.id ? (
+                <CertificationTaskEditForm
+                  editingTaskDueDate={editingTaskDueDate}
+                  editingTaskStatus={editingTaskStatus}
+                  onSaveTask={onSaveTask}
+                  onTaskDueDateChange={onTaskDueDateChange}
+                  onTaskStatusChange={onTaskStatusChange}
+                />
+              ) : null}
             </View>
           ))}
         </View>
       ))}
       <Text style={styles.body}>{openTasks.length} certification task{openTasks.length === 1 ? "" : "s"} still open.</Text>
-      {editingGoalId ? (
-        <View style={styles.planEditBlock}>
-          <SectionHeading title="Adjust certification goal" />
-          <SelectField label="Goal status" onChange={onGoalStatusChange} options={PLANNING_GOAL_STATUSES.map((status) => ({ label: PLANNING_GOAL_STATUS_LABELS[status], value: status }))} value={editingGoalStatus} />
-          <DateField label="Target date" onChangeText={onGoalTargetDateChange} placeholder="YYYY-MM-DD or leave blank" value={editingGoalTargetDate} />
-          <Button label="Save certification goal timeline" onPress={onSaveGoal} size="large" />
-        </View>
-      ) : null}
-      {editingTaskId ? (
-        <View style={styles.planEditBlock}>
-          <SectionHeading title="Adjust certification task" />
-          <SelectField label="Task status" onChange={onTaskStatusChange} options={PLANNING_TASK_STATUSES.map((status) => ({ label: PLANNING_TASK_STATUS_LABELS[status], value: status }))} value={editingTaskStatus} />
-          <SelectField label="Planning period" onChange={onTaskPeriodChange} options={[{ label: "No period", value: "" }, ...periods.map((period) => ({ label: `${period.label} (${PLANNING_PERIOD_TYPE_LABELS[period.periodType]})`, value: period.id }))]} value={editingTaskPeriodId} />
-          <DateField label="Due date" onChangeText={onTaskDueDateChange} placeholder="YYYY-MM-DD or leave blank" value={editingTaskDueDate} />
-          <Button label="Save certification task timeline" onPress={onSaveTask} size="large" />
-        </View>
-      ) : null}
     </CollapsibleCard>
+  );
+}
+
+function CertificationGoalEditForm({
+  editingGoalStatus,
+  editingGoalTargetDate,
+  onGoalStatusChange,
+  onGoalTargetDateChange,
+  onSaveGoal,
+}: {
+  editingGoalStatus: PlanningGoalStatus;
+  editingGoalTargetDate: string;
+  onGoalStatusChange: (value: string) => void;
+  onGoalTargetDateChange: (value: string) => void;
+  onSaveGoal: () => void;
+}) {
+  return (
+    <View style={styles.planEditBlock}>
+      <SectionHeading title="Adjust certification goal" />
+      <SelectField label="Goal status" onChange={onGoalStatusChange} options={PLANNING_GOAL_STATUSES.map((status) => ({ label: PLANNING_GOAL_STATUS_LABELS[status], value: status }))} value={editingGoalStatus} />
+      <DateField label="Target date" onChangeText={onGoalTargetDateChange} placeholder="YYYY-MM-DD or leave blank" value={editingGoalTargetDate} />
+      <Button label="Save certification goal timeline" onPress={onSaveGoal} size="large" />
+    </View>
+  );
+}
+
+function CertificationTaskEditForm({
+  editingTaskDueDate,
+  editingTaskStatus,
+  onSaveTask,
+  onTaskDueDateChange,
+  onTaskStatusChange,
+}: {
+  editingTaskDueDate: string;
+  editingTaskStatus: PlanningTaskStatus;
+  onSaveTask: () => void;
+  onTaskDueDateChange: (value: string) => void;
+  onTaskStatusChange: (value: string) => void;
+}) {
+  return (
+    <View style={styles.planEditBlock}>
+      <SectionHeading title="Adjust certification task" />
+      <SelectField label="Task status" onChange={onTaskStatusChange} options={PLANNING_TASK_STATUSES.map((status) => ({ label: PLANNING_TASK_STATUS_LABELS[status], value: status }))} value={editingTaskStatus} />
+      <DateField label="Due date" onChangeText={onTaskDueDateChange} placeholder="YYYY-MM-DD or leave blank" value={editingTaskDueDate} />
+      <Button label="Save certification task timeline" onPress={onSaveTask} size="large" />
+    </View>
   );
 }
 

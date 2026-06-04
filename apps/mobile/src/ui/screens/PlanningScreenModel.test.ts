@@ -5,6 +5,7 @@ import type { PlanningGoal, PlanningTask } from "../../domain/planning/Planning"
 import {
   collectGoalTree,
   findRootGoalId,
+  getPlanningEditScrollY,
   selectFocusedGoalScope,
   selectPlanningReviewLists,
 } from "./PlanningScreenModel";
@@ -47,6 +48,29 @@ describe("PlanningScreenModel", () => {
     assert.deepEqual(scope.taskGoalOptions.map((option) => option.value), ["root-a", "sub-a"]);
   });
 
+  it("returns the full goal subtree and tasks needed for focused goal editing", () => {
+    const goals = [
+      makeGoal({ id: "root-a", title: "Root A" }),
+      makeGoal({ id: "sub-a", parentGoalId: "root-a", title: "Sub A" }),
+      makeGoal({ id: "sub-b", parentGoalId: "sub-a", title: "Sub B" }),
+      makeGoal({ id: "root-b", title: "Root B" }),
+    ];
+    const tasks = [
+      makeTask({ goalId: "root-a", id: "task-root-a", title: "Root A task" }),
+      makeTask({ goalId: "sub-a", id: "task-sub-a", title: "Sub A task" }),
+      makeTask({ goalId: "sub-b", id: "task-sub-b", title: "Sub B task" }),
+      makeTask({ goalId: "root-b", id: "task-root-b", title: "Root B task" }),
+      makeTask({ id: "task-standalone", title: "Standalone task" }),
+    ];
+
+    const scope = selectFocusedGoalScope("root-a", goals, tasks, "root-a");
+
+    assert.deepEqual(scope.focusedGoals.map((goal) => goal.id), ["root-a", "sub-a", "sub-b"]);
+    assert.deepEqual(scope.focusedTasks.map((task) => task.id), ["task-root-a", "task-sub-a", "task-sub-b"]);
+    assert.deepEqual(scope.parentGoalOptions.map((option) => option.value), []);
+    assert.deepEqual(scope.taskGoalOptions.map((option) => option.value), ["root-a", "sub-a", "sub-b"]);
+  });
+
   it("keeps parent options inside the focused tree and removes invalid descendants", () => {
     const goals = [
       makeGoal({ id: "root", title: "Root" }),
@@ -69,6 +93,11 @@ describe("PlanningScreenModel", () => {
 
     assert.equal(findRootGoalId(goals[2], goals), "root");
     assert.deepEqual(collectGoalTree("root", goals).map((goal) => goal.id), ["root", "child", "grandchild"]);
+  });
+
+  it("keeps task edit scroll targets just below the screen header", () => {
+    assert.equal(getPlanningEditScrollY(240, 16), 224);
+    assert.equal(getPlanningEditScrollY(8, 16), 0);
   });
 });
 

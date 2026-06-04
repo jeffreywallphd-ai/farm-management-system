@@ -111,17 +111,46 @@ export function OrganicAdvancedScopesScreen({
             <Text style={styles.title}>{ORGANIC_ADVANCED_SCOPE_TYPE_LABELS[record.scopeType]}: {record.topic}</Text>
             <Text style={styles.detail}>{ORGANIC_READINESS_STATUS_LABELS[record.readinessStatus]}</Text>
             <Button label="Edit" onPress={() => beginEdit(record)} size="large" variant="secondary" />
+            {editingId === record.id ? (
+              <AdvancedScopeForm
+                description={description}
+                evidenceText={evidenceText}
+                notes={notes}
+                readinessStatus={readinessStatus}
+                saveLabel="Save advanced scope changes"
+                scopeType={scopeType}
+                topic={topic}
+                onCancel={resetForm}
+                onDescriptionChange={setDescription}
+                onEvidenceTextChange={setEvidenceText}
+                onNotesChange={setNotes}
+                onReadinessStatusChange={(value) => setReadinessStatus(value as OrganicReadinessStatus)}
+                onSave={handleSave}
+                onScopeTypeChange={(value) => setScopeType(value as OrganicAdvancedScopeType)}
+                onTopicChange={setTopic}
+              />
+            ) : null}
           </View>
         ))}
-        <SelectField label="Scope" onChange={(value) => setScopeType(value as OrganicAdvancedScopeType)} options={ORGANIC_ADVANCED_SCOPE_TYPES.map((type) => ({ label: ORGANIC_ADVANCED_SCOPE_TYPE_LABELS[type], value: type }))} value={scopeType} />
-        <FormField label="Topic" onChangeText={setTopic} placeholder="Origin records, wild harvest map, import certificate, label claim" value={topic} />
-        <FormField label="Description" multiline onChangeText={setDescription} placeholder="What needs to be documented or reviewed?" value={description} />
-        <SelectField label="Readiness status" onChange={(value) => setReadinessStatus(value as OrganicReadinessStatus)} options={ORGANIC_READINESS_STATUSES.map((status) => ({ label: ORGANIC_READINESS_STATUS_LABELS[status], value: status }))} value={readinessStatus} />
-        <FormField label="Evidence IDs or local references" multiline onChangeText={setEvidenceText} value={evidenceText} />
-        <FormField label="Notes" multiline onChangeText={setNotes} value={notes} />
+        {!editingId ? (
+          <AdvancedScopeForm
+            description={description}
+            evidenceText={evidenceText}
+            notes={notes}
+            readinessStatus={readinessStatus}
+            saveLabel="Save advanced scope record"
+            scopeType={scopeType}
+            topic={topic}
+            onDescriptionChange={setDescription}
+            onEvidenceTextChange={setEvidenceText}
+            onNotesChange={setNotes}
+            onReadinessStatusChange={(value) => setReadinessStatus(value as OrganicReadinessStatus)}
+            onSave={handleSave}
+            onScopeTypeChange={(value) => setScopeType(value as OrganicAdvancedScopeType)}
+            onTopicChange={setTopic}
+          />
+        ) : null}
         {error ? <Text style={styles.error}>{error}</Text> : null}
-        <Button label={editingId ? "Save advanced scope changes" : "Save advanced scope record"} onPress={handleSave} size="large" />
-        {editingId ? <Button label="Cancel edit" onPress={resetForm} size="large" variant="secondary" /> : null}
       </Card>
       <Card>
         <SectionHeading title="Advanced scope report" />
@@ -132,9 +161,57 @@ export function OrganicAdvancedScopesScreen({
   );
 }
 
+function AdvancedScopeForm({
+  description,
+  evidenceText,
+  notes,
+  readinessStatus,
+  saveLabel,
+  scopeType,
+  topic,
+  onCancel,
+  onDescriptionChange,
+  onEvidenceTextChange,
+  onNotesChange,
+  onReadinessStatusChange,
+  onSave,
+  onScopeTypeChange,
+  onTopicChange,
+}: {
+  description: string;
+  evidenceText: string;
+  notes: string;
+  readinessStatus: OrganicReadinessStatus;
+  saveLabel: string;
+  scopeType: OrganicAdvancedScopeType;
+  topic: string;
+  onCancel?: () => void;
+  onDescriptionChange: (value: string) => void;
+  onEvidenceTextChange: (value: string) => void;
+  onNotesChange: (value: string) => void;
+  onReadinessStatusChange: (value: string) => void;
+  onSave: () => void;
+  onScopeTypeChange: (value: string) => void;
+  onTopicChange: (value: string) => void;
+}) {
+  return (
+    <View style={styles.inlineEdit}>
+      <SelectField label="Scope" onChange={onScopeTypeChange} options={ORGANIC_ADVANCED_SCOPE_TYPES.map((type) => ({ label: ORGANIC_ADVANCED_SCOPE_TYPE_LABELS[type], value: type }))} value={scopeType} />
+      <FormField label="Topic" onChangeText={onTopicChange} placeholder="Origin records, wild harvest map, import certificate, label claim" value={topic} />
+      <FormField label="Description" multiline onChangeText={onDescriptionChange} placeholder="What needs to be documented or reviewed?" value={description} />
+      <SelectField label="Readiness status" onChange={onReadinessStatusChange} options={ORGANIC_READINESS_STATUSES.map((status) => ({ label: ORGANIC_READINESS_STATUS_LABELS[status], value: status }))} value={readinessStatus} />
+      <FormField label="Evidence IDs or local references" multiline onChangeText={onEvidenceTextChange} value={evidenceText} />
+      <FormField label="Notes" multiline onChangeText={onNotesChange} value={notes} />
+      <Button label={saveLabel} onPress={onSave} size="large" />
+      {onCancel ? <Button label="Cancel edit" onPress={onCancel} size="large" variant="secondary" /> : null}
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
   detail: { color: theme.colors.textSecondary, fontSize: theme.typography.body, lineHeight: 22 },
   error: { color: theme.colors.error, fontSize: theme.typography.small, lineHeight: 20 },
+  inlineEdit: { gap: theme.spacing.sm },
   report: { color: theme.colors.textPrimary, fontSize: theme.typography.small, lineHeight: 20 },
   row: { borderColor: theme.colors.border, borderRadius: theme.radius.sm, borderWidth: 1, gap: theme.spacing.sm, padding: theme.spacing.sm },
   title: { color: theme.colors.textPrimary, fontSize: theme.typography.body, fontWeight: "700" },

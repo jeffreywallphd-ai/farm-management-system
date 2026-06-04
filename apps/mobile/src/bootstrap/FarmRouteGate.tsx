@@ -5,6 +5,7 @@ import { listLocations } from "../application/use-cases/list-locations/listLocat
 import type { Farm } from "../domain/farm/Farm";
 import type { FarmLocation } from "../domain/farm/FarmLocation";
 import { Card } from "../ui/components/Card";
+import { DatePreferencesProvider } from "../ui/datePreferences";
 import { PageHeader } from "../ui/components/PageHeader";
 import { Screen } from "../ui/components/Screen";
 import { FarmPlacesSetupScreen } from "../ui/screens/FarmPlacesSetupScreen";
@@ -91,5 +92,9 @@ export function FarmRouteGate({
     );
   }
 
-  return farm ? <>{children({ farm, database })}</> : null;
+  return farm ? (
+    <DatePreferencesProvider farmhandRepository={database.farmhandRepository} farmId={farm.id}>
+      {children({ farm, database })}
+    </DatePreferencesProvider>
+  ) : null;
 }

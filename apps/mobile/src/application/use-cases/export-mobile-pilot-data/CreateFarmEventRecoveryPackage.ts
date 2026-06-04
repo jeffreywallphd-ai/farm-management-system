@@ -8,6 +8,8 @@ import type { FarmEventRepository } from "../../ports/FarmEventRepository";
 import type { FarmNoteTranscriptRepository } from "../../ports/FarmNoteTranscriptRepository";
 import type { Clock } from "../../ports/Clock";
 import type { ExportRepository, MobilePilotExportFile, RecoveryPackageMediaFile } from "../../ports/ExportRepository";
+import type { FarmhandRepository } from "../../ports/FarmhandRepository";
+import type { FarmMapRepository } from "../../ports/FarmMapRepository";
 import type { FarmReferenceRepository } from "../../ports/FarmReferenceRepository";
 import type { LocalRecordRepository } from "../../ports/LocalRecordRepository";
 import type { PlanningRepository } from "../../ports/PlanningRepository";
@@ -21,6 +23,8 @@ export async function createFarmEventRecoveryPackage(
     exportRepository: ExportRepository;
     farmEventRepository: FarmEventRepository;
     farmNoteTranscriptRepository: FarmNoteTranscriptRepository;
+    farmhandRepository?: FarmhandRepository;
+    farmMapRepository?: FarmMapRepository;
     farmReferenceRepository: FarmReferenceRepository;
     localRecordRepository: LocalRecordRepository;
     planningRepository?: PlanningRepository;

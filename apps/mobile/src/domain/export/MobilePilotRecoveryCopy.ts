@@ -1,5 +1,7 @@
 import type { Farm } from "../farm/Farm";
 import type { FarmLocation } from "../farm/FarmLocation";
+import type { Farmhand, FarmhandRecurringSchedule, FarmhandScheduleSettings, FarmhandWeeklyScheduleBlock } from "../farmhand/Farmhand";
+import type { FarmMapSettings, FarmPlaceGeometry } from "../gis/FarmMap";
 import type { TrackedItem } from "../farm/TrackedItem";
 import type { IsoDateTimeString } from "../records/OperationalRecord";
 import type { HarvestRecorded } from "../records/HarvestRecorded";
@@ -25,10 +27,10 @@ import type { OrganicInspectionReadinessItem, OrganicSystemPlanSection } from ".
 import type { OrganicReportPackage } from "../organic/OrganicReportPackage";
 import type { OrganicAdvancedScopeRecord } from "../organic/OrganicAdvancedScope";
 import type { OrganicEvidenceLink } from "../organic/OrganicEvidenceLink";
-import type { PlanningBoard, PlanningGoal, PlanningLink, PlanningPeriod, PlanningTask } from "../planning/Planning";
+import type { PlanningBoard, PlanningGoal, PlanningLink, PlanningTask } from "../planning/Planning";
 
-export const MOBILE_PILOT_RECOVERY_COPY_EXPORT_VERSION = 16;
-export const MOBILE_PILOT_APP_DATA_SCHEMA_VERSION = 17;
+export const MOBILE_PILOT_RECOVERY_COPY_EXPORT_VERSION = 18;
+export const MOBILE_PILOT_APP_DATA_SCHEMA_VERSION = 22;
 
 export interface MobilePilotRecoveryCopy {
   exportVersion: typeof MOBILE_PILOT_RECOVERY_COPY_EXPORT_VERSION;
@@ -36,6 +38,12 @@ export interface MobilePilotRecoveryCopy {
   appDataSchemaVersion: typeof MOBILE_PILOT_APP_DATA_SCHEMA_VERSION;
   farm: Farm;
   locations: FarmLocation[];
+  farmMapSettings?: FarmMapSettings;
+  farmPlaceGeometries: FarmPlaceGeometry[];
+  farmhands: Farmhand[];
+  farmhandScheduleSettings?: FarmhandScheduleSettings;
+  farmhandRecurringSchedules: FarmhandRecurringSchedule[];
+  farmhandWeeklyScheduleBlocks: FarmhandWeeklyScheduleBlock[];
   trackedItems: TrackedItem[];
   harvestRecords: HarvestRecorded[];
   materialUseRecords: MaterialUseRecorded[];
@@ -68,7 +76,6 @@ export interface MobilePilotRecoveryCopy {
   organicEvidenceLinks: OrganicEvidenceLink[];
   planningGoals: PlanningGoal[];
   planningBoards: PlanningBoard[];
-  planningPeriods: PlanningPeriod[];
   planningTasks: PlanningTask[];
   planningLinks: PlanningLink[];
 }

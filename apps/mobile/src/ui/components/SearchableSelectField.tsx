@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 
+import { getSelectDropdownHint, type SelectSelectionMode } from "./SelectFieldModel";
 import { theme } from "../theme/theme";
 
 export interface SearchableSelectOption {
@@ -16,6 +17,7 @@ export function SearchableSelectField({
   onChange,
   error,
   placeholder = "Search",
+  selectionMode = "single",
 }: {
   label: string;
   options: SearchableSelectOption[];
@@ -23,6 +25,7 @@ export function SearchableSelectField({
   onChange: (value: string) => void;
   error?: string;
   placeholder?: string;
+  selectionMode?: SelectSelectionMode;
 }) {
   const [query, setQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
@@ -44,7 +47,7 @@ export function SearchableSelectField({
       <Text style={styles.label}>{label}</Text>
       <Pressable accessibilityRole="button" onPress={() => setIsOpen((current) => !current)} style={styles.dropdownButton}>
         <Text style={styles.dropdownText}>{selectedOption?.label ?? "Choose an option"}</Text>
-        <Text style={styles.dropdownHint}>{isOpen ? "Hide options" : "Show options"}</Text>
+        <Text style={styles.dropdownHint}>{getSelectDropdownHint(isOpen, selectionMode)}</Text>
       </Pressable>
       {isOpen ? (
         <>
@@ -102,8 +105,8 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.small,
   },
   dropdownButton: {
-    backgroundColor: theme.colors.surface,
-    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.dropdownSurface,
+    borderColor: theme.colors.dropdownBorder,
     borderRadius: theme.radius.md,
     borderWidth: 1,
     gap: theme.spacing.xs,
@@ -144,8 +147,8 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
   option: {
-    backgroundColor: theme.colors.surface,
-    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.dropdownSurface,
+    borderColor: theme.colors.dropdownBorder,
     borderRadius: theme.radius.sm,
     borderWidth: 1,
     gap: theme.spacing.xs,

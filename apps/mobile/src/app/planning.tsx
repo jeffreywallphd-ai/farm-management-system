@@ -5,6 +5,7 @@ import { FarmRouteGate } from "../bootstrap/FarmRouteGate";
 import type { useDatabase } from "../bootstrap/providers/DatabaseProvider";
 import type { Farm } from "../domain/farm/Farm";
 import type { FarmLocation } from "../domain/farm/FarmLocation";
+import type { Farmhand } from "../domain/farmhand/Farmhand";
 import { PlanningScreen } from "../ui/screens/PlanningScreen";
 
 type ReadyDatabase = Extract<ReturnType<typeof useDatabase>, { status: "ready" }>;
@@ -19,14 +20,28 @@ export default function PlanningRoute() {
 
 function PlanningRouteContent({ database, farm }: { database: ReadyDatabase; farm: Farm }) {
   const [locations, setLocations] = useState<FarmLocation[]>([]);
+  const [farmhands, setFarmhands] = useState<Farmhand[]>([]);
 
-  const loadLocations = useCallback(async () => {
-    setLocations(await listLocations(farm.id, database.farmReferenceRepository));
-  }, [database.farmReferenceRepository, farm.id]);
+  const loadPlanningContext = useCallback(async () => {
+    const [nextLocations, nextFarmhands] = await Promise.all([
+      listLocations(farm.id, database.farmReferenceRepository),
+      database.farmhandRepository.listFarmhands(farm.id),
+    ]);
+    setLocations(nextLocations);
+    setFarmhands(nextFarmhands);
+  }, [database.farmReferenceRepository, database.farmhandRepository, farm.id]);
 
   useEffect(() => {
-    loadLocations();
-  }, [loadLocations]);
+    loadPlanningContext();
+  }, [loadPlanningContext]);
 
-  return <PlanningScreen farm={farm} locations={locations} repository={database.planningRepository} />;
+  return (
+    <PlanningScreen
+      farm={farm}
+      farmhandRepository={database.farmhandRepository}
+      farmhands={farmhands}
+      locations={locations}
+      repository={database.planningRepository}
+    />
+  );
 }

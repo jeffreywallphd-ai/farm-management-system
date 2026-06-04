@@ -4,7 +4,6 @@ import {
   PLANNING_GOAL_CATEGORIES,
   PLANNING_GOAL_STATUSES,
   PLANNING_BOARD_SCOPE_TYPES,
-  PLANNING_PERIOD_TYPES,
   PLANNING_RECORD_LINK_TYPES,
   PLANNING_SOURCES,
   PLANNING_TASK_PRIORITIES,
@@ -15,6 +14,7 @@ const optionalText = (maxLength: number) =>
   z.string().trim().max(maxLength).optional().transform((value) => (value ? value : undefined));
 
 const optionalDateText = optionalText(32);
+const optionalUriText = optionalText(2000);
 
 export const planningGoalInputSchema = z.object({
   id: z.string().trim().min(1).optional(),
@@ -31,23 +31,10 @@ export const planningGoalInputSchema = z.object({
   sortOrder: z.coerce.number().int().min(0).default(0),
 });
 
-export const planningPeriodInputSchema = z.object({
-  id: z.string().trim().min(1).optional(),
-  farmId: z.string().trim().min(1),
-  label: z.string().trim().min(1, "Planning period label is required.").max(120),
-  periodType: z.enum(PLANNING_PERIOD_TYPES).default("week"),
-  startDate: optionalDateText,
-  endDate: optionalDateText,
-}).refine((input) => Boolean(input.startDate) === Boolean(input.endDate), {
-  message: "Use both start and end dates, or leave both blank.",
-  path: ["endDate"],
-});
-
 export const planningTaskInputSchema = z.object({
   id: z.string().trim().min(1).optional(),
   farmId: z.string().trim().min(1),
   goalId: optionalText(128),
-  periodId: optionalText(128),
   placeId: optionalText(128),
   title: z.string().trim().min(1, "Task title is required.").max(140),
   notes: optionalText(1000),
@@ -56,7 +43,20 @@ export const planningTaskInputSchema = z.object({
   plannedStartDate: optionalDateText,
   dueDate: optionalDateText,
   estimatedMinutes: z.coerce.number().int().positive().max(24 * 60).optional(),
-  responsiblePerson: optionalText(120),
+  assignedFarmhandId: optionalText(128),
+  instructionVoiceMemo: z.object({
+    localUri: optionalUriText,
+    durationMs: z.coerce.number().int().positive().optional(),
+    fileSizeBytes: z.coerce.number().int().nonnegative().optional(),
+  }).optional().transform((value) => (value?.localUri ? value as { localUri: string; durationMs?: number; fileSizeBytes?: number } : undefined)),
+  instructionPhotos: z.array(z.object({
+    localUri: optionalUriText,
+    width: z.coerce.number().int().positive().optional(),
+    height: z.coerce.number().int().positive().optional(),
+    mimeType: optionalText(80),
+    fileSizeBytes: z.coerce.number().int().nonnegative().optional(),
+  }).transform((value) => (value.localUri ? { ...value, localUri: value.localUri } : null))).default([])
+    .transform((values) => values.filter((value): value is NonNullable<typeof value> => value !== null)),
   completionNotes: optionalText(1000),
   source: z.enum(PLANNING_SOURCES).default("farmer"),
   templateKey: optionalText(180),

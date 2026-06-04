@@ -1,11 +1,11 @@
 import type { Clock } from "../../ports/Clock";
+import type { FarmhandRepository } from "../../ports/FarmhandRepository";
 import type { IdGenerator } from "../../ports/IdGenerator";
 import type { PlanningRepository } from "../../ports/PlanningRepository";
 import type {
   PlanningGoal,
   PlanningBoard,
   PlanningLink,
-  PlanningPeriod,
   PlanningTask,
   PlanningTaskStatus,
 } from "../../../domain/planning/Planning";
@@ -13,12 +13,12 @@ import {
   planningBoardInputSchema,
   planningGoalInputSchema,
   planningLinkInputSchema,
-  planningPeriodInputSchema,
   planningTaskInputSchema,
 } from "../../../domain/validation/planningValidation";
 
 interface PlanningDependencies {
   clock: Clock;
+  farmhandRepository?: FarmhandRepository;
   idGenerator: IdGenerator;
   repository: PlanningRepository;
 }
@@ -151,32 +151,6 @@ export async function savePlanningGoal(
   return goal;
 }
 
-export async function savePlanningPeriod(
-  input: Parameters<typeof planningPeriodInputSchema.parse>[0],
-  dependencies: PlanningDependencies,
-): Promise<PlanningPeriod> {
-  const parsed = planningPeriodInputSchema.parse(input);
-  const existing = parsed.id ? await dependencies.repository.getPeriod(parsed.farmId, parsed.id) : null;
-  if (parsed.id && !existing) {
-    throw new Error("Planning period does not exist on this farm.");
-  }
-
-  const now = dependencies.clock.now().toISOString();
-  const period: PlanningPeriod = {
-    id: existing?.id ?? dependencies.idGenerator.newId(),
-    farmId: parsed.farmId,
-    label: parsed.label,
-    periodType: parsed.periodType,
-    startDate: parsed.startDate,
-    endDate: parsed.endDate,
-    createdAt: existing?.createdAt ?? now,
-    updatedAt: now,
-  };
-
-  await dependencies.repository.savePeriod(period);
-  return period;
-}
-
 export async function savePlanningTask(
   input: Parameters<typeof planningTaskInputSchema.parse>[0],
   dependencies: PlanningDependencies,
@@ -195,8 +169,8 @@ export async function savePlanningTask(
     throw new Error("Planning task place does not exist on this farm.");
   }
 
-  if (parsed.periodId && !(await dependencies.repository.getPeriod(parsed.farmId, parsed.periodId))) {
-    throw new Error("Planning task period does not exist on this farm.");
+  if (parsed.assignedFarmhandId && dependencies.farmhandRepository && !(await dependencies.farmhandRepository.getFarmhand(parsed.farmId, parsed.assignedFarmhandId))) {
+    throw new Error("Assigned farmhand does not exist on this farm.");
   }
 
   const now = dependencies.clock.now().toISOString();
@@ -205,7 +179,6 @@ export async function savePlanningTask(
     id: existing?.id ?? dependencies.idGenerator.newId(),
     farmId: parsed.farmId,
     goalId: parsed.goalId,
-    periodId: parsed.periodId,
     placeId: parsed.placeId,
     title: parsed.title,
     notes: parsed.notes,
@@ -214,7 +187,9 @@ export async function savePlanningTask(
     plannedStartDate: parsed.plannedStartDate,
     dueDate: parsed.dueDate,
     estimatedMinutes: parsed.estimatedMinutes,
-    responsiblePerson: parsed.responsiblePerson,
+    assignedFarmhandId: parsed.assignedFarmhandId,
+    instructionVoiceMemo: parsed.instructionVoiceMemo,
+    instructionPhotos: parsed.instructionPhotos,
     completionNotes: parsed.completionNotes,
     completedAt,
     source: parsed.source,

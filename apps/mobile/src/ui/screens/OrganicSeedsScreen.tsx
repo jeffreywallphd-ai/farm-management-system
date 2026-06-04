@@ -193,22 +193,68 @@ export function OrganicSeedsScreen({
               <Text style={styles.detail}>{SEED_LOT_ORGANIC_STATUS_LABELS[seedLot.organicStatus]}</Text>
             </View>
             <Button label="Edit" onPress={() => beginEdit(seedLot)} size="large" variant="secondary" />
+            {editingSeedLotId === seedLot.id ? (
+              <SeedLotForm
+                cropId={cropId}
+                cropOptions={cropOptions}
+                invoiceAttachmentId={invoiceAttachmentId}
+                labelAttachmentId={labelAttachmentId}
+                lotNumber={lotNumber}
+                notes={notes}
+                organicStatus={organicStatus}
+                purchaseDate={purchaseDate}
+                quantity={quantity}
+                saveLabel="Save seed lot changes"
+                seedTreatment={seedTreatment}
+                supplier={supplier}
+                variety={variety}
+                onCancel={resetSeedLotForm}
+                onCropIdChange={setCropId}
+                onInvoiceAttachmentIdChange={setInvoiceAttachmentId}
+                onLabelAttachmentIdChange={setLabelAttachmentId}
+                onLotNumberChange={setLotNumber}
+                onNotesChange={setNotes}
+                onOrganicStatusChange={(value) => setOrganicStatus(value as SeedLotOrganicStatus)}
+                onPurchaseDateChange={setPurchaseDate}
+                onQuantityChange={setQuantity}
+                onSave={handleSaveSeedLot}
+                onSeedTreatmentChange={setSeedTreatment}
+                onSupplierChange={setSupplier}
+                onVarietyChange={setVariety}
+              />
+            ) : null}
           </View>
         ))}
-        <SelectField label="Crop" onChange={setCropId} options={cropOptions} value={cropId} />
-        <FormField label="Variety" onChangeText={setVariety} placeholder="Red Russian kale" value={variety} />
-        <FormField label="Supplier" onChangeText={setSupplier} placeholder="Optional" value={supplier} />
-        <FormField label="Lot number" onChangeText={setLotNumber} placeholder="Optional" value={lotNumber} />
-        <DateField label="Purchase date" onChangeText={setPurchaseDate} placeholder="YYYY-MM-DD" value={purchaseDate} />
-        <FormField label="Quantity" onChangeText={setQuantity} placeholder="Optional" value={quantity} />
-        <SelectField label="Organic status" onChange={(value) => setOrganicStatus(value as SeedLotOrganicStatus)} options={SEED_LOT_ORGANIC_STATUSES.map((status) => ({ label: SEED_LOT_ORGANIC_STATUS_LABELS[status], value: status }))} value={organicStatus} />
-        <FormField label="Seed treatment" onChangeText={setSeedTreatment} placeholder="Untreated, treatment name, or notes" value={seedTreatment} />
-        <FormField label="Invoice evidence" onChangeText={setInvoiceAttachmentId} placeholder="Optional local reference" value={invoiceAttachmentId} />
-        <FormField label="Label evidence" onChangeText={setLabelAttachmentId} placeholder="Optional local reference" value={labelAttachmentId} />
-        <FormField label="Notes" multiline onChangeText={setNotes} placeholder="Optional" value={notes} />
+        {!editingSeedLotId ? (
+          <SeedLotForm
+            cropId={cropId}
+            cropOptions={cropOptions}
+            invoiceAttachmentId={invoiceAttachmentId}
+            labelAttachmentId={labelAttachmentId}
+            lotNumber={lotNumber}
+            notes={notes}
+            organicStatus={organicStatus}
+            purchaseDate={purchaseDate}
+            quantity={quantity}
+            saveLabel="Save seed lot"
+            seedTreatment={seedTreatment}
+            supplier={supplier}
+            variety={variety}
+            onCropIdChange={setCropId}
+            onInvoiceAttachmentIdChange={setInvoiceAttachmentId}
+            onLabelAttachmentIdChange={setLabelAttachmentId}
+            onLotNumberChange={setLotNumber}
+            onNotesChange={setNotes}
+            onOrganicStatusChange={(value) => setOrganicStatus(value as SeedLotOrganicStatus)}
+            onPurchaseDateChange={setPurchaseDate}
+            onQuantityChange={setQuantity}
+            onSave={handleSaveSeedLot}
+            onSeedTreatmentChange={setSeedTreatment}
+            onSupplierChange={setSupplier}
+            onVarietyChange={setVariety}
+          />
+        ) : null}
         {error ? <Text style={styles.error}>{error}</Text> : null}
-        <Button label={editingSeedLotId ? "Save seed lot changes" : "Save seed lot"} onPress={handleSaveSeedLot} size="large" />
-        {editingSeedLotId ? <Button label="Cancel edit" onPress={resetSeedLotForm} size="large" variant="secondary" /> : null}
       </Card>
       <Card>
         <SectionHeading title="Commercial availability search" />
@@ -245,10 +291,85 @@ export function OrganicSeedsScreen({
   );
 }
 
+function SeedLotForm({
+  cropId,
+  cropOptions,
+  invoiceAttachmentId,
+  labelAttachmentId,
+  lotNumber,
+  notes,
+  organicStatus,
+  purchaseDate,
+  quantity,
+  saveLabel,
+  seedTreatment,
+  supplier,
+  variety,
+  onCancel,
+  onCropIdChange,
+  onInvoiceAttachmentIdChange,
+  onLabelAttachmentIdChange,
+  onLotNumberChange,
+  onNotesChange,
+  onOrganicStatusChange,
+  onPurchaseDateChange,
+  onQuantityChange,
+  onSave,
+  onSeedTreatmentChange,
+  onSupplierChange,
+  onVarietyChange,
+}: {
+  cropId: string;
+  cropOptions: Array<{ label: string; value: string }>;
+  invoiceAttachmentId: string;
+  labelAttachmentId: string;
+  lotNumber: string;
+  notes: string;
+  organicStatus: SeedLotOrganicStatus;
+  purchaseDate: string;
+  quantity: string;
+  saveLabel: string;
+  seedTreatment: string;
+  supplier: string;
+  variety: string;
+  onCancel?: () => void;
+  onCropIdChange: (value: string) => void;
+  onInvoiceAttachmentIdChange: (value: string) => void;
+  onLabelAttachmentIdChange: (value: string) => void;
+  onLotNumberChange: (value: string) => void;
+  onNotesChange: (value: string) => void;
+  onOrganicStatusChange: (value: string) => void;
+  onPurchaseDateChange: (value: string) => void;
+  onQuantityChange: (value: string) => void;
+  onSave: () => void;
+  onSeedTreatmentChange: (value: string) => void;
+  onSupplierChange: (value: string) => void;
+  onVarietyChange: (value: string) => void;
+}) {
+  return (
+    <View style={styles.inlineEdit}>
+      <SelectField label="Crop" onChange={onCropIdChange} options={cropOptions} value={cropId} />
+      <FormField label="Variety" onChangeText={onVarietyChange} placeholder="Red Russian kale" value={variety} />
+      <FormField label="Supplier" onChangeText={onSupplierChange} placeholder="Optional" value={supplier} />
+      <FormField label="Lot number" onChangeText={onLotNumberChange} placeholder="Optional" value={lotNumber} />
+      <DateField label="Purchase date" onChangeText={onPurchaseDateChange} placeholder="YYYY-MM-DD" value={purchaseDate} />
+      <FormField label="Quantity" onChangeText={onQuantityChange} placeholder="Optional" value={quantity} />
+      <SelectField label="Organic status" onChange={onOrganicStatusChange} options={SEED_LOT_ORGANIC_STATUSES.map((status) => ({ label: SEED_LOT_ORGANIC_STATUS_LABELS[status], value: status }))} value={organicStatus} />
+      <FormField label="Seed treatment" onChangeText={onSeedTreatmentChange} placeholder="Untreated, treatment name, or notes" value={seedTreatment} />
+      <FormField label="Invoice evidence" onChangeText={onInvoiceAttachmentIdChange} placeholder="Optional local reference" value={invoiceAttachmentId} />
+      <FormField label="Label evidence" onChangeText={onLabelAttachmentIdChange} placeholder="Optional local reference" value={labelAttachmentId} />
+      <FormField label="Notes" multiline onChangeText={onNotesChange} placeholder="Optional" value={notes} />
+      <Button label={saveLabel} onPress={onSave} size="large" />
+      {onCancel ? <Button label="Cancel edit" onPress={onCancel} size="large" variant="secondary" /> : null}
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
   buttons: { gap: theme.spacing.sm },
   detail: { color: theme.colors.textSecondary, fontSize: theme.typography.body, lineHeight: 22 },
   error: { color: theme.colors.error, fontSize: theme.typography.small, lineHeight: 20 },
+  inlineEdit: { gap: theme.spacing.sm },
   report: { color: theme.colors.textPrimary, fontSize: theme.typography.small, lineHeight: 20 },
   row: { borderColor: theme.colors.border, borderRadius: theme.radius.sm, borderWidth: 1, gap: theme.spacing.sm, padding: theme.spacing.sm },
   rowText: { gap: 2 },

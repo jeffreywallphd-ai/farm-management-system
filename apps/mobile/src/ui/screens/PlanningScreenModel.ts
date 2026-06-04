@@ -2,6 +2,10 @@ import type { PlanningGoal, PlanningTask } from "../../domain/planning/Planning"
 
 export type PlanningMode = "createGoal" | "singleTask" | "review";
 
+export function getPlanningEditScrollY(itemY: number, topPadding: number): number {
+  return Math.max(0, itemY - topPadding);
+}
+
 export function selectPlanningReviewLists(goals: PlanningGoal[], tasks: PlanningTask[]) {
   return {
     rootGoals: goals.filter((goal) => !goal.parentGoalId),

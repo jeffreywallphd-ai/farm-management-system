@@ -23,6 +23,13 @@ import { createPlanning } from "./0020_create_planning";
 import { addPlanningPlaceReferences } from "./0021_add_planning_place_references";
 import { removeCountableItems } from "./0022_remove_countable_items";
 import { createPlanningBoards } from "./0023_create_planning_boards";
+import { createFarmhands } from "./0024_create_farmhands";
+import { createFarmhandScheduleSettings } from "./0025_create_farmhand_schedule_settings";
+import { createFarmMapSettings } from "./0026_create_farm_map_settings";
+import { createFarmPlaceGeometries } from "./0027_create_farm_place_geometries";
+import { addFarmPlaceGeometryMapView } from "./0028_add_farm_place_geometry_map_view";
+import { refinePlanningTaskFields } from "./0029_refine_planning_task_fields";
+import { removeReadyPlanningStatus } from "./0030_remove_ready_planning_status";
 
 export interface Migration {
   version: number;
@@ -54,6 +61,13 @@ const migrations: Migration[] = [
   addPlanningPlaceReferences,
   removeCountableItems,
   createPlanningBoards,
+  createFarmhands,
+  createFarmhandScheduleSettings,
+  createFarmMapSettings,
+  createFarmPlaceGeometries,
+  addFarmPlaceGeometryMapView,
+  refinePlanningTaskFields,
+  removeReadyPlanningStatus,
 ];
 
 export async function runMigrations(database: SQLiteDatabase): Promise<void> {
@@ -76,7 +90,7 @@ export async function runMigrations(database: SQLiteDatabase): Promise<void> {
     }
 
     for (const statement of migration.statements) {
-      await database.execAsync(statement);
+      await executeMigrationStatement(database, statement);
     }
 
     await database.runAsync(
@@ -84,4 +98,38 @@ export async function runMigrations(database: SQLiteDatabase): Promise<void> {
       [migration.version, migration.name, new Date().toISOString()],
     );
   }
+}
+
+async function executeMigrationStatement(database: SQLiteDatabase, statement: string): Promise<void> {
+  const addColumnStatement = parseAddColumnStatement(statement);
+
+  if (addColumnStatement && await columnExists(database, addColumnStatement.tableName, addColumnStatement.columnName)) {
+    return;
+  }
+
+  await database.execAsync(statement);
+}
+
+function parseAddColumnStatement(statement: string): { tableName: string; columnName: string } | null {
+  const match = statement.trim().match(/^ALTER\s+TABLE\s+("?[\w]+"?)\s+ADD\s+COLUMN\s+("?[\w]+"?)/i);
+
+  if (!match) {
+    return null;
+  }
+
+  return {
+    tableName: unquoteSqlIdentifier(match[1]),
+    columnName: unquoteSqlIdentifier(match[2]),
+  };
+}
+
+async function columnExists(database: SQLiteDatabase, tableName: string, columnName: string): Promise<boolean> {
+  const escapedTableName = tableName.replace(/'/g, "''");
+  const rows = await database.getAllAsync<{ name: string }>(`PRAGMA table_info('${escapedTableName}');`);
+
+  return rows.some((row) => row.name === columnName);
+}
+
+function unquoteSqlIdentifier(identifier: string): string {
+  return identifier.replace(/^"|"$/g, "");
 }

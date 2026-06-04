@@ -1,14 +1,18 @@
 import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from "react";
 
 import type { FarmReferenceRepository } from "../../application/ports/FarmReferenceRepository";
+import type { FarmMapRepository } from "../../application/ports/FarmMapRepository";
 import type { FarmEventRepository } from "../../application/ports/FarmEventRepository";
+import type { FarmhandRepository } from "../../application/ports/FarmhandRepository";
 import type { FarmNoteTranscriptRepository } from "../../application/ports/FarmNoteTranscriptRepository";
 import type { LocalRecordRepository } from "../../application/ports/LocalRecordRepository";
 import type { OrganicCertificationRepository } from "../../application/ports/OrganicCertificationRepository";
 import type { PlanningRepository } from "../../application/ports/PlanningRepository";
 import { openMobilePilotDatabase } from "../../infrastructure/sqlite/database";
 import { SqliteFarmReferenceRepository } from "../../infrastructure/sqlite/repositories/SqliteFarmReferenceRepository";
+import { SqliteFarmMapRepository } from "../../infrastructure/sqlite/repositories/SqliteFarmMapRepository";
 import { SqliteFarmEventRepository } from "../../infrastructure/sqlite/repositories/SqliteFarmEventRepository";
+import { SqliteFarmhandRepository } from "../../infrastructure/sqlite/repositories/SqliteFarmhandRepository";
 import { SqliteFarmNoteTranscriptRepository } from "../../infrastructure/sqlite/repositories/SqliteFarmNoteTranscriptRepository";
 import { SqliteHarvestRecordRepository } from "../../infrastructure/sqlite/repositories/SqliteHarvestRecordRepository";
 import { SqliteOrganicCertificationRepository } from "../../infrastructure/sqlite/repositories/SqliteOrganicCertificationRepository";
@@ -19,6 +23,8 @@ type DatabaseState =
   | {
       status: "ready";
       farmEventRepository: FarmEventRepository;
+      farmhandRepository: FarmhandRepository;
+      farmMapRepository: FarmMapRepository;
       farmNoteTranscriptRepository: FarmNoteTranscriptRepository;
       farmReferenceRepository: FarmReferenceRepository;
       localRecordRepository: LocalRecordRepository;
@@ -43,6 +49,8 @@ export function DatabaseProvider({ children }: { children: ReactNode }) {
           setState({
             status: "ready",
             farmEventRepository: new SqliteFarmEventRepository(database),
+            farmhandRepository: new SqliteFarmhandRepository(database),
+            farmMapRepository: new SqliteFarmMapRepository(database),
             farmNoteTranscriptRepository: new SqliteFarmNoteTranscriptRepository(database),
             farmReferenceRepository: new SqliteFarmReferenceRepository(database),
             localRecordRepository: new SqliteHarvestRecordRepository(database),

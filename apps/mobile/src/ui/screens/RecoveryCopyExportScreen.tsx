@@ -5,6 +5,8 @@ import { useRouter } from "expo-router";
 import type { Farm } from "../../domain/farm/Farm";
 import type { ExportRepository, MobilePilotExportFile } from "../../application/ports/ExportRepository";
 import type { FarmEventRepository } from "../../application/ports/FarmEventRepository";
+import type { FarmhandRepository } from "../../application/ports/FarmhandRepository";
+import type { FarmMapRepository } from "../../application/ports/FarmMapRepository";
 import type { FarmNoteTranscriptRepository } from "../../application/ports/FarmNoteTranscriptRepository";
 import type { FarmReferenceRepository } from "../../application/ports/FarmReferenceRepository";
 import type { LocalRecordRepository } from "../../application/ports/LocalRecordRepository";
@@ -26,6 +28,8 @@ export function RecoveryCopyExportScreen({
   exportRepository,
   farm,
   farmEventRepository,
+  farmhandRepository,
+  farmMapRepository,
   farmNoteTranscriptRepository,
   farmReferenceRepository,
   localRecordRepository,
@@ -35,6 +39,8 @@ export function RecoveryCopyExportScreen({
   exportRepository: ExportRepository;
   farm: Farm;
   farmEventRepository: FarmEventRepository;
+  farmhandRepository?: FarmhandRepository;
+  farmMapRepository?: FarmMapRepository;
   farmNoteTranscriptRepository: FarmNoteTranscriptRepository;
   farmReferenceRepository: FarmReferenceRepository;
   localRecordRepository: LocalRecordRepository;
@@ -54,7 +60,7 @@ export function RecoveryCopyExportScreen({
     try {
       const nextFile = await createMobilePilotRecoveryCopy(
         { farmId: farm.id },
-        { clock: systemClock, exportRepository, farmReferenceRepository, localRecordRepository, organicCertificationRepository, planningRepository },
+        { clock: systemClock, exportRepository, farmhandRepository, farmMapRepository, farmReferenceRepository, localRecordRepository, organicCertificationRepository, planningRepository },
       );
       setFile(nextFile);
     } catch {
@@ -76,6 +82,8 @@ export function RecoveryCopyExportScreen({
           clock: systemClock,
           exportRepository,
           farmEventRepository,
+          farmhandRepository,
+          farmMapRepository,
           farmNoteTranscriptRepository,
           farmReferenceRepository,
           localRecordRepository,
@@ -99,7 +107,7 @@ export function RecoveryCopyExportScreen({
       />
       <Card>
         <SectionHeading
-          detail="This includes farm setup, locations, tracked items, harvests, material use, and inventory counts. Restore/import is not available yet."
+          detail="This includes farm setup, locations, map settings, farm geometry, tracked items, harvests, material use, and inventory counts. Restore/import is not available yet."
           title="Manual record JSON"
         />
         <Text style={styles.body}>
@@ -111,7 +119,7 @@ export function RecoveryCopyExportScreen({
       </Card>
       <Card>
         <SectionHeading
-          detail="This ZIP includes the manual JSON data plus saved farm-note metadata, voice memos, photos, and transcript drafts when present. Restore/import is not available yet."
+          detail="This ZIP includes the manual JSON data, map settings, farm geometry, plus saved farm-note metadata, voice memos, photos, and transcript drafts when present. Restore/import is not available yet."
           title="Farm-note media package"
         />
         <Text style={styles.body}>

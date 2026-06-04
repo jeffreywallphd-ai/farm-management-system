@@ -1,4 +1,5 @@
 import { useState } from "react";
+import type { ReactNode } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { z } from "zod";
 
@@ -30,12 +31,14 @@ export function FarmPlacesEditor({
   locations,
   repository,
   onReferenceSaved,
+  geometryEditorForPlace,
   intro,
 }: {
   farmId: string;
   locations: FarmLocation[];
   repository: FarmReferenceRepository;
   onReferenceSaved: () => Promise<void>;
+  geometryEditorForPlace?: (place: FarmLocation) => ReactNode;
   intro?: string;
 }) {
   const [name, setName] = useState("");
@@ -65,20 +68,32 @@ export function FarmPlacesEditor({
     setError(undefined);
 
     try {
+      let savedPlace: FarmLocation;
+
       if (editingPlaceId) {
-        await updateLocation(
+        savedPlace = await updateLocation(
           { farmId, id: editingPlaceId, name, kind: kind || undefined, parentId: parentId || undefined },
           { repository },
         );
       } else {
-        await addLocation(
+        savedPlace = await addLocation(
           { farmId, name, kind: kind || undefined, parentId: parentId || undefined },
           { clock: systemClock, idGenerator: localIdGenerator, repository },
         );
       }
 
-      resetForm();
       await onReferenceSaved();
+
+      if (!editingPlaceId && geometryEditorForPlace) {
+        setEditingPlaceId(savedPlace.id);
+        setIsAddingPlace(false);
+        setName(savedPlace.name);
+        setKind(savedPlace.kind);
+        setParentId(savedPlace.parentId ?? "");
+        return;
+      }
+
+      resetForm();
     } catch (caughtError) {
       setError(
         caughtError instanceof z.ZodError
@@ -113,6 +128,18 @@ export function FarmPlacesEditor({
 
             return (
               <View key={display.place.id} style={[styles.placeRow, { marginLeft: display.depth * 16 }]}>
+                <View style={styles.placeText}>
+                  <Text style={styles.placeTitle}>{display.place.name}</Text>
+                  <Text style={styles.placeDetail}>{display.typeLabel}</Text>
+                </View>
+                <View style={styles.rowActions}>
+                  <Button
+                    label="Edit"
+                    onPress={() => beginEdit(display.place)}
+                    size="large"
+                    variant="secondary"
+                  />
+                </View>
                 {isEditing ? (
                   <PlaceForm
                     error={error}
@@ -127,23 +154,10 @@ export function FarmPlacesEditor({
                     onParentChange={setParentId}
                     onSave={handleSave}
                     saveLabel="Save place changes"
-                  />
-                ) : (
-                  <>
-                    <View style={styles.placeText}>
-                      <Text style={styles.placeTitle}>{display.place.name}</Text>
-                      <Text style={styles.placeDetail}>{display.typeLabel}</Text>
-                    </View>
-                    <View style={styles.rowActions}>
-                      <Button
-                        label="Edit"
-                        onPress={() => beginEdit(display.place)}
-                        size="large"
-                        variant="secondary"
-                      />
-                    </View>
-                  </>
-                )}
+                  >
+                    {geometryEditorForPlace ? geometryEditorForPlace(display.place) : null}
+                  </PlaceForm>
+                ) : null}
               </View>
             );
           })
@@ -247,6 +261,20 @@ export function TrackedItemsEditor({
 
             return (
               <View key={item.id} style={styles.itemRow}>
+                <View style={styles.itemText}>
+                  <ListRow title={item.name} />
+                </View>
+                <Button
+                  label="Edit"
+                  onPress={() => {
+                    setEditingItemId(item.id);
+                    setIsAddingItem(false);
+                    setName(item.name);
+                    setError(undefined);
+                  }}
+                  size="large"
+                  variant="secondary"
+                />
                 {isEditing ? (
                   <TrackedItemForm
                     error={error}
@@ -258,24 +286,7 @@ export function TrackedItemsEditor({
                     onNameChange={setName}
                     onSave={handleSave}
                   />
-                ) : (
-                  <>
-                    <View style={styles.itemText}>
-                      <ListRow title={item.name} />
-                    </View>
-                    <Button
-                      label="Edit"
-                      onPress={() => {
-                        setEditingItemId(item.id);
-                        setIsAddingItem(false);
-                        setName(item.name);
-                        setError(undefined);
-                      }}
-                      size="large"
-                      variant="secondary"
-                    />
-                  </>
-                )}
+                ) : null}
               </View>
             );
           })
@@ -345,6 +356,7 @@ function TrackedItemForm({
 }
 
 function PlaceForm({
+  children,
   error,
   isSaving,
   kind,
@@ -358,6 +370,7 @@ function PlaceForm({
   onParentChange,
   onSave,
 }: {
+  children?: ReactNode;
   error?: string;
   isSaving: boolean;
   kind: FarmPlaceKind | "";
@@ -394,6 +407,7 @@ function PlaceForm({
       />
       <SelectField label="Parent place" onChange={onParentChange} options={parentOptions} value={parentId} />
       <Button disabled={isSaving} label={isSaving ? "Saving..." : saveLabel} onPress={onSave} size="large" />
+      {children}
       <Button label="Cancel" onPress={onCancel} size="large" variant="secondary" />
     </View>
   );

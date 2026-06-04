@@ -169,16 +169,42 @@ export function OrganicSystemPlanScreen({
               <Text style={styles.detail}>{ORGANIC_OSP_SECTION_TYPE_LABELS[section.sectionType]} - {ORGANIC_READINESS_STATUS_LABELS[section.readinessStatus]}</Text>
             </View>
             <Button label="Edit" onPress={() => beginEdit(section)} size="large" variant="secondary" />
+            {editingSectionId === section.id ? (
+              <OspSectionForm
+                evidenceText={evidenceText}
+                narrative={narrative}
+                readinessStatus={sectionReadinessStatus}
+                sectionType={sectionType}
+                title={title}
+                onCancel={resetSectionForm}
+                onEvidenceTextChange={setEvidenceText}
+                onNarrativeChange={setNarrative}
+                onReadinessStatusChange={(value) => setSectionReadinessStatus(value as OrganicReadinessStatus)}
+                onSave={handleSaveSection}
+                onSectionTypeChange={(value) => setSectionType(value as OrganicOspSectionType)}
+                onTitleChange={setTitle}
+                saveLabel="Save OSP section changes"
+              />
+            ) : null}
           </View>
         ))}
-        <SelectField label="OSP section type" onChange={(value) => setSectionType(value as OrganicOspSectionType)} options={ORGANIC_OSP_SECTION_TYPES.map((type) => ({ label: ORGANIC_OSP_SECTION_TYPE_LABELS[type], value: type }))} value={sectionType} />
-        <FormField label="Section title" onChangeText={setTitle} placeholder="Crop rotation monitoring, input review, recordkeeping" value={title} />
-        <FormField label="Narrative" multiline onChangeText={setNarrative} placeholder="Describe the practice, frequency, records, and monitoring notes." value={narrative} />
-        <SelectField label="Readiness status" onChange={(value) => setSectionReadinessStatus(value as OrganicReadinessStatus)} options={ORGANIC_READINESS_STATUSES.map((status) => ({ label: ORGANIC_READINESS_STATUS_LABELS[status], value: status }))} value={sectionReadinessStatus} />
-        <FormField label="Evidence IDs or local references" multiline onChangeText={setEvidenceText} placeholder="Photos, notes, labels, logs, reports" value={evidenceText} />
+        {!editingSectionId ? (
+          <OspSectionForm
+            evidenceText={evidenceText}
+            narrative={narrative}
+            readinessStatus={sectionReadinessStatus}
+            sectionType={sectionType}
+            title={title}
+            onEvidenceTextChange={setEvidenceText}
+            onNarrativeChange={setNarrative}
+            onReadinessStatusChange={(value) => setSectionReadinessStatus(value as OrganicReadinessStatus)}
+            onSave={handleSaveSection}
+            onSectionTypeChange={(value) => setSectionType(value as OrganicOspSectionType)}
+            onTitleChange={setTitle}
+            saveLabel="Save OSP section"
+          />
+        ) : null}
         {error ? <Text style={styles.error}>{error}</Text> : null}
-        <Button label={editingSectionId ? "Save OSP section changes" : "Save OSP section"} onPress={handleSaveSection} size="large" />
-        {editingSectionId ? <Button label="Cancel edit" onPress={resetSectionForm} size="large" variant="secondary" /> : null}
       </Card>
       <Card>
         <SectionHeading
@@ -207,10 +233,53 @@ export function OrganicSystemPlanScreen({
   );
 }
 
+function OspSectionForm({
+  evidenceText,
+  narrative,
+  readinessStatus,
+  saveLabel,
+  sectionType,
+  title,
+  onCancel,
+  onEvidenceTextChange,
+  onNarrativeChange,
+  onReadinessStatusChange,
+  onSave,
+  onSectionTypeChange,
+  onTitleChange,
+}: {
+  evidenceText: string;
+  narrative: string;
+  readinessStatus: OrganicReadinessStatus;
+  saveLabel: string;
+  sectionType: OrganicOspSectionType;
+  title: string;
+  onCancel?: () => void;
+  onEvidenceTextChange: (value: string) => void;
+  onNarrativeChange: (value: string) => void;
+  onReadinessStatusChange: (value: string) => void;
+  onSave: () => void;
+  onSectionTypeChange: (value: string) => void;
+  onTitleChange: (value: string) => void;
+}) {
+  return (
+    <View style={styles.inlineEdit}>
+      <SelectField label="OSP section type" onChange={onSectionTypeChange} options={ORGANIC_OSP_SECTION_TYPES.map((type) => ({ label: ORGANIC_OSP_SECTION_TYPE_LABELS[type], value: type }))} value={sectionType} />
+      <FormField label="Section title" onChangeText={onTitleChange} placeholder="Crop rotation monitoring, input review, recordkeeping" value={title} />
+      <FormField label="Narrative" multiline onChangeText={onNarrativeChange} placeholder="Describe the practice, frequency, records, and monitoring notes." value={narrative} />
+      <SelectField label="Readiness status" onChange={onReadinessStatusChange} options={ORGANIC_READINESS_STATUSES.map((status) => ({ label: ORGANIC_READINESS_STATUS_LABELS[status], value: status }))} value={readinessStatus} />
+      <FormField label="Evidence IDs or local references" multiline onChangeText={onEvidenceTextChange} placeholder="Photos, notes, labels, logs, reports" value={evidenceText} />
+      <Button label={saveLabel} onPress={onSave} size="large" />
+      {onCancel ? <Button label="Cancel edit" onPress={onCancel} size="large" variant="secondary" /> : null}
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
   buttons: { gap: theme.spacing.sm },
   detail: { color: theme.colors.textSecondary, fontSize: theme.typography.body, lineHeight: 22 },
   error: { color: theme.colors.error, fontSize: theme.typography.small, lineHeight: 20 },
+  inlineEdit: { gap: theme.spacing.sm },
   report: { color: theme.colors.textPrimary, fontSize: theme.typography.small, lineHeight: 20 },
   row: { borderColor: theme.colors.border, borderRadius: theme.radius.sm, borderWidth: 1, gap: theme.spacing.sm, padding: theme.spacing.sm },
   textBlock: { gap: 2 },

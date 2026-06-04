@@ -1,9 +1,9 @@
 import type { FarmId } from "../farm/Farm";
 import type { FarmLocationId } from "../farm/FarmLocation";
+import type { FarmhandId } from "../farmhand/Farmhand";
 import type { IsoDateTimeString } from "../records/OperationalRecord";
 
 export type PlanningGoalId = string;
-export type PlanningPeriodId = string;
 export type PlanningTaskId = string;
 export type PlanningLinkId = string;
 export type PlanningBoardId = string;
@@ -44,27 +44,12 @@ export const PLANNING_GOAL_STATUS_LABELS: Record<PlanningGoalStatus, string> = {
   canceled: "Canceled",
 };
 
-export const PLANNING_PERIOD_TYPES = ["day", "week", "twoWeeks", "month", "season", "year", "custom"] as const;
-
-export type PlanningPeriodType = (typeof PLANNING_PERIOD_TYPES)[number];
-
-export const PLANNING_PERIOD_TYPE_LABELS: Record<PlanningPeriodType, string> = {
-  day: "Day",
-  week: "Week",
-  twoWeeks: "Two weeks",
-  month: "Month",
-  season: "Season",
-  year: "Year",
-  custom: "Custom",
-};
-
-export const PLANNING_TASK_STATUSES = ["notStarted", "ready", "inProgress", "blocked", "done", "canceled"] as const;
+export const PLANNING_TASK_STATUSES = ["notStarted", "inProgress", "blocked", "done", "canceled"] as const;
 
 export type PlanningTaskStatus = (typeof PLANNING_TASK_STATUSES)[number];
 
 export const PLANNING_TASK_STATUS_LABELS: Record<PlanningTaskStatus, string> = {
   notStarted: "Not started",
-  ready: "Ready",
   inProgress: "In progress",
   blocked: "Blocked",
   done: "Done",
@@ -162,22 +147,24 @@ export interface PlanningGoal {
   updatedAt: IsoDateTimeString;
 }
 
-export interface PlanningPeriod {
-  id: PlanningPeriodId;
-  farmId: FarmId;
-  label: string;
-  periodType: PlanningPeriodType;
-  startDate?: string;
-  endDate?: string;
-  createdAt: IsoDateTimeString;
-  updatedAt: IsoDateTimeString;
+export interface PlanningTaskInstructionVoiceMemo {
+  localUri: string;
+  durationMs?: number;
+  fileSizeBytes?: number;
+}
+
+export interface PlanningTaskInstructionPhoto {
+  localUri: string;
+  width?: number;
+  height?: number;
+  mimeType?: string;
+  fileSizeBytes?: number;
 }
 
 export interface PlanningTask {
   id: PlanningTaskId;
   farmId: FarmId;
   goalId?: PlanningGoalId;
-  periodId?: PlanningPeriodId;
   placeId?: FarmLocationId;
   title: string;
   notes?: string;
@@ -186,7 +173,9 @@ export interface PlanningTask {
   plannedStartDate?: string;
   dueDate?: string;
   estimatedMinutes?: number;
-  responsiblePerson?: string;
+  assignedFarmhandId?: FarmhandId;
+  instructionVoiceMemo?: PlanningTaskInstructionVoiceMemo;
+  instructionPhotos?: PlanningTaskInstructionPhoto[];
   completionNotes?: string;
   completedAt?: IsoDateTimeString;
   source: PlanningSource;

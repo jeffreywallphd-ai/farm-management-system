@@ -2,6 +2,7 @@ import type { SQLiteDatabase } from "expo-sqlite";
 
 import type { FarmId } from "../../../domain/farm/Farm";
 import type { FarmLocation, FarmLocationId, FarmPlaceKind } from "../../../domain/farm/FarmLocation";
+import type { FarmhandId } from "../../../domain/farmhand/Farmhand";
 import type {
   PlanningGoal,
   PlanningGoalCategory,
@@ -11,9 +12,7 @@ import type {
   PlanningBoardId,
   PlanningBoardScopeType,
   PlanningLink,
-  PlanningPeriod,
-  PlanningPeriodId,
-  PlanningPeriodType,
+  PlanningTaskInstructionPhoto,
   PlanningRecordLinkType,
   PlanningSource,
   PlanningTask,
@@ -51,22 +50,10 @@ interface BoardRow {
   updated_at: string;
 }
 
-interface PeriodRow {
-  id: string;
-  farm_id: string;
-  label: string;
-  period_type: PlanningPeriodType;
-  start_date: string | null;
-  end_date: string | null;
-  created_at: string;
-  updated_at: string;
-}
-
 interface TaskRow {
   id: string;
   farm_id: string;
   goal_id: string | null;
-  period_id: string | null;
   place_id: string | null;
   title: string;
   notes: string | null;
@@ -75,7 +62,11 @@ interface TaskRow {
   planned_start_date: string | null;
   due_date: string | null;
   estimated_minutes: number | null;
-  responsible_person: string | null;
+  assigned_farmhand_id: string | null;
+  instruction_voice_memo_local_uri: string | null;
+  instruction_voice_memo_duration_ms: number | null;
+  instruction_voice_memo_file_size_bytes: number | null;
+  instruction_photo_json: string | null;
   completion_notes: string | null;
   completed_at: string | null;
   source: PlanningSource;
@@ -229,46 +220,16 @@ export class SqlitePlanningRepository implements PlanningRepository {
     return goals;
   }
 
-  async savePeriod(period: PlanningPeriod): Promise<void> {
-    await this.database.runAsync(
-      `INSERT INTO planning_periods (id, farm_id, label, period_type, start_date, end_date, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-       ON CONFLICT(id) DO UPDATE SET
-        label = excluded.label,
-        period_type = excluded.period_type,
-        start_date = excluded.start_date,
-        end_date = excluded.end_date,
-        updated_at = excluded.updated_at;`,
-      [period.id, period.farmId, period.label, period.periodType, period.startDate ?? null, period.endDate ?? null, period.createdAt, period.updatedAt],
-    );
-  }
-
-  async getPeriod(farmId: FarmId, id: PlanningPeriodId): Promise<PlanningPeriod | null> {
-    const row = await this.database.getFirstAsync<PeriodRow>(
-      "SELECT id, farm_id, label, period_type, start_date, end_date, created_at, updated_at FROM planning_periods WHERE farm_id = ? AND id = ? LIMIT 1;",
-      [farmId, id],
-    );
-    return row ? mapPeriod(row) : null;
-  }
-
-  async listPeriods(farmId: FarmId): Promise<PlanningPeriod[]> {
-    const rows = await this.database.getAllAsync<PeriodRow>(
-      "SELECT id, farm_id, label, period_type, start_date, end_date, created_at, updated_at FROM planning_periods WHERE farm_id = ? ORDER BY updated_at DESC;",
-      [farmId],
-    );
-    return rows.map(mapPeriod);
-  }
-
   async saveTask(task: PlanningTask): Promise<void> {
     await this.database.runAsync(
       `INSERT INTO planning_tasks (
-        id, farm_id, goal_id, period_id, place_id, title, notes, status, priority, planned_start_date,
-        due_date, estimated_minutes, responsible_person, completion_notes, completed_at, source,
-        template_key, sort_order, created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        id, farm_id, goal_id, place_id, title, notes, status, priority, planned_start_date,
+        due_date, estimated_minutes, assigned_farmhand_id, instruction_voice_memo_local_uri,
+        instruction_voice_memo_duration_ms, instruction_voice_memo_file_size_bytes, instruction_photo_json,
+        completion_notes, completed_at, source, template_key, sort_order, created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       ON CONFLICT(id) DO UPDATE SET
         goal_id = excluded.goal_id,
-        period_id = excluded.period_id,
         place_id = excluded.place_id,
         title = excluded.title,
         notes = excluded.notes,
@@ -277,7 +238,11 @@ export class SqlitePlanningRepository implements PlanningRepository {
         planned_start_date = excluded.planned_start_date,
         due_date = excluded.due_date,
         estimated_minutes = excluded.estimated_minutes,
-        responsible_person = excluded.responsible_person,
+        assigned_farmhand_id = excluded.assigned_farmhand_id,
+        instruction_voice_memo_local_uri = excluded.instruction_voice_memo_local_uri,
+        instruction_voice_memo_duration_ms = excluded.instruction_voice_memo_duration_ms,
+        instruction_voice_memo_file_size_bytes = excluded.instruction_voice_memo_file_size_bytes,
+        instruction_photo_json = excluded.instruction_photo_json,
         completion_notes = excluded.completion_notes,
         completed_at = excluded.completed_at,
         source = excluded.source,
@@ -288,7 +253,6 @@ export class SqlitePlanningRepository implements PlanningRepository {
         task.id,
         task.farmId,
         task.goalId ?? null,
-        task.periodId ?? null,
         task.placeId ?? null,
         task.title,
         task.notes ?? null,
@@ -297,7 +261,11 @@ export class SqlitePlanningRepository implements PlanningRepository {
         task.plannedStartDate ?? null,
         task.dueDate ?? null,
         task.estimatedMinutes ?? null,
-        task.responsiblePerson ?? null,
+        task.assignedFarmhandId ?? null,
+        task.instructionVoiceMemo?.localUri ?? null,
+        task.instructionVoiceMemo?.durationMs ?? null,
+        task.instructionVoiceMemo?.fileSizeBytes ?? null,
+        JSON.stringify(task.instructionPhotos ?? []),
         task.completionNotes ?? null,
         task.completedAt ?? null,
         task.source,
@@ -311,9 +279,10 @@ export class SqlitePlanningRepository implements PlanningRepository {
 
   async getTask(farmId: FarmId, id: PlanningTaskId): Promise<PlanningTask | null> {
     const row = await this.database.getFirstAsync<TaskRow>(
-      `SELECT id, farm_id, goal_id, period_id, place_id, title, notes, status, priority, planned_start_date,
-        due_date, estimated_minutes, responsible_person, completion_notes, completed_at, source,
-        template_key, sort_order, created_at, updated_at
+      `SELECT id, farm_id, goal_id, place_id, title, notes, status, priority, planned_start_date,
+        due_date, estimated_minutes, assigned_farmhand_id, instruction_voice_memo_local_uri,
+        instruction_voice_memo_duration_ms, instruction_voice_memo_file_size_bytes, instruction_photo_json,
+        completion_notes, completed_at, source, template_key, sort_order, created_at, updated_at
        FROM planning_tasks WHERE farm_id = ? AND id = ? LIMIT 1;`,
       [farmId, id],
     );
@@ -322,19 +291,20 @@ export class SqlitePlanningRepository implements PlanningRepository {
 
   async listTasks(
     farmId: FarmId,
-    filters?: { goalId?: PlanningGoalId; periodId?: PlanningPeriodId; source?: PlanningSource },
+    filters?: { goalId?: PlanningGoalId; source?: PlanningSource; assignedFarmhandId?: FarmhandId },
   ): Promise<PlanningTask[]> {
     const rows = await this.database.getAllAsync<TaskRow>(
-      `SELECT id, farm_id, goal_id, period_id, place_id, title, notes, status, priority, planned_start_date,
-        due_date, estimated_minutes, responsible_person, completion_notes, completed_at, source,
-        template_key, sort_order, created_at, updated_at
+      `SELECT id, farm_id, goal_id, place_id, title, notes, status, priority, planned_start_date,
+        due_date, estimated_minutes, assigned_farmhand_id, instruction_voice_memo_local_uri,
+        instruction_voice_memo_duration_ms, instruction_voice_memo_file_size_bytes, instruction_photo_json,
+        completion_notes, completed_at, source, template_key, sort_order, created_at, updated_at
        FROM planning_tasks WHERE farm_id = ? ORDER BY sort_order ASC, updated_at DESC;`,
       [farmId],
     );
     let tasks = rows.map(mapTask);
     if (filters?.goalId) tasks = tasks.filter((task) => task.goalId === filters.goalId);
-    if (filters?.periodId) tasks = tasks.filter((task) => task.periodId === filters.periodId);
     if (filters?.source) tasks = tasks.filter((task) => task.source === filters.source);
+    if (filters?.assignedFarmhandId) tasks = tasks.filter((task) => task.assignedFarmhandId === filters.assignedFarmhandId);
     return tasks;
   }
 
@@ -396,25 +366,11 @@ function mapBoard(row: BoardRow): PlanningBoard {
   };
 }
 
-function mapPeriod(row: PeriodRow): PlanningPeriod {
-  return {
-    id: row.id,
-    farmId: row.farm_id,
-    label: row.label,
-    periodType: row.period_type,
-    startDate: row.start_date ?? undefined,
-    endDate: row.end_date ?? undefined,
-    createdAt: row.created_at,
-    updatedAt: row.updated_at,
-  };
-}
-
 function mapTask(row: TaskRow): PlanningTask {
   return {
     id: row.id,
     farmId: row.farm_id,
     goalId: row.goal_id ?? undefined,
-    periodId: row.period_id ?? undefined,
     placeId: row.place_id ?? undefined,
     title: row.title,
     notes: row.notes ?? undefined,
@@ -423,7 +379,15 @@ function mapTask(row: TaskRow): PlanningTask {
     plannedStartDate: row.planned_start_date ?? undefined,
     dueDate: row.due_date ?? undefined,
     estimatedMinutes: row.estimated_minutes ?? undefined,
-    responsiblePerson: row.responsible_person ?? undefined,
+    assignedFarmhandId: row.assigned_farmhand_id ?? undefined,
+    instructionVoiceMemo: row.instruction_voice_memo_local_uri
+      ? {
+        localUri: row.instruction_voice_memo_local_uri,
+        durationMs: row.instruction_voice_memo_duration_ms ?? undefined,
+        fileSizeBytes: row.instruction_voice_memo_file_size_bytes ?? undefined,
+      }
+      : undefined,
+    instructionPhotos: parseInstructionPhotos(row.instruction_photo_json),
     completionNotes: row.completion_notes ?? undefined,
     completedAt: row.completed_at ?? undefined,
     source: row.source,
@@ -456,4 +420,30 @@ function mapLink(row: LinkRow): PlanningLink {
     notes: row.notes ?? undefined,
     createdAt: row.created_at,
   };
+}
+
+function parseInstructionPhotos(value: string | null): PlanningTaskInstructionPhoto[] {
+  if (!value) return [];
+
+  try {
+    const parsed: unknown = JSON.parse(value);
+    if (!Array.isArray(parsed)) return [];
+    return parsed
+      .filter((photo): photo is PlanningTaskInstructionPhoto =>
+        Boolean(
+          photo
+          && typeof photo === "object"
+          && "localUri" in photo
+          && typeof (photo as { localUri?: unknown }).localUri === "string",
+        ))
+      .map((photo) => ({
+        localUri: photo.localUri,
+        width: typeof photo.width === "number" ? photo.width : undefined,
+        height: typeof photo.height === "number" ? photo.height : undefined,
+        mimeType: typeof photo.mimeType === "string" ? photo.mimeType : undefined,
+        fileSizeBytes: typeof photo.fileSizeBytes === "number" ? photo.fileSizeBytes : undefined,
+      }));
+  } catch {
+    return [];
+  }
 }

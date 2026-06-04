@@ -1,5 +1,6 @@
 import type { FarmId } from "../../domain/farm/Farm";
 import type { FarmLocation, FarmLocationId } from "../../domain/farm/FarmLocation";
+import type { FarmhandId } from "../../domain/farmhand/Farmhand";
 import type {
   PlanningGoal,
   PlanningGoalCategory,
@@ -8,8 +9,6 @@ import type {
   PlanningBoardId,
   PlanningBoardScopeType,
   PlanningLink,
-  PlanningPeriod,
-  PlanningPeriodId,
   PlanningSource,
   PlanningTask,
   PlanningTaskId,
@@ -23,12 +22,9 @@ export interface PlanningRepository {
   saveGoal(goal: PlanningGoal): Promise<void>;
   getGoal(farmId: FarmId, id: PlanningGoalId): Promise<PlanningGoal | null>;
   listGoals(farmId: FarmId, filters?: { category?: PlanningGoalCategory; source?: PlanningSource; parentGoalId?: PlanningGoalId | null }): Promise<PlanningGoal[]>;
-  savePeriod(period: PlanningPeriod): Promise<void>;
-  getPeriod(farmId: FarmId, id: PlanningPeriodId): Promise<PlanningPeriod | null>;
-  listPeriods(farmId: FarmId): Promise<PlanningPeriod[]>;
   saveTask(task: PlanningTask): Promise<void>;
   getTask(farmId: FarmId, id: PlanningTaskId): Promise<PlanningTask | null>;
-  listTasks(farmId: FarmId, filters?: { goalId?: PlanningGoalId; periodId?: PlanningPeriodId; source?: PlanningSource }): Promise<PlanningTask[]>;
+  listTasks(farmId: FarmId, filters?: { goalId?: PlanningGoalId; source?: PlanningSource; assignedFarmhandId?: FarmhandId }): Promise<PlanningTask[]>;
   saveLink(link: PlanningLink): Promise<void>;
   listLinks(farmId: FarmId, filters?: { goalId?: PlanningGoalId; taskId?: PlanningTaskId }): Promise<PlanningLink[]>;
 }

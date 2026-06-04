@@ -38,6 +38,73 @@ const locationSchema = z.object({
   createdAt: isoDateTimeString,
 });
 
+const geoJsonPositionSchema = z.union([
+  z.tuple([z.number().min(-180).max(180), z.number().min(-90).max(90)]),
+  z.tuple([z.number().min(-180).max(180), z.number().min(-90).max(90), z.number()]),
+]);
+
+const geoJsonRingSchema = z.array(geoJsonPositionSchema).min(4);
+
+const supportedGeoJsonGeometrySchema = z.union([
+  z.object({ type: z.literal("Point"), coordinates: geoJsonPositionSchema }),
+  z.object({ type: z.literal("LineString"), coordinates: z.array(geoJsonPositionSchema).min(2) }),
+  z.object({ type: z.literal("Polygon"), coordinates: z.array(geoJsonRingSchema).min(1) }),
+  z.object({ type: z.literal("MultiPolygon"), coordinates: z.array(z.array(geoJsonRingSchema).min(1)).min(1) }),
+]);
+
+const farmMapSettingsSchema = z.object({
+  id: z.string().min(1),
+  farmId: z.string().min(1),
+  addressText: z.string().optional(),
+  defaultCenterLatitude: z.number().min(-90).max(90).optional(),
+  defaultCenterLongitude: z.number().min(-180).max(180).optional(),
+  defaultZoom: z.number().min(0).max(22),
+  defaultPitch: z.number().min(0).max(85),
+  defaultBearing: z.number().min(0).max(360),
+  mapProvider: z.enum(["fallback", "mapLibre"]),
+  offlineMapStatus: z.enum(["notConfigured", "notDownloaded", "downloadQueued", "downloading", "downloaded", "failed", "unavailable"]),
+  offlinePackName: z.string().optional(),
+  offlineDownloadedAt: isoDateTimeString.optional(),
+  createdAt: isoDateTimeString,
+  updatedAt: isoDateTimeString,
+});
+
+const farmPlaceGeometrySchema = z.object({
+  id: z.string().min(1),
+  farmId: z.string().min(1),
+  placeId: z.string().optional(),
+  geometryType: z.enum(["point", "line", "polygon", "multiPolygon"]),
+  geometryRole: z.enum([
+    "farmCenter",
+    "fieldBoundary",
+    "bedBoundary",
+    "rowLine",
+    "greenhouseBoundary",
+    "buildingFootprint",
+    "storageArea",
+    "washPackArea",
+    "bufferZone",
+    "waterSource",
+    "accessRoad",
+    "adjacentLandRiskArea",
+    "driftIncidentArea",
+    "contaminationConcernPoint",
+    "other",
+  ]),
+  geojson: supportedGeoJsonGeometrySchema,
+  source: z.enum(["manualMapEdit", "gps", "addressGeocode", "imported", "derived"]),
+  name: z.string().optional(),
+  notes: z.string().optional(),
+  mapViewLatitude: z.number().min(-90).max(90).optional(),
+  mapViewLongitude: z.number().min(-180).max(180).optional(),
+  mapViewZoom: z.number().min(0).max(22).optional(),
+  mapViewPitch: z.number().min(0).max(85).optional(),
+  mapViewBearing: z.number().min(0).max(360).optional(),
+  createdAt: isoDateTimeString,
+  updatedAt: isoDateTimeString,
+  archivedAt: isoDateTimeString.optional(),
+});
+
 const trackedItemSchema = z.object({
   id: z.string().min(1),
   farmId: z.string().min(1),
@@ -45,6 +112,49 @@ const trackedItemSchema = z.object({
   name: z.string().min(1),
   createdAt: isoDateTimeString,
   defaultUnit: z.string().optional(),
+});
+
+const farmhandSchema = z.object({
+  id: z.string().min(1),
+  farmId: z.string().min(1),
+  name: z.string().min(1),
+  phoneNumber: z.string().optional(),
+  notes: z.string().optional(),
+  status: z.enum(["active", "inactive"]),
+  createdAt: isoDateTimeString,
+  updatedAt: isoDateTimeString,
+});
+
+const farmhandRecurringScheduleSchema = z.object({
+  id: z.string().min(1),
+  farmId: z.string().min(1),
+  farmhandId: z.string().min(1),
+  weekday: z.union([z.literal(0), z.literal(1), z.literal(2), z.literal(3), z.literal(4), z.literal(5), z.literal(6)]),
+  startTime: z.string().min(1),
+  endTime: z.string().min(1),
+  effectiveStartDate: z.string().optional(),
+  effectiveEndDate: z.string().optional(),
+  notes: z.string().optional(),
+  createdAt: isoDateTimeString,
+  updatedAt: isoDateTimeString,
+});
+
+const farmhandScheduleSettingsSchema = z.object({
+  farmId: z.string().min(1),
+  weekStartsOn: z.union([z.literal(0), z.literal(1)]),
+  updatedAt: isoDateTimeString,
+});
+
+const farmhandWeeklyScheduleBlockSchema = z.object({
+  id: z.string().min(1),
+  farmId: z.string().min(1),
+  farmhandId: z.string().min(1),
+  date: z.string().min(1),
+  startTime: z.string().min(1),
+  endTime: z.string().min(1),
+  notes: z.string().optional(),
+  createdAt: isoDateTimeString,
+  updatedAt: isoDateTimeString,
 });
 
 const harvestRecordSchema = z.object({
@@ -546,17 +656,6 @@ const planningGoalSchema = z.object({
   updatedAt: isoDateTimeString,
 });
 
-const planningPeriodSchema = z.object({
-  id: z.string().min(1),
-  farmId: z.string().min(1),
-  label: z.string().min(1),
-  periodType: z.enum(["day", "week", "twoWeeks", "month", "season", "year", "custom"]),
-  startDate: z.string().optional(),
-  endDate: z.string().optional(),
-  createdAt: isoDateTimeString,
-  updatedAt: isoDateTimeString,
-});
-
 const planningBoardSchema = z.object({
   id: z.string().min(1),
   farmId: z.string().min(1),
@@ -572,16 +671,27 @@ const planningTaskSchema = z.object({
   id: z.string().min(1),
   farmId: z.string().min(1),
   goalId: z.string().optional(),
-  periodId: z.string().optional(),
   placeId: z.string().optional(),
   title: z.string().min(1),
   notes: z.string().optional(),
-  status: z.enum(["notStarted", "ready", "inProgress", "blocked", "done", "canceled"]),
+  status: z.enum(["notStarted", "inProgress", "blocked", "done", "canceled"]),
   priority: z.enum(["low", "normal", "high", "urgent"]),
   plannedStartDate: z.string().optional(),
   dueDate: z.string().optional(),
   estimatedMinutes: z.number().int().positive().optional(),
-  responsiblePerson: z.string().optional(),
+  assignedFarmhandId: z.string().optional(),
+  instructionVoiceMemo: z.object({
+    localUri: z.string().min(1),
+    durationMs: z.number().int().positive().optional(),
+    fileSizeBytes: z.number().int().nonnegative().optional(),
+  }).optional(),
+  instructionPhotos: z.array(z.object({
+    localUri: z.string().min(1),
+    width: z.number().int().positive().optional(),
+    height: z.number().int().positive().optional(),
+    mimeType: z.string().optional(),
+    fileSizeBytes: z.number().int().nonnegative().optional(),
+  })),
   completionNotes: z.string().optional(),
   completedAt: isoDateTimeString.optional(),
   source: z.enum(["farmer", "organicCertificationTemplate", "organicCertification"]),
@@ -630,6 +740,12 @@ export const mobilePilotRecoveryCopySchema = z.object({
   appDataSchemaVersion: z.literal(MOBILE_PILOT_APP_DATA_SCHEMA_VERSION),
   farm: farmSchema,
   locations: z.array(locationSchema),
+  farmMapSettings: farmMapSettingsSchema.optional(),
+  farmPlaceGeometries: z.array(farmPlaceGeometrySchema),
+  farmhands: z.array(farmhandSchema),
+  farmhandScheduleSettings: farmhandScheduleSettingsSchema.optional(),
+  farmhandRecurringSchedules: z.array(farmhandRecurringScheduleSchema),
+  farmhandWeeklyScheduleBlocks: z.array(farmhandWeeklyScheduleBlockSchema),
   trackedItems: z.array(trackedItemSchema),
   harvestRecords: z.array(harvestRecordSchema),
   materialUseRecords: z.array(materialUseRecordSchema),
@@ -662,7 +778,6 @@ export const mobilePilotRecoveryCopySchema = z.object({
   organicEvidenceLinks: z.array(organicEvidenceLinkSchema),
   planningGoals: z.array(planningGoalSchema),
   planningBoards: z.array(planningBoardSchema),
-  planningPeriods: z.array(planningPeriodSchema),
   planningTasks: z.array(planningTaskSchema),
   planningLinks: z.array(planningLinkSchema),
 });

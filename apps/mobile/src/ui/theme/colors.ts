@@ -2,6 +2,8 @@ export const colors = {
   background: "#F6F1E7",
   surface: "#FFFCF6",
   surfaceMuted: "#E6E2D5",
+  dropdownSurface: "#EFE2C8",
+  dropdownBorder: "#CDBA96",
   primary: "#2F4F3E",
   primaryPressed: "#223B2E",
   secondary: "#667A45",

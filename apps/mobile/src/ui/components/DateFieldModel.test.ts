@@ -24,6 +24,14 @@ describe("DateFieldModel", () => {
     assert.equal(days[41]?.date, "2026-07-11");
   });
 
+  it("can start the calendar grid on Monday when farm setup chooses Monday", () => {
+    const days = buildCalendarWeeks(2026, 5, new Date(2026, 5, 3), 1);
+
+    assert.equal(days[0]?.date, "2026-06-01");
+    assert.equal(days[6]?.date, "2026-06-07");
+    assert.equal(days[41]?.date, "2026-07-12");
+  });
+
   it("shifts months across year boundaries", () => {
     assert.deepEqual(shiftMonth(2026, 0, -1), { year: 2025, month: 11 });
     assert.deepEqual(shiftMonth(2026, 11, 1), { year: 2027, month: 0 });

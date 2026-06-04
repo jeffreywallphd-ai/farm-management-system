@@ -1,11 +1,19 @@
-import type { ReactNode } from "react";
+import type { ReactNode, RefObject } from "react";
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { AppHeader } from "./AppHeader";
 import { theme } from "../theme/theme";
 
-export function Screen({ children }: { children: ReactNode }) {
+export function Screen({
+  children,
+  contentRef,
+  scrollViewRef,
+}: {
+  children: ReactNode;
+  contentRef?: RefObject<View | null>;
+  scrollViewRef?: RefObject<ScrollView | null>;
+}) {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : undefined}
@@ -16,9 +24,10 @@ export function Screen({ children }: { children: ReactNode }) {
         <ScrollView
           contentContainerStyle={styles.content}
           keyboardShouldPersistTaps="handled"
+          ref={scrollViewRef}
           style={styles.scrollView}
         >
-          <View style={styles.inner}>{children}</View>
+          <View collapsable={false} ref={contentRef} style={styles.inner}>{children}</View>
         </ScrollView>
       </SafeAreaView>
     </KeyboardAvoidingView>

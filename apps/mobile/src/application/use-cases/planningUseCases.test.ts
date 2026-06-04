@@ -10,7 +10,6 @@ import {
   savePlanningBoard,
   savePlanningGoal,
   savePlanningLink,
-  savePlanningPeriod,
   savePlanningTask,
 } from "./manage-planning/ManagePlanning";
 import { InMemoryFarmReferenceRepository } from "../../testing/fakes/InMemoryFarmReferenceRepository";
@@ -34,7 +33,7 @@ function dependencies() {
   };
 }
 
-test("planning goals support subgoals, periods, assignment-ready tasks, links, and recovery export", async () => {
+test("planning goals support subgoals, assignment-ready tasks, instruction media, links, and recovery export", async () => {
   const deps = dependencies();
   await deps.farmReferenceRepository.createFarm(farm);
   const field = { id: "field-1", farmId: farm.id, name: "North Field", kind: "field" as const, createdAt: farm.createdAt };
@@ -44,10 +43,6 @@ test("planning goals support subgoals, periods, assignment-ready tasks, links, a
   deps.planningRepository.addLocation(field);
   deps.planningRepository.addLocation(bed);
 
-  const period = await savePlanningPeriod(
-    { farmId: farm.id, label: "This week", periodType: "week", startDate: "2026-06-01", endDate: "2026-06-07" },
-    { clock: deps.clock, idGenerator: deps.idGenerator, repository: deps.planningRepository },
-  );
   const goal = await savePlanningGoal(
     { farmId: farm.id, placeId: field.id, title: "Prepare north field", category: "cropProduction", status: "active", targetDate: "2026-06-30" },
     { clock: deps.clock, idGenerator: deps.idGenerator, repository: deps.planningRepository },
@@ -60,13 +55,14 @@ test("planning goals support subgoals, periods, assignment-ready tasks, links, a
     {
       farmId: farm.id,
       goalId: subgoal.id,
-      periodId: period.id,
       placeId: bed.id,
       title: "Broadfork Bed 3",
-      status: "ready",
+      status: "notStarted",
       priority: "high",
+      plannedStartDate: "2026-06-03",
       dueDate: "2026-06-05",
-      responsiblePerson: "Sam",
+      instructionVoiceMemo: { localUri: "file:///task-instructions.m4a", durationMs: 45_000, fileSizeBytes: 1234 },
+      instructionPhotos: [{ localUri: "file:///task-instructions.jpg", width: 1200, height: 900, mimeType: "image/jpeg", fileSizeBytes: 4567 }],
     },
     { clock: deps.clock, idGenerator: deps.idGenerator, repository: deps.planningRepository },
   );
@@ -78,8 +74,10 @@ test("planning goals support subgoals, periods, assignment-ready tasks, links, a
   const overview = await getPlanningOverview({ farmId: farm.id }, { repository: deps.planningRepository });
   assert.equal(overview.rootGoals[0].id, goal.id);
   assert.equal(overview.rootGoals[0].placeId, field.id);
-  assert.equal(overview.tasks[0].responsiblePerson, "Sam");
+  assert.equal(overview.tasks[0].plannedStartDate, "2026-06-03");
   assert.equal(overview.tasks[0].placeId, bed.id);
+  assert.equal(overview.tasks[0].instructionVoiceMemo?.localUri, "file:///task-instructions.m4a");
+  assert.equal(overview.tasks[0].instructionPhotos?.length, 1);
   assert.equal((await deps.planningRepository.listLinks(farm.id, { taskId: task.id }))[0].id, link.id);
 
   await assert.rejects(
@@ -101,12 +99,11 @@ test("planning goals support subgoals, periods, assignment-ready tasks, links, a
   );
   assert.equal(recovery.planningGoals.length, 2);
   assert.equal(recovery.planningBoards.length, 0);
-  assert.equal(recovery.planningPeriods.length, 1);
   assert.equal(recovery.planningTasks.length, 1);
   assert.equal(recovery.planningLinks.length, 1);
   assert.equal(recovery.planningGoals.find((candidate) => candidate.id === goal.id)?.placeId, field.id);
   assert.equal(recovery.planningTasks.find((candidate) => candidate.id === task.id)?.placeId, bed.id);
-  assert.equal(recovery.planningTasks.find((candidate) => candidate.id === task.id)?.responsiblePerson, "Sam");
+  assert.equal(recovery.planningTasks.find((candidate) => candidate.id === task.id)?.instructionPhotos?.[0]?.localUri, "file:///task-instructions.jpg");
 });
 
 test("planning boards default to root goal boards and a non-goal task board", async () => {
@@ -121,7 +118,7 @@ test("planning boards default to root goal boards and a non-goal task board", as
     { clock: deps.clock, idGenerator: deps.idGenerator, repository: deps.planningRepository },
   );
   const goalTask = await savePlanningTask(
-    { farmId: farm.id, goalId: subgoal.id, title: "Broadfork beds", status: "ready", priority: "high" },
+    { farmId: farm.id, goalId: subgoal.id, title: "Broadfork beds", status: "notStarted", priority: "high" },
     { clock: deps.clock, idGenerator: deps.idGenerator, repository: deps.planningRepository },
   );
   const nonGoalTask = await savePlanningTask(
@@ -151,7 +148,7 @@ test("planning board overview includes linked farm events and status movement", 
     { clock: deps.clock, idGenerator: deps.idGenerator, repository: deps.planningRepository },
   );
   const task = await savePlanningTask(
-    { farmId: farm.id, goalId: goal.id, title: "Clean benches", status: "ready", priority: "normal" },
+    { farmId: farm.id, goalId: goal.id, title: "Clean benches", status: "notStarted", priority: "normal" },
     { clock: deps.clock, idGenerator: deps.idGenerator, repository: deps.planningRepository },
   );
   const board = await savePlanningBoard(
@@ -197,13 +194,6 @@ test("planning edits reject unknown local IDs instead of creating duplicate reco
       { clock: deps.clock, idGenerator: deps.idGenerator, repository: deps.planningRepository },
     ),
     /Planning goal does not exist/,
-  );
-  await assert.rejects(
-    () => savePlanningPeriod(
-      { farmId: farm.id, id: "missing-period", label: "Missing period", periodType: "week" },
-      { clock: deps.clock, idGenerator: deps.idGenerator, repository: deps.planningRepository },
-    ),
-    /Planning period does not exist/,
   );
   await assert.rejects(
     () => savePlanningTask(

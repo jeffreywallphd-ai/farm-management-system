@@ -20,7 +20,8 @@ ADR-0012 pivots the next farmer-shareable pilot direction toward quick voice/pho
 - Optional farm-note photo attachments with `expo-image-picker`: [ADR-0012](../../docs/adr/ADR-0012-voice-photo-first-farm-event-capture-pilot.md)
 - On-device draft transcription path with `whisper.rn`/`whisper.cpp`: [ADR-0013](../../docs/adr/ADR-0013-on-device-farm-note-transcription-with-whisper-rn.md)
 - Local USDA organic certification readiness module: [ADR-0014](../../docs/adr/ADR-0014-organic-certification-readiness-module.md)
-- Local farm planning foundation for goals, subgoals, planning periods, tasks, and certification preparation: [ADR-0015](../../docs/adr/ADR-0015-local-farm-planning-foundation.md)
+- Local farm planning foundation for goals, subgoals, assignment-ready tasks, task instructions, boards, and certification preparation: [ADR-0015](../../docs/adr/ADR-0015-local-farm-planning-foundation.md)
+- Local GIS foundation for farm map settings and farm-owned GeoJSON geometry: [ADR-0016](../../docs/adr/ADR-0016-local-gis-map-and-geometry-foundation.md)
 
 Package versions are pinned in `package.json`, and `package-lock.json` records the app-local dependency resolution.
 
@@ -61,8 +62,10 @@ Canonical record meaning lives in [Mobile Pilot 1 Operational Records](../../doc
 - Organic Certification Phase 5: local soil fertility practices, compost batches and temperature logs, manure interval planning dates, crop rotations, soil reports, and recovery-copy inclusion. Manure dates are planning warnings, not automatic harvest blocks or compliance determinations.
 - Organic Certification Phase 6: local pest/weed/disease observations, linked actions, input-escalation notes, plastic mulch records, reports, and recovery-copy inclusion. The app organizes hierarchy evidence but does not diagnose or prescribe treatments.
 - Organic Certification Phase 7: local harvest lots, handling events, storage records, sale records, traceability reports, mass-balance review, and recovery-copy inclusion. The app organizes lot evidence but does not submit to certifiers, print labels, automate recalls, or make compliance determinations.
-- Local Planning: device-local goals, child goals/subgoals, selectable planning periods, farmer-editable tasks, responsible-person labels for future assignment readiness, and farm-note/organic-record links. Planning remains local and does not add accounts, notifications, calendars, sync, analytics, or worker permissions.
+- Local Planning: device-local goals, child goals/subgoals, farmer-editable tasks, optional desired start dates, assigned farmhands, task instruction audio/photos, and farm-note/organic-record links. Planning remains local and does not add accounts, notifications, calendars, sync, analytics, or worker permissions.
 - Organic Certification planning: seeded certification goals, subgoals, and preparation tasks are shown inside the standalone Organic Certification area while using the shared local planning foundation. Farmers can adjust certification timelines and task status without creating certifier submissions or compliance determinations.
+- Local farmhand management: farmers can create and edit farmhands, keep private phone/notes/status details, open the device phone app from a call action, enter one current recurring or week-specific schedule from the selected farmhand's directory item with same-time or different-time batch entry, assign planning tasks to farmhands, filter farm work boards by All work or a specific farmhand, and include farmhand data in recovery exports. Farm setup controls the shared week-start preference used by calendar pickers and schedule Week Of dates. This does not add worker accounts, messaging, payroll, timeclock, sync, notifications, or a companion app.
+- Basic GIS foundation: local farm map settings, saved address text, manual farm-center coordinates, optional foreground GPS helper, optional address geocoding helper, farm center stored as GeoJSON point geometry, basic point/polygon place geometry editing from Farm places, place linking, optional geometry-specific map-view settings, geometry archiving, explicit MapLibre full-screen online imagery editor with simple season-layer switching, map-centered point placement, map-centered polygon corner placement, selectable draggable polygon vertices, local Turf-backed polygon edge distance estimates in rebuilt development apps, Expo Go coordinate/manual fallback, and recovery-copy inclusion. Production online basemap selection, dependable national fall leaf-off imagery, farmer-selectable imagery dates, offline tile packs, advanced GIS editing beyond simple vertex dragging, and map-linked farm-note GPS capture are not implemented yet.
 - Organic Certification Phase 8: local Organic System Plan section drafts, certification preparation tasks, OSP/inspection reports, and recovery-copy inclusion. The app organizes draft evidence but does not submit certifier forms or score compliance.
 - Organic Certification Phase 9: local organic report package generation with manifest, combined report text, saved package records, and recovery-copy inclusion. The app does not upload packages, create signed certifier files, or bundle media automatically.
 - Organic Certification Phase 10: local advanced-scope readiness records for livestock, wild crops, mushrooms, producer groups, imports, and labeling/product claims. These are specialty-scope notes for certifier review, not full compliance modules.
@@ -73,6 +76,7 @@ Canonical record meaning lives in [Mobile Pilot 1 Operational Records](../../doc
 
 - Import or restore from a recovery copy.
 - Strong cryptographic model verification. The app currently checks that the downloaded model exists and falls within the expected size range; SHA-256 verification remains a follow-up.
+- Production online basemap tile configuration, dependable national fall leaf-off imagery, farmer-selectable imagery dates, offline map-pack download/delete flows, advanced GIS editing beyond simple vertex dragging, and map-linked farm-note GPS capture. The current GIS UI remains usable through manual entry and local coordinate display, with an explicit online full-screen imagery editor available in rebuilt development apps.
 - Physical-device pre-distribution review before inviting farmer testers.
 
 ## Pilot Unit Vocabulary
@@ -87,11 +91,11 @@ The app presents physical farm structure as `Farm places`, not generic locations
 
 Supported place types are `Field`, `Bed`, `Row`, `Greenhouse`, `High tunnel`, `Greenhouse bed`, `Bench`, `Storage area`, `Wash/Pack area`, `Cooler`, `Freezer`, `Barn/Shed`, and `Other`.
 
-Farm places remain private and device-local. They do not include GIS boundaries, GPS, maps, acreage, bed dimensions, crop planning, or drag-and-drop layout editing. Record forms use readable place paths, and recovery-copy export includes the place type and parent relationship needed to interpret nested places.
+Farm places remain private and device-local. ADR-0016 adds a separate local GIS foundation so farm-owned geometry can optionally link to a farm place without changing the ordinary place hierarchy model. Record forms use readable place paths, and recovery-copy export includes the place type, parent relationship, map settings, and farm-owned geometry needed to interpret nested places and spatial setup records.
 
 ## Deferred Capabilities
 
-Do not add packages or implementation for server synchronization, server APIs, multi-device behavior, certifier submission, shared need-listing publication, responses/messaging, automatic AI extraction, authentication, cloud backup, analytics, telemetry, maps/geolocation, push notifications, ORM, or deployment tooling without later accepted scope and ADR work.
+Do not add packages or implementation for server synchronization, server APIs, multi-device behavior, certifier submission, shared need-listing publication, responses/messaging, automatic AI extraction, authentication, cloud backup, analytics, telemetry, native map/geolocation providers beyond ADR-0016 boundaries, push notifications, ORM, or deployment tooling without later accepted scope and ADR work.
 
 ## Folder Overview
 

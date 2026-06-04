@@ -223,20 +223,62 @@ export function OrganicTraceabilityScreen({
               <Text style={styles.lotDetail}>{ORGANIC_LOT_STATUS_LABELS[lot.organicStatus]} - {lot.quantityHarvested} {lot.unit}</Text>
             </View>
             <Button label="Edit" onPress={() => beginEdit(lot)} size="large" variant="secondary" />
+            {editingLotId === lot.id ? (
+              <LotForm
+                createdFromHarvestRecordId={createdFromHarvestRecordId}
+                cropId={cropId}
+                cropOptions={cropOptions}
+                harvestDate={harvestDate}
+                lotCode={lotCode}
+                lotNotes={lotNotes}
+                organicStatus={organicStatus}
+                placeId={placeId}
+                placeOptions={placeOptions}
+                quantityHarvested={quantityHarvested}
+                unit={unit}
+                onCancel={resetLotForm}
+                onCreatedFromHarvestRecordIdChange={setCreatedFromHarvestRecordId}
+                onCropIdChange={setCropId}
+                onHarvestDateChange={setHarvestDate}
+                onLotCodeChange={setLotCode}
+                onLotNotesChange={setLotNotes}
+                onOrganicStatusChange={(value) => setOrganicStatus(value as OrganicLotStatus)}
+                onPlaceIdChange={setPlaceId}
+                onQuantityHarvestedChange={setQuantityHarvested}
+                onSave={handleSaveLot}
+                onUnitChange={setUnit}
+                saveLabel="Save lot changes"
+              />
+            ) : null}
           </View>
         ))}
-        <FormField label="Lot code" onChangeText={setLotCode} placeholder="KALE-2026-001" value={lotCode} />
-        <SelectField label="Crop" onChange={setCropId} options={cropOptions} value={cropId} />
-        <SelectField label="Harvest place" onChange={setPlaceId} options={placeOptions} value={placeId} />
-        <DateField label="Harvest date" onChangeText={setHarvestDate} placeholder="YYYY-MM-DD" value={harvestDate} />
-        <SelectField label="Organic status" onChange={(value) => setOrganicStatus(value as OrganicLotStatus)} options={ORGANIC_LOT_STATUSES.map((status) => ({ label: ORGANIC_LOT_STATUS_LABELS[status], value: status }))} value={organicStatus} />
-        <FormField label="Quantity harvested" keyboardType="decimal-pad" onChangeText={setQuantityHarvested} placeholder="25" value={quantityHarvested} />
-        <SelectField label="Unit" onChange={setUnit} options={PILOT_UNITS.map((pilotUnit) => ({ label: pilotUnit, value: pilotUnit }))} value={unit} />
-        <FormField label="Source harvest record ID" onChangeText={setCreatedFromHarvestRecordId} placeholder="Optional existing harvest record ID" value={createdFromHarvestRecordId} />
-        <FormField label="Notes" multiline onChangeText={setLotNotes} placeholder="Optional" value={lotNotes} />
+        {!editingLotId ? (
+          <LotForm
+            createdFromHarvestRecordId={createdFromHarvestRecordId}
+            cropId={cropId}
+            cropOptions={cropOptions}
+            harvestDate={harvestDate}
+            lotCode={lotCode}
+            lotNotes={lotNotes}
+            organicStatus={organicStatus}
+            placeId={placeId}
+            placeOptions={placeOptions}
+            quantityHarvested={quantityHarvested}
+            unit={unit}
+            onCreatedFromHarvestRecordIdChange={setCreatedFromHarvestRecordId}
+            onCropIdChange={setCropId}
+            onHarvestDateChange={setHarvestDate}
+            onLotCodeChange={setLotCode}
+            onLotNotesChange={setLotNotes}
+            onOrganicStatusChange={(value) => setOrganicStatus(value as OrganicLotStatus)}
+            onPlaceIdChange={setPlaceId}
+            onQuantityHarvestedChange={setQuantityHarvested}
+            onSave={handleSaveLot}
+            onUnitChange={setUnit}
+            saveLabel="Save organic lot"
+          />
+        ) : null}
         {error ? <Text style={styles.error}>{error}</Text> : null}
-        <Button label={editingLotId ? "Save lot changes" : "Save organic lot"} onPress={handleSaveLot} size="large" />
-        {editingLotId ? <Button label="Cancel edit" onPress={resetLotForm} size="large" variant="secondary" /> : null}
       </Card>
       <Card>
         <SectionHeading title="Handling, storage, and sales" />
@@ -286,9 +328,76 @@ export function OrganicTraceabilityScreen({
   );
 }
 
+function LotForm({
+  createdFromHarvestRecordId,
+  cropId,
+  cropOptions,
+  harvestDate,
+  lotCode,
+  lotNotes,
+  organicStatus,
+  placeId,
+  placeOptions,
+  quantityHarvested,
+  saveLabel,
+  unit,
+  onCancel,
+  onCreatedFromHarvestRecordIdChange,
+  onCropIdChange,
+  onHarvestDateChange,
+  onLotCodeChange,
+  onLotNotesChange,
+  onOrganicStatusChange,
+  onPlaceIdChange,
+  onQuantityHarvestedChange,
+  onSave,
+  onUnitChange,
+}: {
+  createdFromHarvestRecordId: string;
+  cropId: string;
+  cropOptions: Array<{ label: string; value: string }>;
+  harvestDate: string;
+  lotCode: string;
+  lotNotes: string;
+  organicStatus: OrganicLotStatus;
+  placeId: string;
+  placeOptions: Array<{ label: string; value: string }>;
+  quantityHarvested: string;
+  saveLabel: string;
+  unit: string;
+  onCancel?: () => void;
+  onCreatedFromHarvestRecordIdChange: (value: string) => void;
+  onCropIdChange: (value: string) => void;
+  onHarvestDateChange: (value: string) => void;
+  onLotCodeChange: (value: string) => void;
+  onLotNotesChange: (value: string) => void;
+  onOrganicStatusChange: (value: string) => void;
+  onPlaceIdChange: (value: string) => void;
+  onQuantityHarvestedChange: (value: string) => void;
+  onSave: () => void;
+  onUnitChange: (value: string) => void;
+}) {
+  return (
+    <View style={styles.inlineEdit}>
+      <FormField label="Lot code" onChangeText={onLotCodeChange} placeholder="KALE-2026-001" value={lotCode} />
+      <SelectField label="Crop" onChange={onCropIdChange} options={cropOptions} value={cropId} />
+      <SelectField label="Harvest place" onChange={onPlaceIdChange} options={placeOptions} value={placeId} />
+      <DateField label="Harvest date" onChangeText={onHarvestDateChange} placeholder="YYYY-MM-DD" value={harvestDate} />
+      <SelectField label="Organic status" onChange={onOrganicStatusChange} options={ORGANIC_LOT_STATUSES.map((status) => ({ label: ORGANIC_LOT_STATUS_LABELS[status], value: status }))} value={organicStatus} />
+      <FormField label="Quantity harvested" keyboardType="decimal-pad" onChangeText={onQuantityHarvestedChange} placeholder="25" value={quantityHarvested} />
+      <SelectField label="Unit" onChange={onUnitChange} options={PILOT_UNITS.map((pilotUnit) => ({ label: pilotUnit, value: pilotUnit }))} value={unit} />
+      <FormField label="Source harvest record ID" onChangeText={onCreatedFromHarvestRecordIdChange} placeholder="Optional existing harvest record ID" value={createdFromHarvestRecordId} />
+      <FormField label="Notes" multiline onChangeText={onLotNotesChange} placeholder="Optional" value={lotNotes} />
+      <Button label={saveLabel} onPress={onSave} size="large" />
+      {onCancel ? <Button label="Cancel edit" onPress={onCancel} size="large" variant="secondary" /> : null}
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
   buttons: { gap: theme.spacing.sm },
   error: { color: theme.colors.error, fontSize: theme.typography.small, lineHeight: 20 },
+  inlineEdit: { gap: theme.spacing.sm },
   lotDetail: { color: theme.colors.textSecondary, fontSize: theme.typography.body, lineHeight: 22 },
   lotRow: { borderColor: theme.colors.border, borderRadius: theme.radius.sm, borderWidth: 1, gap: theme.spacing.sm, padding: theme.spacing.sm },
   lotText: { gap: 2 },

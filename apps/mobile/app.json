@@ -16,6 +16,16 @@
         "android.permission.MODIFY_AUDIO_SETTINGS"
       ]
     },
+    "androidStatusBar": {
+      "barStyle": "light-content",
+      "backgroundColor": "#223B2E",
+      "translucent": false
+    },
+    "androidNavigationBar": {
+      "barStyle": "light-content",
+      "backgroundColor": "#223B2E",
+      "enforceContrast": true
+    },
     "plugins": [
       "expo-router",
       [
@@ -26,6 +36,15 @@
         }
       ],
       "expo-asset",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location while you choose farm map points.",
+          "isAndroidBackgroundLocationEnabled": false,
+          "isIosBackgroundLocationEnabled": false
+        }
+      ],
+      "@maplibre/maplibre-react-native",
       [
         "expo-image-picker",
         {

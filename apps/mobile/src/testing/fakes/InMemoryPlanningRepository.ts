@@ -1,5 +1,6 @@
 import type { FarmId } from "../../domain/farm/Farm";
 import type { FarmLocation, FarmLocationId } from "../../domain/farm/FarmLocation";
+import type { FarmhandId } from "../../domain/farmhand/Farmhand";
 import type {
   PlanningGoal,
   PlanningGoalCategory,
@@ -8,8 +9,6 @@ import type {
   PlanningBoardId,
   PlanningBoardScopeType,
   PlanningLink,
-  PlanningPeriod,
-  PlanningPeriodId,
   PlanningSource,
   PlanningTask,
   PlanningTaskId,
@@ -20,7 +19,6 @@ export class InMemoryPlanningRepository implements PlanningRepository {
   private locations = new Map<FarmId, FarmLocation[]>();
   private boards = new Map<FarmId, PlanningBoard[]>();
   private goals = new Map<FarmId, PlanningGoal[]>();
-  private periods = new Map<FarmId, PlanningPeriod[]>();
   private tasks = new Map<FarmId, PlanningTask[]>();
   private links = new Map<FarmId, PlanningLink[]>();
 
@@ -90,22 +88,6 @@ export class InMemoryPlanningRepository implements PlanningRepository {
     return records;
   }
 
-  async savePeriod(period: PlanningPeriod): Promise<void> {
-    const existing = this.periods.get(period.farmId) ?? [];
-    this.periods.set(period.farmId, [
-      period,
-      ...existing.filter((candidate) => candidate.id !== period.id),
-    ].sort((left, right) => left.label.localeCompare(right.label)));
-  }
-
-  async getPeriod(farmId: FarmId, id: PlanningPeriodId): Promise<PlanningPeriod | null> {
-    return this.periods.get(farmId)?.find((period) => period.id === id) ?? null;
-  }
-
-  async listPeriods(farmId: FarmId): Promise<PlanningPeriod[]> {
-    return this.periods.get(farmId) ?? [];
-  }
-
   async saveTask(task: PlanningTask): Promise<void> {
     const existing = this.tasks.get(task.farmId) ?? [];
     this.tasks.set(task.farmId, [
@@ -120,17 +102,17 @@ export class InMemoryPlanningRepository implements PlanningRepository {
 
   async listTasks(
     farmId: FarmId,
-    filters?: { goalId?: PlanningGoalId; periodId?: PlanningPeriodId; source?: PlanningSource },
+    filters?: { goalId?: PlanningGoalId; source?: PlanningSource; assignedFarmhandId?: FarmhandId },
   ): Promise<PlanningTask[]> {
     let records = this.tasks.get(farmId) ?? [];
     if (filters?.goalId) {
       records = records.filter((task) => task.goalId === filters.goalId);
     }
-    if (filters?.periodId) {
-      records = records.filter((task) => task.periodId === filters.periodId);
-    }
     if (filters?.source) {
       records = records.filter((task) => task.source === filters.source);
+    }
+    if (filters?.assignedFarmhandId) {
+      records = records.filter((task) => task.assignedFarmhandId === filters.assignedFarmhandId);
     }
     return records;
   }

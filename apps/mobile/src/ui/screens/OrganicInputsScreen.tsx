@@ -238,34 +238,76 @@ export function OrganicInputsScreen({
               </Text>
             </View>
             <Button label="Edit" onPress={() => beginEdit(input)} size="large" variant="secondary" />
+            {editingInputId === input.id ? (
+              <OrganicInputForm
+                approvalEvidenceAttachmentIdsText={approvalEvidenceAttachmentIdsText}
+                approvalExpirationDate={approvalExpirationDate}
+                approvalStatus={approvalStatus}
+                certifierApprovalDate={certifierApprovalDate}
+                composition={composition}
+                inputCategory={inputCategory}
+                manufacturer={manufacturer}
+                materialId={materialId}
+                materialOptions={materialOptions}
+                name={name}
+                notes={notes}
+                restrictions={restrictions}
+                saveLabel="Save organic input changes"
+                source={source}
+                supplier={supplier}
+                onApprovalEvidenceAttachmentIdsTextChange={setApprovalEvidenceAttachmentIdsText}
+                onApprovalExpirationDateChange={setApprovalExpirationDate}
+                onApprovalStatusChange={(value) => setApprovalStatus(value as OrganicInputApprovalStatus)}
+                onCancel={resetInputForm}
+                onCertifierApprovalDateChange={setCertifierApprovalDate}
+                onCompositionChange={setComposition}
+                onInputCategoryChange={(value) => setInputCategory(value as OrganicInputCategory)}
+                onManufacturerChange={setManufacturer}
+                onMaterialIdChange={setMaterialId}
+                onNameChange={setName}
+                onNotesChange={setNotes}
+                onRestrictionsChange={setRestrictions}
+                onSave={handleSaveInput}
+                onSourceChange={setSource}
+                onSupplierChange={setSupplier}
+              />
+            ) : null}
           </View>
         ))}
-        <SelectField label="Linked setup material" onChange={setMaterialId} options={materialOptions} value={materialId} />
-        <FormField label="Input name" onChangeText={setName} placeholder="Compost, copper spray, sanitizer" value={name} />
-        <SelectField
-          label="Input category"
-          onChange={(value) => setInputCategory(value as OrganicInputCategory)}
-          options={ORGANIC_INPUT_CATEGORIES.map((category) => ({ label: ORGANIC_INPUT_CATEGORY_LABELS[category], value: category }))}
-          value={inputCategory}
-        />
-        <SelectField
-          label="Approval status"
-          onChange={(value) => setApprovalStatus(value as OrganicInputApprovalStatus)}
-          options={ORGANIC_INPUT_APPROVAL_STATUSES.map((status) => ({ label: ORGANIC_INPUT_APPROVAL_STATUS_LABELS[status], value: status }))}
-          value={approvalStatus}
-        />
-        <FormField label="Manufacturer" onChangeText={setManufacturer} placeholder="Optional" value={manufacturer} />
-        <FormField label="Supplier" onChangeText={setSupplier} placeholder="Optional" value={supplier} />
-        <FormField label="Composition" multiline onChangeText={setComposition} placeholder="Ingredients, analysis, label composition" value={composition} />
-        <FormField label="Source" onChangeText={setSource} placeholder="Where it came from" value={source} />
-        <FormField label="Approval evidence IDs or local references" multiline onChangeText={setApprovalEvidenceAttachmentIdsText} placeholder="Label photo, receipt, OMRI listing, certifier email" value={approvalEvidenceAttachmentIdsText} />
-        <DateField label="Certifier approval date" onChangeText={setCertifierApprovalDate} placeholder="YYYY-MM-DD" value={certifierApprovalDate} />
-        <DateField label="Approval expiration date" onChangeText={setApprovalExpirationDate} placeholder="YYYY-MM-DD" value={approvalExpirationDate} />
-        <FormField label="Restrictions" multiline onChangeText={setRestrictions} placeholder="Rate limits, crop restrictions, certifier conditions" value={restrictions} />
-        <FormField label="Notes" multiline onChangeText={setNotes} placeholder="Optional" value={notes} />
+        {!editingInputId ? (
+          <OrganicInputForm
+            approvalEvidenceAttachmentIdsText={approvalEvidenceAttachmentIdsText}
+            approvalExpirationDate={approvalExpirationDate}
+            approvalStatus={approvalStatus}
+            certifierApprovalDate={certifierApprovalDate}
+            composition={composition}
+            inputCategory={inputCategory}
+            manufacturer={manufacturer}
+            materialId={materialId}
+            materialOptions={materialOptions}
+            name={name}
+            notes={notes}
+            restrictions={restrictions}
+            saveLabel="Save organic input"
+            source={source}
+            supplier={supplier}
+            onApprovalEvidenceAttachmentIdsTextChange={setApprovalEvidenceAttachmentIdsText}
+            onApprovalExpirationDateChange={setApprovalExpirationDate}
+            onApprovalStatusChange={(value) => setApprovalStatus(value as OrganicInputApprovalStatus)}
+            onCertifierApprovalDateChange={setCertifierApprovalDate}
+            onCompositionChange={setComposition}
+            onInputCategoryChange={(value) => setInputCategory(value as OrganicInputCategory)}
+            onManufacturerChange={setManufacturer}
+            onMaterialIdChange={setMaterialId}
+            onNameChange={setName}
+            onNotesChange={setNotes}
+            onRestrictionsChange={setRestrictions}
+            onSave={handleSaveInput}
+            onSourceChange={setSource}
+            onSupplierChange={setSupplier}
+          />
+        ) : null}
         {error ? <Text style={styles.error}>{error}</Text> : null}
-        <Button label={editingInputId ? "Save organic input changes" : "Save organic input"} onPress={handleSaveInput} size="large" />
-        {editingInputId ? <Button label="Cancel edit" onPress={resetInputForm} size="large" variant="secondary" /> : null}
       </Card>
       <Card>
         <SectionHeading detail="Use this for organic input applications that need place, crop, amount, reason, and evidence context." title="Input application" />
@@ -304,6 +346,100 @@ export function OrganicInputsScreen({
   );
 }
 
+function OrganicInputForm({
+  approvalEvidenceAttachmentIdsText,
+  approvalExpirationDate,
+  approvalStatus,
+  certifierApprovalDate,
+  composition,
+  inputCategory,
+  manufacturer,
+  materialId,
+  materialOptions,
+  name,
+  notes,
+  restrictions,
+  saveLabel,
+  source,
+  supplier,
+  onApprovalEvidenceAttachmentIdsTextChange,
+  onApprovalExpirationDateChange,
+  onApprovalStatusChange,
+  onCancel,
+  onCertifierApprovalDateChange,
+  onCompositionChange,
+  onInputCategoryChange,
+  onManufacturerChange,
+  onMaterialIdChange,
+  onNameChange,
+  onNotesChange,
+  onRestrictionsChange,
+  onSave,
+  onSourceChange,
+  onSupplierChange,
+}: {
+  approvalEvidenceAttachmentIdsText: string;
+  approvalExpirationDate: string;
+  approvalStatus: OrganicInputApprovalStatus;
+  certifierApprovalDate: string;
+  composition: string;
+  inputCategory: OrganicInputCategory;
+  manufacturer: string;
+  materialId: string;
+  materialOptions: Array<{ label: string; value: string }>;
+  name: string;
+  notes: string;
+  restrictions: string;
+  saveLabel: string;
+  source: string;
+  supplier: string;
+  onApprovalEvidenceAttachmentIdsTextChange: (value: string) => void;
+  onApprovalExpirationDateChange: (value: string) => void;
+  onApprovalStatusChange: (value: string) => void;
+  onCancel?: () => void;
+  onCertifierApprovalDateChange: (value: string) => void;
+  onCompositionChange: (value: string) => void;
+  onInputCategoryChange: (value: string) => void;
+  onManufacturerChange: (value: string) => void;
+  onMaterialIdChange: (value: string) => void;
+  onNameChange: (value: string) => void;
+  onNotesChange: (value: string) => void;
+  onRestrictionsChange: (value: string) => void;
+  onSave: () => void;
+  onSourceChange: (value: string) => void;
+  onSupplierChange: (value: string) => void;
+}) {
+  return (
+    <View style={styles.inlineEdit}>
+      <SelectField label="Linked setup material" onChange={onMaterialIdChange} options={materialOptions} value={materialId} />
+      <FormField label="Input name" onChangeText={onNameChange} placeholder="Compost, copper spray, sanitizer" value={name} />
+      <SelectField
+        label="Input category"
+        onChange={onInputCategoryChange}
+        options={ORGANIC_INPUT_CATEGORIES.map((category) => ({ label: ORGANIC_INPUT_CATEGORY_LABELS[category], value: category }))}
+        value={inputCategory}
+      />
+      <SelectField
+        label="Approval status"
+        onChange={onApprovalStatusChange}
+        options={ORGANIC_INPUT_APPROVAL_STATUSES.map((status) => ({ label: ORGANIC_INPUT_APPROVAL_STATUS_LABELS[status], value: status }))}
+        value={approvalStatus}
+      />
+      <FormField label="Manufacturer" onChangeText={onManufacturerChange} placeholder="Optional" value={manufacturer} />
+      <FormField label="Supplier" onChangeText={onSupplierChange} placeholder="Optional" value={supplier} />
+      <FormField label="Composition" multiline onChangeText={onCompositionChange} placeholder="Ingredients, analysis, label composition" value={composition} />
+      <FormField label="Source" onChangeText={onSourceChange} placeholder="Where it came from" value={source} />
+      <FormField label="Approval evidence IDs or local references" multiline onChangeText={onApprovalEvidenceAttachmentIdsTextChange} placeholder="Label photo, receipt, OMRI listing, certifier email" value={approvalEvidenceAttachmentIdsText} />
+      <DateField label="Certifier approval date" onChangeText={onCertifierApprovalDateChange} placeholder="YYYY-MM-DD" value={certifierApprovalDate} />
+      <DateField label="Approval expiration date" onChangeText={onApprovalExpirationDateChange} placeholder="YYYY-MM-DD" value={approvalExpirationDate} />
+      <FormField label="Restrictions" multiline onChangeText={onRestrictionsChange} placeholder="Rate limits, crop restrictions, certifier conditions" value={restrictions} />
+      <FormField label="Notes" multiline onChangeText={onNotesChange} placeholder="Optional" value={notes} />
+      <Button label={saveLabel} onPress={onSave} size="large" />
+      {onCancel ? <Button label="Cancel edit" onPress={onCancel} size="large" variant="secondary" /> : null}
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
   buttonStack: {
     gap: theme.spacing.sm,
@@ -332,6 +468,9 @@ const styles = StyleSheet.create({
     color: theme.colors.textSecondary,
     fontSize: theme.typography.body,
     lineHeight: 22,
+  },
+  inlineEdit: {
+    gap: theme.spacing.sm,
   },
   report: {
     color: theme.colors.textPrimary,

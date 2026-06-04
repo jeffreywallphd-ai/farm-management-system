@@ -62,17 +62,7 @@ interface SelectedPhoto {
   mimeType?: string;
 }
 
-export function RecordFarmEventScreen({
-  farm,
-  farmEventRepository,
-  farmReferenceRepository,
-  initialPlanningTaskId,
-  initialOrganicCategory,
-  locations,
-  organicCertificationRepository,
-  planningRepository,
-  planningTasks,
-}: {
+interface RecordFarmEventScreenProps {
   farm: Farm;
   farmEventRepository: FarmEventRepository;
   farmReferenceRepository: FarmReferenceRepository;
@@ -82,7 +72,45 @@ export function RecordFarmEventScreen({
   organicCertificationRepository: OrganicCertificationRepository;
   planningRepository: PlanningRepository;
   planningTasks: PlanningTask[];
-}) {
+}
+
+interface RecordFarmEventFormProps extends RecordFarmEventScreenProps {
+  onSaved?: (eventId: string) => void | Promise<void>;
+  showCertificationRequirementField?: boolean;
+  showPlaceField?: boolean;
+  showTaskField?: boolean;
+}
+
+export function RecordFarmEventScreen(props: RecordFarmEventScreenProps) {
+  return (
+    <Screen>
+      <PageHeader
+        eyebrow="Farm event"
+        supportingText="Record a quick voice memo while the work is fresh. Add photos when a picture helps."
+        title="Quick record farm events"
+      />
+      <Card>
+        <RecordFarmEventForm {...props} />
+      </Card>
+    </Screen>
+  );
+}
+
+export function RecordFarmEventForm({
+  farm,
+  farmEventRepository,
+  farmReferenceRepository,
+  initialPlanningTaskId,
+  initialOrganicCategory,
+  locations,
+  onSaved,
+  organicCertificationRepository,
+  planningRepository,
+  planningTasks,
+  showCertificationRequirementField = true,
+  showPlaceField = true,
+  showTaskField = true,
+}: RecordFarmEventFormProps) {
   const recorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
   const recorderState = useAudioRecorderState(recorder);
   const [eventType, setEventType] = useState<FarmEventType>("general");
@@ -254,6 +282,7 @@ export function RecordFarmEventScreen({
     setIsSaving(true);
     setErrors({});
     setSavedMessage(undefined);
+    let savedEventId: string | undefined;
 
     try {
       if (!recordedUri) {
@@ -356,6 +385,7 @@ export function RecordFarmEventScreen({
             ? "Farm event saved on this device and connected to your selected context."
             : "Farm event saved on this device.",
       );
+      savedEventId = result.event.id;
     } catch (caughtError) {
       if (caughtError instanceof z.ZodError) {
         setErrors(mapZodErrors(caughtError));
@@ -365,17 +395,15 @@ export function RecordFarmEventScreen({
     } finally {
       setIsSaving(false);
     }
+
+    if (savedEventId) {
+      await onSaved?.(savedEventId);
+    }
   }
 
   return (
-    <Screen>
-      <PageHeader
-        eyebrow="Farm event"
-        supportingText="Record a quick voice memo while the work is fresh. Add photos when a picture helps."
-        title="Quick record farm events"
-      />
-      <Card>
-        <SectionHeading detail="Speak what happened. You can add place and type context if it helps." title="Voice memo" />
+    <>
+        <SectionHeading detail="Speak what happened. Add type, text, and photos if they help." title="Voice memo" />
         <View style={styles.recorderPanel}>
           <Text style={styles.recorderStatus}>
             {recorderState.isRecording
@@ -407,31 +435,37 @@ export function RecordFarmEventScreen({
           }))}
           value={eventType}
         />
-        <SearchableSelectField
-          error={errors.placeId}
-          label="Farm place"
-          onChange={setPlaceId}
-          options={placeOptions}
-          placeholder="Search farm places"
-          value={placeId}
-        />
-        <SearchableSelectField
-          label="Associated task"
-          onChange={setPlanningTaskId}
-          options={planningTaskOptions}
-          placeholder="Search tasks"
-          value={planningTaskId}
-        />
-        <SearchableSelectField
-          label="Certification requirement"
-          onChange={(value) => {
-            setOrganicCategory(isOrganicEvidenceCategory(value) ? value : "");
-            setNeedsOrganicReview(Boolean(value));
-          }}
-          options={organicCategoryOptions}
-          placeholder="Search certification areas"
-          value={organicCategory}
-        />
+        {showPlaceField ? (
+          <SearchableSelectField
+            error={errors.placeId}
+            label="Farm place"
+            onChange={setPlaceId}
+            options={placeOptions}
+            placeholder="Search farm places"
+            value={placeId}
+          />
+        ) : null}
+        {showTaskField ? (
+          <SearchableSelectField
+            label="Associated task"
+            onChange={setPlanningTaskId}
+            options={planningTaskOptions}
+            placeholder="Search tasks"
+            value={planningTaskId}
+          />
+        ) : null}
+        {showCertificationRequirementField ? (
+          <SearchableSelectField
+            label="Certification requirement"
+            onChange={(value) => {
+              setOrganicCategory(isOrganicEvidenceCategory(value) ? value : "");
+              setNeedsOrganicReview(Boolean(value));
+            }}
+            options={organicCategoryOptions}
+            placeholder="Search certification areas"
+            value={organicCategory}
+          />
+        ) : null}
         <FormField
           error={errors.note}
           label="Text note"
@@ -476,8 +510,7 @@ export function RecordFarmEventScreen({
         {errors.form ? <Text style={styles.error}>{errors.form}</Text> : null}
         {savedMessage ? <Text style={styles.success}>{savedMessage}</Text> : null}
         <Button disabled={isSaving || recorderState.isRecording} label={isSaving ? "Saving..." : "Save farm event"} onPress={handleSave} />
-      </Card>
-    </Screen>
+    </>
   );
 }
 

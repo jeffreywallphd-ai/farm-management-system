@@ -22,6 +22,14 @@ import { createPlanning } from "./0020_create_planning";
 import { addPlanningPlaceReferences } from "./0021_add_planning_place_references";
 import { removeCountableItems } from "./0022_remove_countable_items";
 import { createPlanningBoards } from "./0023_create_planning_boards";
+import { createFarmhands } from "./0024_create_farmhands";
+import { createFarmhandScheduleSettings } from "./0025_create_farmhand_schedule_settings";
+import { createFarmMapSettings } from "./0026_create_farm_map_settings";
+import { createFarmPlaceGeometries } from "./0027_create_farm_place_geometries";
+import { addFarmPlaceGeometryMapView } from "./0028_add_farm_place_geometry_map_view";
+import { refinePlanningTaskFields } from "./0029_refine_planning_task_fields";
+import { removeReadyPlanningStatus } from "./0030_remove_ready_planning_status";
+import { runMigrations } from "./migrationRunner";
 
 test("harvest migration creates only harvest record storage", () => {
   const sql = createHarvestRecords.statements.join("\n");
@@ -269,24 +277,96 @@ test("organic evidence link migration connects farm notes to organic records loc
   assert.doesNotMatch(sql, /account/i);
 });
 
-test("planning migration creates local goals periods tasks and links only", () => {
+test("planning migration creates local goals tasks and links only", () => {
   const sql = createPlanning.statements.join("\n");
 
   assert.equal(createPlanning.version, 20);
   assert.match(sql, /CREATE TABLE IF NOT EXISTS planning_goals/);
   assert.match(sql, /parent_goal_id TEXT/);
-  assert.match(sql, /place_id TEXT/);
-  assert.match(sql, /CREATE TABLE IF NOT EXISTS planning_periods/);
-  assert.match(sql, /period_type TEXT NOT NULL/);
+  assert.doesNotMatch(sql, /place_id TEXT/);
   assert.match(sql, /CREATE TABLE IF NOT EXISTS planning_tasks/);
-  assert.match(sql, /responsible_person TEXT/);
+  assert.match(sql, /planned_start_date TEXT/);
+  assert.match(sql, /instruction_voice_memo_local_uri TEXT/);
+  assert.match(sql, /instruction_photo_json TEXT NOT NULL DEFAULT '\[\]'/);
+  assert.match(sql, /status IN \('notStarted', 'inProgress', 'blocked', 'done', 'canceled'\)/);
+  assert.doesNotMatch(sql, /'ready'/);
+  assert.doesNotMatch(sql, /planning_periods/);
+  assert.doesNotMatch(sql, /responsible_person/);
   assert.match(sql, /CREATE TABLE IF NOT EXISTS planning_links/);
-  assert.match(sql, /CREATE TABLE IF NOT EXISTS planning_boards/);
+  assert.doesNotMatch(sql, /CREATE TABLE IF NOT EXISTS planning_boards/);
   assert.match(sql, /linked_record_type TEXT NOT NULL/);
   assert.doesNotMatch(sql, /server/i);
   assert.doesNotMatch(sql, /sync/i);
   assert.doesNotMatch(sql, /notification/i);
   assert.doesNotMatch(sql, /auth/i);
+});
+
+test("planning task refinement migration removes retired task fields and adds instruction media locally", () => {
+  const sql = refinePlanningTaskFields.statements.join("\n");
+
+  assert.equal(refinePlanningTaskFields.version, 29);
+  assert.match(sql, /CREATE TABLE IF NOT EXISTS planning_tasks_rebuilt/);
+  assert.match(sql, /instruction_voice_memo_local_uri TEXT/);
+  assert.match(sql, /instruction_photo_json TEXT NOT NULL DEFAULT '\[\]'/);
+  assert.match(sql, /CASE WHEN status = 'ready' THEN 'notStarted' ELSE status END/);
+  assert.match(sql, /DROP TABLE IF EXISTS planning_periods/);
+  assert.doesNotMatch(sql, /period_id TEXT/);
+  assert.doesNotMatch(sql, /responsible_person TEXT/);
+  assert.doesNotMatch(sql, /server/i);
+  assert.doesNotMatch(sql, /sync/i);
+  assert.doesNotMatch(sql, /notification/i);
+  assert.doesNotMatch(sql, /auth/i);
+});
+
+test("planning status cleanup migration removes Ready status and preserves local task data", () => {
+  const sql = removeReadyPlanningStatus.statements.join("\n");
+
+  assert.equal(removeReadyPlanningStatus.version, 30);
+  assert.match(sql, /CREATE TABLE IF NOT EXISTS planning_tasks_status_rebuilt/);
+  assert.match(sql, /CASE WHEN status = 'ready' THEN 'notStarted' ELSE status END/);
+  assert.match(sql, /status IN \('notStarted', 'inProgress', 'blocked', 'done', 'canceled'\)/);
+  assert.doesNotMatch(sql, /status IN \('notStarted', 'ready'/);
+  assert.doesNotMatch(sql, /server/i);
+  assert.doesNotMatch(sql, /sync/i);
+  assert.doesNotMatch(sql, /notification/i);
+  assert.doesNotMatch(sql, /auth/i);
+});
+
+test("migration runner skips add-column migrations when a failed prior build already added the column", async () => {
+  const executedStatements: string[] = [];
+  const insertedVersions: number[] = [];
+  const appliedVersions = [
+    1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+    11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+    22, 23, 24, 25, 26, 27,
+  ];
+  const fakeDatabase = {
+    async execAsync(statement: string) {
+      executedStatements.push(statement);
+    },
+    async getAllAsync<T>(statement: string): Promise<T[]> {
+      if (statement.includes("SELECT version FROM schema_migrations")) {
+        return appliedVersions.map((version) => ({ version })) as T[];
+      }
+
+      if (statement.includes("PRAGMA table_info('planning_goals')") || statement.includes("PRAGMA table_info('planning_tasks')")) {
+        return [{ name: "place_id" }] as T[];
+      }
+
+      return [] as T[];
+    },
+    async runAsync(_statement: string, values: unknown[]) {
+      insertedVersions.push(Number(values[0]));
+    },
+  };
+
+  await runMigrations(fakeDatabase as never);
+
+  assert.equal(insertedVersions.includes(21), true);
+  assert.equal(executedStatements.some((statement) => /ALTER TABLE planning_goals ADD COLUMN place_id/.test(statement)), false);
+  assert.equal(executedStatements.some((statement) => /ALTER TABLE planning_tasks ADD COLUMN place_id/.test(statement)), false);
+  assert.equal(executedStatements.some((statement) => /idx_planning_goals_place/.test(statement)), true);
+  assert.equal(executedStatements.some((statement) => /idx_planning_tasks_place/.test(statement)), true);
 });
 
 test("planning board migration creates local kanban views without workflow services", () => {
@@ -327,5 +407,79 @@ test("countable item cleanup migration removes retired countable setup records",
   assert.doesNotMatch(sql, /server/i);
   assert.doesNotMatch(sql, /sync/i);
   assert.doesNotMatch(sql, /notification/i);
+  assert.doesNotMatch(sql, /auth/i);
+});
+
+test("farmhand migration creates local farmhand schedules and task assignments only", () => {
+  const sql = createFarmhands.statements.join("\n");
+
+  assert.equal(createFarmhands.version, 24);
+  assert.match(sql, /CREATE TABLE IF NOT EXISTS farmhands/);
+  assert.match(sql, /phone_number TEXT/);
+  assert.match(sql, /CREATE TABLE IF NOT EXISTS farmhand_recurring_schedules/);
+  assert.match(sql, /CREATE TABLE IF NOT EXISTS farmhand_weekly_schedule_blocks/);
+  assert.match(sql, /ALTER TABLE planning_tasks ADD COLUMN assigned_farmhand_id/);
+  assert.doesNotMatch(sql, /payroll/i);
+  assert.doesNotMatch(sql, /timeclock/i);
+  assert.doesNotMatch(sql, /server/i);
+  assert.doesNotMatch(sql, /sync/i);
+  assert.doesNotMatch(sql, /notification/i);
+  assert.doesNotMatch(sql, /auth/i);
+});
+
+test("farmhand schedule settings migration creates local week-start preference only", () => {
+  const sql = createFarmhandScheduleSettings.statements.join("\n");
+
+  assert.equal(createFarmhandScheduleSettings.version, 25);
+  assert.match(sql, /CREATE TABLE IF NOT EXISTS farmhand_schedule_settings/);
+  assert.match(sql, /week_starts_on INTEGER NOT NULL/);
+  assert.doesNotMatch(sql, /server/i);
+  assert.doesNotMatch(sql, /sync/i);
+  assert.doesNotMatch(sql, /notification/i);
+  assert.doesNotMatch(sql, /auth/i);
+});
+
+test("farm map settings migration creates local saved map view only", () => {
+  const sql = createFarmMapSettings.statements.join("\n");
+
+  assert.equal(createFarmMapSettings.version, 26);
+  assert.match(sql, /CREATE TABLE IF NOT EXISTS farm_map_settings/);
+  assert.match(sql, /default_center_latitude REAL/);
+  assert.match(sql, /default_zoom REAL NOT NULL/);
+  assert.match(sql, /offline_map_status TEXT NOT NULL/);
+  assert.doesNotMatch(sql, /server/i);
+  assert.doesNotMatch(sql, /sync/i);
+  assert.doesNotMatch(sql, /upload/i);
+  assert.doesNotMatch(sql, /analytics/i);
+  assert.doesNotMatch(sql, /auth/i);
+});
+
+test("farm place geometry migration creates local GeoJSON geometry storage only", () => {
+  const sql = createFarmPlaceGeometries.statements.join("\n");
+
+  assert.equal(createFarmPlaceGeometries.version, 27);
+  assert.match(sql, /CREATE TABLE IF NOT EXISTS farm_place_geometries/);
+  assert.match(sql, /geometry_role TEXT NOT NULL/);
+  assert.match(sql, /geojson TEXT NOT NULL/);
+  assert.match(sql, /'bufferZone'/);
+  assert.match(sql, /'adjacentLandRiskArea'/);
+  assert.match(sql, /archived_at TEXT/);
+  assert.doesNotMatch(sql, /server/i);
+  assert.doesNotMatch(sql, /sync/i);
+  assert.doesNotMatch(sql, /upload/i);
+  assert.doesNotMatch(sql, /analytics/i);
+  assert.doesNotMatch(sql, /auth/i);
+});
+
+test("farm place geometry map-view migration adds local view settings only", () => {
+  const sql = addFarmPlaceGeometryMapView.statements.join("\n");
+
+  assert.equal(addFarmPlaceGeometryMapView.version, 28);
+  assert.match(sql, /ALTER TABLE farm_place_geometries ADD COLUMN map_view_latitude REAL/);
+  assert.match(sql, /ALTER TABLE farm_place_geometries ADD COLUMN map_view_zoom REAL/);
+  assert.doesNotMatch(sql, /server/i);
+  assert.doesNotMatch(sql, /sync/i);
+  assert.doesNotMatch(sql, /upload/i);
+  assert.doesNotMatch(sql, /analytics/i);
   assert.doesNotMatch(sql, /auth/i);
 });

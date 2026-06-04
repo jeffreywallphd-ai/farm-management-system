@@ -9,6 +9,10 @@ import { listHarvestHistory } from "./list-harvest-history/ListHarvestHistory";
 import { recordHarvest } from "./record-harvest/RecordHarvest";
 import { InMemoryFarmReferenceRepository } from "../../testing/fakes/InMemoryFarmReferenceRepository";
 import { InMemoryLocalRecordRepository } from "../../testing/fakes/InMemoryLocalRecordRepository";
+import {
+  MOBILE_PILOT_APP_DATA_SCHEMA_VERSION,
+  MOBILE_PILOT_RECOVERY_COPY_EXPORT_VERSION,
+} from "../../domain/export/MobilePilotRecoveryCopy";
 
 function testDependencies() {
   let nextId = 1;
@@ -164,8 +168,8 @@ test("recovery copy export contains farm references and harvest records", async 
   assert.equal(file.fileName, "farm-pilot-recovery-copy-20260529T110000.json");
   assert.equal(exportRepository.sharedFile?.fileName, file.fileName);
   const payload = JSON.parse(exportRepository.contents);
-  assert.equal(payload.exportVersion, 16);
-  assert.equal(payload.appDataSchemaVersion, 17);
+  assert.equal(payload.exportVersion, MOBILE_PILOT_RECOVERY_COPY_EXPORT_VERSION);
+  assert.equal(payload.appDataSchemaVersion, MOBILE_PILOT_APP_DATA_SCHEMA_VERSION);
   assert.equal(payload.farm.name, "Green Hill Farm");
   assert.equal(payload.locations[0].name, "North Field");
   assert.equal(payload.locations[0].kind, "field");
