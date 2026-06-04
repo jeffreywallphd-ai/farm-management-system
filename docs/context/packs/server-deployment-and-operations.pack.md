@@ -2,7 +2,7 @@
 
 - Pack name: `server-deployment-and-operations`
 - Status: active
-- Last reviewed: 2026-05-28
+- Last reviewed: 2026-06-04
 - Authority posture: Derived context aid only; canonical docs and accepted ADRs govern.
 
 ## Purpose
@@ -29,7 +29,7 @@ Helps agents work on future server operation/deployment modes and current mobile
 
 - Server and deployment work is not initial pilot implementation scope.
 - Mobile Pilot 1 export/backup and pilot data safety are active now and governed by `docs/operations/mobile-pilot-data-safety-requirements.md`.
-- The currently implemented recovery-copy export covers farm setup/reference data and saved harvest, material-use, and inventory-count records; restore/import, cloud backup, and server backup remain unimplemented.
+- The currently implemented recovery-copy export covers farm setup/reference data, saved harvest/material-use/inventory-count records, farm-event/media metadata, planning records, and starter-pack activation state; restore/import, cloud backup, and server backup remain unimplemented.
 - Mobile offline capability remains required in every later deployment mode.
 - Ordinary farmers must not be assumed to administer infrastructure.
 - Hosted use and credible farmer-controlled/self-hosted operation remain compatible directions.

@@ -48,9 +48,13 @@ This keeps daily farm work and certification work together. Marking a note for o
 
 Organic Certification uses the shared local farm planning foundation for certification goals, subgoals, and preparation tasks, while remaining a standalone feature area in the mobile UX.
 
-The certification area should seed a practical certification plan with meaningful subgoals for profile setup, land context, input approvals and restrictions, input applications, seed and planting records, soil fertility and rotations, compost evidence, raw manure intervals, pest hierarchy, lot traceability, handling/storage/sales mass balance, Organic System Plan practices and monitoring, Organic System Plan recordkeeping and prevention procedures, inspection preparation, reports, and advanced scopes where relevant. Farmers may adjust timelines and task status locally. These planning records organize work for certification preparation; they do not determine compliance, submit records, assign legal responsibility, create worker accounts, or replace certifier instructions.
+Farm setup owns the farmer-facing control for whether the farm is pursuing or continuing organic certification work. When certification pursuit is on, the certification area may seed two highest-level certification goals: certification administration work and certification farm work. Administration work covers certifier/profile setup, recordkeeping and audit-trail administration, input approval review, Organic System Plan narratives, Organic System Plan recordkeeping and prevention procedures, and certifier follow-up. Farm work covers land context, input applications, seed and planting records, soil fertility and rotations, compost evidence, raw manure intervals, pest hierarchy, lot traceability, handling/storage/sales, and mass-balance work. Farmers may adjust timelines and task status locally. These planning records organize work for certification preparation; they do not determine compliance, submit records, assign legal responsibility, create worker accounts, or replace certifier instructions.
 
-Seeded certification tasks should be concrete enough for a farmer to act on without translating broad regulatory categories themselves. Task notes should describe expected evidence for certifier review, including record retention and audit trail setup, three-year prohibited-substance history, boundaries and buffers, input composition/source/location documentation, seed labels and commercial availability searches, compost process evidence, raw manure interval planning, pest-prevention hierarchy, plastic mulch removal, lot traceability, commingling-prevention practices, OSP narratives, linked farm-note evidence, and local report/recovery exports. Compost-related tasks should distinguish hot compost process evidence from cold/unfinished or aged material that needs certifier review or raw-manure interval planning. These tasks remain planning aids and must not be presented as compliance findings.
+When certification pursuit is off, the seeded certification goals and boards should not be shown in Farm Planning or Farm Work Boards. Existing local certification planning records may remain stored for continuity and recovery, but they are hidden until pursuit is turned back on. The Organic Certification entry page should explain that certification is off and link the farmer to Farm setup to turn it on.
+
+Seeded certification tasks should be concrete enough for a farmer to act on without translating broad regulatory categories themselves. Administration tasks may be oriented around review, setup, drafting, and collecting certifier-facing information. Farm-work tasks should be atomic action items that a farmer can do or assign directly, such as recording a date, checking compost temperature, turning a windrow pile, assigning a lot code, linking seed to a planting event, recording container cleaning, or explaining a mass-balance discrepancy. Task notes should describe expected evidence for certifier review, including record retention and audit trail setup, three-year prohibited-substance history, boundaries and buffers, input composition/source/location documentation, seed labels and commercial availability searches, compost process evidence, raw manure interval planning, pest-prevention hierarchy, plastic mulch removal, lot traceability, commingling-prevention practices, OSP narratives, linked farm-note evidence, and local report/recovery exports. Compost-related tasks should distinguish hot compost process evidence from cold/unfinished or aged material that needs certifier review or raw-manure interval planning, and hot compost work should separate temperature checking from windrow turning where those are different actions. These tasks remain planning aids and must not be presented as compliance findings.
+
+Certification task cards should explain why each task exists under a "Summary of USDA Requirements" section. The summary should be specific to the task rather than repeated category boilerplate: it should name the USDA/NOP requirement logic that motivated the task, include the task's expected evidence, and provide links to official USDA or eCFR pages for the relevant sections. Requirement links are informational anchors only. If the app does not provide a safe in-app official-source viewer with an obvious close control, tapping a requirement link must ask the farmer before opening the default browser and must not send farm records.
 
 ## Evidence Linking and Package Automation
 
@@ -82,7 +86,7 @@ Implemented behavior:
    - Remove the seeded `Prepare inspection evidence` and `Generate certification or renewal package` subgoals from the certification template.
    - Delete template-owned tasks under those two goals during the implementation change, since no farmer data is expected before release. If farmer-entered data exists later, preserve farmer-created non-template tasks and only retire template-owned records.
    - Move any remaining follow-up work into system-generated prompts, package warnings, or farmer-created tasks instead of a standing manual checklist.
-   - Expected template result: the base certification template drops from 15 subgoals to 13 subgoals, with evidence review and package generation handled by dedicated organic workflows.
+   - Expected template result: the base certification template keeps evidence review and package generation in dedicated organic workflows while certification planning uses two highest-level goals with 14 subgoals: 5 administration subgoals and 9 farm-work subgoals.
    - Required verification: template creation without the two goals, no duplicate replacement tasks, recovery export still includes planning data, and package/evidence screens cover the removed work.
 
 Future extension:
@@ -138,7 +142,7 @@ Included:
   - imports
   - packaged product labeling
 - Capture certifier name/contact, certificate number, certificate effective date, annual update due date, inspection due window, record retention years, and notes.
-- Display an Organic Certification dashboard only when organic tracking is enabled.
+- Display an Organic Certification dashboard only when organic tracking is enabled; otherwise show an off-state page that links to Farm setup.
 - Generate a basic Organic Profile Report.
 - Include Phase 1 profile/scope data in local recovery export.
 
@@ -159,12 +163,13 @@ Excluded from Phase 1:
 
 Organic Certification appears in the hamburger menu as the entry point.
 
-Before organic tracking is enabled, show a setup screen that explains:
+Before organic tracking is enabled, show an off-state screen that explains:
 
 - Organic tracking is optional.
 - Records stay local unless the farmer exports them.
 - The module helps organize records for certifier review.
 - The app does not replace certification.
+- Organic tracking can be turned on from Farm setup.
 
 After organic tracking is enabled, show:
 

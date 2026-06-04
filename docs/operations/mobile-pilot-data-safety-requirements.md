@@ -1,7 +1,7 @@
 # Mobile Pilot Data-Safety Requirements
 
 - Status: accepted
-- Last reviewed: 2026-05-28
+- Last reviewed: 2026-06-04
 - Canonical for: device-local Mobile Pilot 1 data retention, export/backup expectations, farmer communication, update/replacement safety, and limitations before real pilot reliance
 - Related ADRs: [ADR-0001](../adr/ADR-0001-offline-first-field-operation.md), [ADR-0002](../adr/ADR-0002-history-preserving-idempotent-synchronization.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](../adr/ADR-0005-data-portability-and-recoverability.md), [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md), [ADR-0009](../adr/ADR-0009-mobile-pilot-1-local-persistence.md), [ADR-0010](../adr/ADR-0010-mobile-pilot-1-export-and-recovery-copy.md), [ADR-0011](../adr/ADR-0011-mobile-pilot-1-runtime-boundary-validation.md), [ADR-0012](../adr/ADR-0012-voice-photo-first-farm-event-capture-pilot.md), [ADR-0013](../adr/ADR-0013-on-device-farm-note-transcription-with-whisper-rn.md)
 - Related docs: [Mobile Pilot 1 Implementation Scope](../product/mobile-pilot-1-implementation-scope.md), [Mobile Pilot 1 Operational Records](../domain/mobile-pilot-1-operational-records.md), [Offline-First Mobile Architecture](../architecture/offline-first-mobile-architecture.md), [Backup, Restore, and Data Export Requirements](backup-restore-and-data-export-requirements.md), [Upgrades, Migrations, and Recovery Requirements](upgrades-migrations-and-recovery-requirements.md), [Mobile App README](../../apps/mobile/README.md)
@@ -25,6 +25,7 @@ Before a farmer relies on Mobile Pilot 1 for meaningful records:
    - `MaterialUseRecorded`.
    - `InventoryCountRecorded`.
    - Farm-event capture metadata, voice memo files, photo files, and transcript drafts when present.
+   - Local planning goals, tasks, boards, links, starter farm-work pack activation state, and starter-pack subgoal/task activation state when present.
    - Essential identifiers, timestamps, quantities, units, location/item relationships, and privacy classification needed to understand the records.
 3. The app must clearly communicate:
    - Records are stored on the device.

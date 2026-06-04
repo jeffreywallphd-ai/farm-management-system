@@ -1,10 +1,13 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
+import type { Farmhand } from "../../domain/farmhand/Farmhand";
 import type { PlanningBoard, PlanningGoal, PlanningLink, PlanningTask } from "../../domain/planning/Planning";
 import {
+  buildTaskAssignmentOptions,
   countFarmNoteLinksByTask,
   describeBoardTask,
+  describeBoardTaskSummary,
   isWipLimitExceeded,
   selectBoardColumnTasks,
   selectBoardsForFarmhand,
@@ -40,6 +43,20 @@ test("board model counts farm-note links by task", () => {
   ];
 
   assert.deepEqual(countFarmNoteLinksByTask(links), { "task-1": 2 });
+});
+
+test("board task summary names priority and linked farm events", () => {
+  const task: PlanningTask = {
+    ...baseTask,
+    id: "task-1",
+    title: "Seed carrots",
+    status: "notStarted",
+    priority: "high",
+  };
+
+  assert.equal(describeBoardTaskSummary(task, 0), "High priority");
+  assert.equal(describeBoardTaskSummary(task, 1), "High priority - 1 linked farm event");
+  assert.equal(describeBoardTaskSummary(task, 2), "High priority - 2 linked farm events");
 });
 
 test("board task details include description, place path, and target completion date", () => {
@@ -94,6 +111,7 @@ test("board farmhand filter keeps only boards with work assigned to the selected
   const boards: PlanningBoard[] = [
     { id: "board-1", farmId: "farm-1", title: "Greenhouse", scopeType: "goal", goalId: "goal-1", createdAt: baseTask.createdAt, updatedAt: baseTask.updatedAt },
     { id: "board-2", farmId: "farm-1", title: "Non-goal farm work", scopeType: "nonGoalTasks", createdAt: baseTask.createdAt, updatedAt: baseTask.updatedAt },
+    { id: "board-3", farmId: "farm-1", title: "Retired certification goal", scopeType: "goal", goalId: "missing-goal", createdAt: baseTask.createdAt, updatedAt: baseTask.updatedAt },
   ];
   const goals: PlanningGoal[] = [
     { id: "goal-1", farmId: "farm-1", title: "Greenhouse", category: "general", status: "planned", source: "farmer", sortOrder: 0, createdAt: baseTask.createdAt, updatedAt: baseTask.updatedAt },
@@ -109,4 +127,32 @@ test("board farmhand filter keeps only boards with work assigned to the selected
   assert.deepEqual(selectBoardTasksForFarmhand(boards[0]!, goals, tasks, "farmhand-1").map((task) => task.id), ["task-1"]);
   assert.deepEqual(selectBoardsForFarmhand(boards, goals, tasks, "farmhand-2").map((board) => board.id), ["board-2"]);
   assert.deepEqual(selectBoardsForFarmhand(boards, goals, tasks, "all").map((board) => board.id), ["board-1", "board-2"]);
+});
+
+test("board selector hides non-goal board when there are no non-goal tasks", () => {
+  const boards: PlanningBoard[] = [
+    { id: "board-1", farmId: "farm-1", title: "Greenhouse", scopeType: "goal", goalId: "goal-1", createdAt: baseTask.createdAt, updatedAt: baseTask.updatedAt },
+    { id: "board-2", farmId: "farm-1", title: "Non-goal farm work", scopeType: "nonGoalTasks", createdAt: baseTask.createdAt, updatedAt: baseTask.updatedAt },
+  ];
+  const goals: PlanningGoal[] = [
+    { id: "goal-1", farmId: "farm-1", title: "Greenhouse", category: "general", status: "planned", source: "farmer", sortOrder: 0, createdAt: baseTask.createdAt, updatedAt: baseTask.updatedAt },
+  ];
+  const tasks: PlanningTask[] = [
+    { ...baseTask, id: "task-1", goalId: "goal-1", title: "Water seedlings", status: "notStarted" },
+  ];
+
+  assert.deepEqual(selectBoardsForFarmhand(boards, goals, tasks, "all").map((board) => board.id), ["board-1"]);
+});
+
+test("task assignment options include unassigned and preserve inactive farmhand context", () => {
+  const farmhands: Farmhand[] = [
+    { id: "farmhand-1", farmId: "farm-1", name: "Ana", status: "active", createdAt: baseTask.createdAt, updatedAt: baseTask.updatedAt },
+    { id: "farmhand-2", farmId: "farm-1", name: "Lee", status: "inactive", createdAt: baseTask.createdAt, updatedAt: baseTask.updatedAt },
+  ];
+
+  assert.deepEqual(buildTaskAssignmentOptions(farmhands), [
+    { label: "Unassigned", value: "" },
+    { label: "Ana", value: "farmhand-1" },
+    { label: "Lee (inactive)", value: "farmhand-2" },
+  ]);
 });

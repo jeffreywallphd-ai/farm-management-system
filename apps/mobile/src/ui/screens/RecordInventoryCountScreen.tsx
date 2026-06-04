@@ -83,7 +83,7 @@ export function RecordInventoryCountScreen({
         <Card>
           <SectionHeading title="Finish setup first" />
           <EmptyState text="Add a crop or material before recording a count." />
-          <Button label="Back to farm setup" onPress={() => replaceRoute(router, "/")} variant="secondary" />
+          <Button label="Back to farm setup" onPress={() => replaceRoute(router, "/setup")} variant="secondary" />
         </Card>
       ) : (
         <Card>

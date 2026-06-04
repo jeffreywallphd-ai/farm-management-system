@@ -110,7 +110,7 @@ export function RecordHarvestScreen({
           <SectionHeading title="Finish setup first" />
           {crops.length === 0 ? <EmptyState text="Add a crop before recording a harvest." /> : null}
           {locations.length === 0 ? <EmptyState text="Add a farm place before recording a harvest." /> : null}
-          <Button label="Back to farm setup" onPress={() => replaceRoute(router, "/")} variant="secondary" />
+          <Button label="Back to farm setup" onPress={() => replaceRoute(router, "/setup")} variant="secondary" />
         </Card>
       ) : (
         <Card>

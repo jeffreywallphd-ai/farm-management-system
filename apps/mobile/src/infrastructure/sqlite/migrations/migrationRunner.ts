@@ -30,6 +30,10 @@ import { createFarmPlaceGeometries } from "./0027_create_farm_place_geometries";
 import { addFarmPlaceGeometryMapView } from "./0028_add_farm_place_geometry_map_view";
 import { refinePlanningTaskFields } from "./0029_refine_planning_task_fields";
 import { removeReadyPlanningStatus } from "./0030_remove_ready_planning_status";
+import { addFarmWorkTemplatePlanningSource } from "./0031_add_farm_work_template_planning_source";
+import { createFarmWorkPackStates } from "./0032_create_farm_work_pack_states";
+import { addStarterWorkPacksSetupState } from "./0033_add_starter_work_packs_setup_state";
+import { createFarmWorkPackItemStates } from "./0034_create_farm_work_pack_item_states";
 
 export interface Migration {
   version: number;
@@ -68,6 +72,10 @@ const migrations: Migration[] = [
   addFarmPlaceGeometryMapView,
   refinePlanningTaskFields,
   removeReadyPlanningStatus,
+  addFarmWorkTemplatePlanningSource,
+  createFarmWorkPackStates,
+  addStarterWorkPacksSetupState,
+  createFarmWorkPackItemStates,
 ];
 
 export async function runMigrations(database: SQLiteDatabase): Promise<void> {

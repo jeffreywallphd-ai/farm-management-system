@@ -11,6 +11,7 @@ interface FarmRow {
   name: string;
   created_at: string;
   core_places_setup_completed_at: string | null;
+  starter_work_packs_setup_completed_at: string | null;
 }
 
 interface LocationRow {
@@ -36,14 +37,20 @@ export class SqliteFarmReferenceRepository implements FarmReferenceRepository {
 
   async createFarm(farm: Farm): Promise<void> {
     await this.database.runAsync(
-      "INSERT INTO farms (id, name, created_at, core_places_setup_completed_at) VALUES (?, ?, ?, ?);",
-      [farm.id, farm.name, farm.createdAt, farm.corePlacesSetupCompletedAt ?? null],
+      "INSERT INTO farms (id, name, created_at, core_places_setup_completed_at, starter_work_packs_setup_completed_at) VALUES (?, ?, ?, ?, ?);",
+      [
+        farm.id,
+        farm.name,
+        farm.createdAt,
+        farm.corePlacesSetupCompletedAt ?? null,
+        farm.starterWorkPacksSetupCompletedAt ?? null,
+      ],
     );
   }
 
   async getFarm(): Promise<Farm | null> {
     const row = await this.database.getFirstAsync<FarmRow>(
-      "SELECT id, name, created_at, core_places_setup_completed_at FROM farms ORDER BY created_at ASC LIMIT 1;",
+      "SELECT id, name, created_at, core_places_setup_completed_at, starter_work_packs_setup_completed_at FROM farms ORDER BY created_at ASC LIMIT 1;",
     );
 
     return row ? mapFarm(row) : null;
@@ -56,6 +63,13 @@ export class SqliteFarmReferenceRepository implements FarmReferenceRepository {
   async markCorePlacesSetupComplete(farmId: FarmId, completedAt: string): Promise<void> {
     await this.database.runAsync(
       "UPDATE farms SET core_places_setup_completed_at = ? WHERE id = ?;",
+      [completedAt, farmId],
+    );
+  }
+
+  async markStarterWorkPacksSetupComplete(farmId: FarmId, completedAt: string): Promise<void> {
+    await this.database.runAsync(
+      "UPDATE farms SET starter_work_packs_setup_completed_at = ? WHERE id = ?;",
       [completedAt, farmId],
     );
   }
@@ -118,6 +132,7 @@ function mapFarm(row: FarmRow): Farm {
     name: row.name,
     createdAt: row.created_at,
     corePlacesSetupCompletedAt: row.core_places_setup_completed_at ?? undefined,
+    starterWorkPacksSetupCompletedAt: row.starter_work_packs_setup_completed_at ?? undefined,
   };
 }
 

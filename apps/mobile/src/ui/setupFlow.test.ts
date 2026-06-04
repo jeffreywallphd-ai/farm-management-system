@@ -18,9 +18,20 @@ test("saving a farm name moves startup to core farm places setup", () => {
   assert.equal(getStartupStep(farm), "coreFarmPlaces");
 });
 
-test("completed setup opens the post-setup home experience", () => {
+test("completed farm places setup moves startup to starter work pack setup", () => {
   assert.equal(
     getStartupStep({ ...farm, corePlacesSetupCompletedAt: "2026-05-29T12:05:00.000Z" }),
+    "starterWorkPacks",
+  );
+});
+
+test("completed setup opens the post-setup home experience", () => {
+  assert.equal(
+    getStartupStep({
+      ...farm,
+      corePlacesSetupCompletedAt: "2026-05-29T12:05:00.000Z",
+      starterWorkPacksSetupCompletedAt: "2026-05-29T12:10:00.000Z",
+    }),
     "home",
   );
 });

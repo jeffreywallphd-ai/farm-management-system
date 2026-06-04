@@ -43,6 +43,8 @@ Phase 1 adds local SQLite storage for:
 - one certification-scope row per selected/known scope;
 - generated report content derived from current local data when the user opens or exports the report.
 
+The organic operation profile also acts as the local pursuit/continuation switch. A missing profile or a profile with `organicStatus` set to `notOrganic` is treated as certification off. Farm setup owns the control that changes this state. Turning certification off does not require deleting existing organic or planning records; planning and certification screens hide certification-specific work until the farmer turns pursuit back on.
+
 Later phases may add organic place profiles, evidence records, inputs, seed lots, soil records, pest observations, lots, sales, OSP sections, and export packages only after their phase docs and tests are updated.
 
 ## Phase 2 Storage Boundary
@@ -125,7 +127,17 @@ The mobile UX must not introduce a separate evidence inbox or organic review que
 
 Organic Certification uses the shared local planning repository for seeded certification goals, subgoals, and preparation tasks. The Organic Certification UX remains standalone, but timeline and task data are stored through the planning foundation so generic Planning and certification preparation share one local work model.
 
+The certification template creates two highest-level local planning goals: certification administration work and certification farm work. Default farm work boards may be generated from each root goal by the shared planning-board foundation. This split does not introduce a second task system or a certification-specific workflow engine.
+
 Certification planning must not introduce accounts, cloud calendars, push notifications, server sync, automatic task generation, compliance scoring, certifier submission, or worker permission models. A task may include a farmer-entered responsible-person label for future assignment readiness, but that label is not an authenticated user or access-control boundary.
+
+Seeded certification tasks may carry static USDA/NOP requirement-reference metadata used by the Organic Certification UX to explain why the task exists. That metadata points to official USDA or eCFR URLs and is maintained as local app text, not fetched from a remote requirement service.
+
+## USDA Requirement Link Boundary
+
+The mobile app does not currently include an in-app federal web viewer. Requirement links therefore open the device browser only after the farmer confirms the action. Opening a requirement link must not include farm IDs, record IDs, task IDs, evidence contents, or other private farm data in the URL.
+
+Adding an embedded official-source viewer, cached regulation text, remote regulation lookup, or certifier-specific requirement service would require separate architectural review because it changes dependencies, offline behavior, update cadence, and trust boundaries.
 
 ## Export Boundary
 

@@ -49,6 +49,8 @@ export type ThemedIconName =
 export function getThemedIconForText(text: string, fallback: ThemedIconName = "leaf"): ThemedIconName {
   const normalized = text.toLowerCase();
 
+  if (normalized === "yes" || normalized.includes(" yes") || normalized.includes("complete") || normalized.includes("done")) return "check";
+  if (normalized === "no" || normalized.includes(" no") || normalized.includes("not recorded")) return "minus";
   if (normalized.includes("cancel") || normalized.includes("close") || normalized.includes("remove")) return "close";
   if (normalized.includes("archive")) return "archive";
   if (normalized.includes("back")) return "arrowLeft";
@@ -65,6 +67,7 @@ export function getThemedIconForText(text: string, fallback: ThemedIconName = "l
   if (normalized.includes("gps") || normalized.includes("coordinate") || normalized.includes("location")) return "gps";
   if (normalized.includes("harvest")) return "harvest";
   if (normalized.includes("history") || normalized.includes("timeline")) return "history";
+  if (normalized.includes("in progress") || normalized.includes("active")) return "clock";
   if (normalized.includes("input") || normalized.includes("material") || normalized.includes("compost") || normalized.includes("manure")) return "material";
   if (normalized.includes("organic") || normalized.includes("certification") || normalized.includes("osp")) return "organic";
   if (normalized.includes("package")) return "package";
@@ -79,10 +82,12 @@ export function getThemedIconForText(text: string, fallback: ThemedIconName = "l
   if (normalized.includes("sale") || normalized.includes("storage") || normalized.includes("traceability") || normalized.includes("lot")) return "package";
   if (normalized.includes("save")) return "save";
   if (normalized.includes("schedule") || normalized.includes("time")) return "calendar";
-  if (normalized.includes("seed") || normalized.includes("planting")) return "seed";
+  if (normalized.includes("direct seed") || normalized.includes("seed") || normalized.includes("planting")) return "seed";
   if (normalized.includes("soil") || normalized.includes("rotation") || normalized.includes("erosion")) return "soil";
   if (normalized.includes("start")) return "play";
   if (normalized.includes("stop")) return "stop";
+  if (normalized.includes("transplant")) return "sprout";
+  if (normalized.includes("unit") || normalized.includes("lb") || normalized.includes("oz") || normalized.includes("kg") || normalized.includes("gal")) return "material";
   if (normalized.includes("use current")) return "gps";
 
   return fallback;

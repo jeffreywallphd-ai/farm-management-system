@@ -7,6 +7,7 @@ export interface FarmReferenceRepository {
   getFarm(): Promise<Farm | null>;
   updateFarmName(farmId: FarmId, name: string): Promise<void>;
   markCorePlacesSetupComplete(farmId: FarmId, completedAt: string): Promise<void>;
+  markStarterWorkPacksSetupComplete(farmId: FarmId, completedAt: string): Promise<void>;
   addLocation(location: FarmLocation): Promise<void>;
   updateLocation(location: FarmLocation): Promise<void>;
   listLocations(farmId: FarmId): Promise<FarmLocation[]>;

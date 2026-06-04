@@ -53,7 +53,7 @@ export function FarmPlacesSetupScreen({
   return (
     <Screen>
       <PageHeader
-        eyebrow="Step 2 of 2"
+        eyebrow="Step 2 of 3"
         supportingText="Add the places you use every day so later voice and photo notes are easier to find."
         title="Set up farm places"
       />
@@ -69,9 +69,10 @@ export function FarmPlacesSetupScreen({
         />
         <Button
           disabled={isContinuing}
-          label={isContinuing ? "Continuing..." : "Continue"}
+          label={isContinuing ? "Saving..." : "Skip and save for later"}
           onPress={handleContinue}
           size="large"
+          variant="secondary"
         />
       </Card>
     </Screen>

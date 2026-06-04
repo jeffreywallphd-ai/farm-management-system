@@ -2,6 +2,13 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { buildMobilePilotRecoveryCopyPayload } from "./export-mobile-pilot-data/CreateHarvestRecoveryCopy";
+import {
+  ensureFarmWorkPacks,
+  getFarmWorkPackSetupSummary,
+  listInactiveFarmWorkPackItemTemplateKeys,
+  setFarmWorkPackActive,
+  setFarmWorkPackItemActive,
+} from "./manage-planning/DefaultFarmWorkPacks";
 import { ensureOrganicCertificationPlan } from "./manage-planning/CreateOrganicCertificationPlan";
 import { getPlanningBoardOverview, getPlanningOverview, selectTasksForBoard } from "./manage-planning/ListPlanning";
 import {
@@ -15,6 +22,7 @@ import {
 import { InMemoryFarmReferenceRepository } from "../../testing/fakes/InMemoryFarmReferenceRepository";
 import { InMemoryLocalRecordRepository } from "../../testing/fakes/InMemoryLocalRecordRepository";
 import { InMemoryPlanningRepository } from "../../testing/fakes/InMemoryPlanningRepository";
+import { filterPlanningForActiveFarmWorkPacks } from "../../ui/farmWorkPackPlanningVisibility";
 
 const farm = {
   id: "farm-1",
@@ -138,6 +146,20 @@ test("planning boards default to root goal boards and a non-goal task board", as
   assert.equal(nonGoalBoard?.title, "Non-goal farm work");
   assert.deepEqual(selectTasksForBoard(goalBoard!, [goal, subgoal], [goalTask, nonGoalTask]).map((task) => task.id), [goalTask.id]);
   assert.deepEqual(selectTasksForBoard(nonGoalBoard!, [goal, subgoal], [goalTask, nonGoalTask]).map((task) => task.id), [nonGoalTask.id]);
+
+  const renamedGoal = await savePlanningGoal(
+    { ...goal, title: "Prepare spring beds and tunnels" },
+    { clock: deps.clock, idGenerator: deps.idGenerator, repository: deps.planningRepository },
+  );
+  const renamedBoards = await ensureDefaultPlanningBoards(
+    { farmId: farm.id },
+    { clock: deps.clock, idGenerator: deps.idGenerator, repository: deps.planningRepository },
+  );
+
+  assert.equal(
+    renamedBoards.find((board) => board.scopeType === "goal" && board.goalId === renamedGoal.id)?.title,
+    "Prepare spring beds and tunnels",
+  );
 });
 
 test("planning board overview includes linked farm events and status movement", async () => {
@@ -204,6 +226,271 @@ test("planning edits reject unknown local IDs instead of creating duplicate reco
   );
 });
 
+test("default farm work packs create ordinary local planning records without duplicates", async () => {
+  const deps = dependencies();
+  await deps.farmReferenceRepository.createFarm(farm);
+
+  const created = await ensureFarmWorkPacks(
+    { farmId: farm.id, packIds: ["marketGardenPlanning", "compostWork"] },
+    { clock: deps.clock, idGenerator: deps.idGenerator, repository: deps.planningRepository },
+  );
+
+  assert.deepEqual(created.packIds, ["marketGardenPlanning", "compostWork"]);
+  assert.equal(created.goals.filter((goal) => !goal.parentGoalId).length, 2);
+  assert.equal(created.goals.some((goal) => goal.title === "Plan market garden crop work"), true);
+  assert.equal(created.goals.some((goal) => goal.title === "Do compost work"), true);
+  assert.equal(created.tasks.some((task) => task.title === "Create seeding calendar"), true);
+  assert.equal(created.tasks.some((task) => task.title === "Check compost temperature"), true);
+  assert.equal(created.tasks.every((task) => task.source === "farmWorkTemplate"), true);
+  assert.equal(created.tasks.every((task) => task.templateKey?.startsWith("farmWorkPack:")), true);
+
+  const boards = await ensureDefaultPlanningBoards(
+    { farmId: farm.id },
+    { clock: deps.clock, idGenerator: deps.idGenerator, repository: deps.planningRepository },
+  );
+  assert.equal(boards.some((board) => board.title === "Plan market garden crop work"), true);
+  assert.equal(boards.some((board) => board.title === "Do compost work"), true);
+
+  const rerun = await ensureFarmWorkPacks(
+    { farmId: farm.id, packIds: ["compostWork", "marketGardenPlanning"] },
+    { clock: deps.clock, idGenerator: deps.idGenerator, repository: deps.planningRepository },
+  );
+
+  assert.equal(rerun.tasks.length, created.tasks.length);
+  assert.equal((await deps.planningRepository.listGoals(farm.id, { source: "farmWorkTemplate" })).length, created.goals.length);
+  assert.equal((await deps.planningRepository.listTasks(farm.id, { source: "farmWorkTemplate" })).length, created.tasks.length);
+  assert.equal((await deps.planningRepository.listFarmWorkPackStates(farm.id)).every((state) => state.isActive), true);
+});
+
+test("default farm work packs preserve farmer edits and report setup status", async () => {
+  const deps = dependencies();
+  await deps.farmReferenceRepository.createFarm(farm);
+  const created = await ensureFarmWorkPacks(
+    { farmId: farm.id, packIds: ["chickenCareWork"] },
+    { clock: deps.clock, idGenerator: deps.idGenerator, repository: deps.planningRepository },
+  );
+  const feedTask = created.tasks.find((task) => task.title === "Feed chickens");
+  assert.ok(feedTask);
+
+  await savePlanningTask(
+    { ...feedTask, title: "Feed laying hens", status: "inProgress", dueDate: "2026-06-05" },
+    { clock: deps.clock, idGenerator: deps.idGenerator, repository: deps.planningRepository },
+  );
+
+  await ensureFarmWorkPacks(
+    { farmId: farm.id, packIds: ["chickenCareWork"] },
+    { clock: deps.clock, idGenerator: deps.idGenerator, repository: deps.planningRepository },
+  );
+  const editedTask = await deps.planningRepository.getTask(farm.id, feedTask.id);
+  assert.equal(editedTask?.title, "Feed laying hens");
+  assert.equal(editedTask?.status, "inProgress");
+  assert.equal(editedTask?.dueDate, "2026-06-05");
+
+  const summaries = await getFarmWorkPackSetupSummary(
+    { farmId: farm.id },
+    { repository: deps.planningRepository },
+  );
+  assert.equal(summaries.find((summary) => summary.id === "chickenCareWork")?.isApplied, true);
+  assert.equal(summaries.find((summary) => summary.id === "chickenCareWork")?.isActive, true);
+  assert.equal(summaries.find((summary) => summary.id === "greenhouseSeedlingPlanning")?.isApplied, false);
+  assert.equal(summaries.find((summary) => summary.id === "chickenCareWork")?.taskCount, created.tasks.length);
+  assert.equal(summaries.find((summary) => summary.id === "chickenCarePlanning")?.group, "administrationPlanning");
+  assert.equal(summaries.find((summary) => summary.id === "chickenCareWork")?.group, "farmWork");
+});
+
+test("default farm work packs can add selected tasks without creating the whole pack", async () => {
+  const deps = dependencies();
+  await deps.farmReferenceRepository.createFarm(farm);
+  const summaries = await getFarmWorkPackSetupSummary(
+    { farmId: farm.id },
+    { repository: deps.planningRepository },
+  );
+  const compostWork = summaries.find((summary) => summary.id === "compostWork");
+  const temperatureTaskKey = compostWork?.goals
+    .flatMap((goal) => goal.subgoals)
+    .flatMap((subgoal) => subgoal.tasks)
+    .find((task) => task.title === "Check compost temperature")?.templateKey;
+  assert.ok(temperatureTaskKey);
+
+  const created = await ensureFarmWorkPacks(
+    {
+      farmId: farm.id,
+      packIds: ["compostWork"],
+      taskTemplateKeysByPackId: { compostWork: [temperatureTaskKey] },
+    },
+    { clock: deps.clock, idGenerator: deps.idGenerator, repository: deps.planningRepository },
+  );
+
+  assert.deepEqual(created.packIds, ["compostWork"]);
+  assert.equal(created.goals.length, 2);
+  assert.equal(created.tasks.length, 1);
+  assert.equal(created.tasks[0].title, "Check compost temperature");
+  assert.equal(created.goals.some((goal) => goal.title === "Do compost work"), true);
+  assert.equal(created.goals.some((goal) => goal.title === "Manage compost piles"), true);
+
+  const updatedSummary = (await getFarmWorkPackSetupSummary(
+    { farmId: farm.id },
+    { repository: deps.planningRepository },
+  )).find((summary) => summary.id === "compostWork");
+  assert.equal(updatedSummary?.isApplied, true);
+  assert.equal(updatedSummary?.isActive, true);
+  assert.equal(
+    updatedSummary?.goals.flatMap((goal) => goal.subgoals).flatMap((subgoal) => subgoal.tasks).find((task) => task.title === "Check compost temperature")?.isApplied,
+    true,
+  );
+  assert.equal(
+    updatedSummary?.goals.flatMap((goal) => goal.subgoals).find((subgoal) => subgoal.title === "Manage compost piles")?.isActive,
+    true,
+  );
+  assert.equal(
+    updatedSummary?.goals.flatMap((goal) => goal.subgoals).flatMap((subgoal) => subgoal.tasks).find((task) => task.title === "Check compost temperature")?.isActive,
+    true,
+  );
+  assert.equal(
+    updatedSummary?.goals.flatMap((goal) => goal.subgoals).flatMap((subgoal) => subgoal.tasks).find((task) => task.title === "Turn compost pile")?.isApplied,
+    false,
+  );
+});
+
+test("starter work pack subgoals and tasks can be deactivated without deleting planning records", async () => {
+  const deps = dependencies();
+  await deps.farmReferenceRepository.createFarm(farm);
+  const created = await ensureFarmWorkPacks(
+    { farmId: farm.id, packIds: ["compostWork"] },
+    { clock: deps.clock, idGenerator: deps.idGenerator, repository: deps.planningRepository },
+  );
+  const manageCompostSubgoal = created.goals.find((goal) => goal.title === "Manage compost piles");
+  const temperatureTask = created.tasks.find((task) => task.title === "Check compost temperature");
+  const moistureTask = created.tasks.find((task) => task.title === "Check compost pile moisture");
+  assert.ok(manageCompostSubgoal?.templateKey);
+  assert.ok(temperatureTask?.templateKey);
+  assert.ok(moistureTask);
+
+  await setFarmWorkPackItemActive(
+    { farmId: farm.id, templateKey: temperatureTask.templateKey, isActive: false },
+    { clock: deps.clock, repository: deps.planningRepository },
+  );
+
+  let inactiveTemplateKeys = await listInactiveFarmWorkPackItemTemplateKeys(
+    { farmId: farm.id },
+    { repository: deps.planningRepository },
+  );
+  assert.deepEqual(inactiveTemplateKeys, [temperatureTask.templateKey]);
+
+  let visible = filterPlanningForActiveFarmWorkPacks(
+    await deps.planningRepository.listGoals(farm.id),
+    await deps.planningRepository.listTasks(farm.id),
+    [],
+    inactiveTemplateKeys,
+  );
+  assert.equal(visible.tasks.some((task) => task.id === temperatureTask.id), false);
+  assert.equal(visible.tasks.some((task) => task.id === moistureTask.id), true);
+  assert.equal((await deps.planningRepository.getTask(farm.id, temperatureTask.id))?.title, "Check compost temperature");
+
+  await setFarmWorkPackItemActive(
+    { farmId: farm.id, templateKey: manageCompostSubgoal.templateKey, isActive: false },
+    { clock: deps.clock, repository: deps.planningRepository },
+  );
+
+  inactiveTemplateKeys = await listInactiveFarmWorkPackItemTemplateKeys(
+    { farmId: farm.id },
+    { repository: deps.planningRepository },
+  );
+  visible = filterPlanningForActiveFarmWorkPacks(
+    await deps.planningRepository.listGoals(farm.id),
+    await deps.planningRepository.listTasks(farm.id),
+    [],
+    inactiveTemplateKeys,
+  );
+  assert.equal(visible.goals.some((goal) => goal.id === manageCompostSubgoal.id), false);
+  assert.equal(visible.tasks.some((task) => task.goalId === manageCompostSubgoal.id), false);
+
+  const summary = (await getFarmWorkPackSetupSummary(
+    { farmId: farm.id },
+    { repository: deps.planningRepository },
+  )).find((candidate) => candidate.id === "compostWork");
+  const summarySubgoal = summary?.goals.flatMap((goal) => goal.subgoals).find((subgoal) => subgoal.templateKey === manageCompostSubgoal.templateKey);
+  const summaryTask = summary?.goals.flatMap((goal) => goal.subgoals).flatMap((subgoal) => subgoal.tasks).find((task) => task.templateKey === temperatureTask.templateKey);
+  assert.equal(summarySubgoal?.isApplied, true);
+  assert.equal(summarySubgoal?.isActive, false);
+  assert.equal(summaryTask?.isApplied, true);
+  assert.equal(summaryTask?.isActive, false);
+
+  const recovery = await buildMobilePilotRecoveryCopyPayload(
+    { farmId: farm.id },
+    {
+      clock: deps.clock,
+      farmReferenceRepository: deps.farmReferenceRepository,
+      localRecordRepository: deps.localRecordRepository,
+      planningRepository: deps.planningRepository,
+    },
+  );
+  assert.equal(recovery.farmWorkPackItemStates.some((state) => state.templateKey === manageCompostSubgoal.templateKey && !state.isActive), true);
+  assert.equal(recovery.planningTasks.some((task) => task.id === temperatureTask.id), true);
+});
+
+test("deactivated farm work packs are hidden from planning views while retained for reporting and export", async () => {
+  const deps = dependencies();
+  await deps.farmReferenceRepository.createFarm(farm);
+  const created = await ensureFarmWorkPacks(
+    { farmId: farm.id, packIds: ["chickenCareWork"] },
+    { clock: deps.clock, idGenerator: deps.idGenerator, repository: deps.planningRepository },
+  );
+  const feedTask = created.tasks.find((task) => task.title === "Feed chickens");
+  assert.ok(feedTask);
+  await savePlanningTask(
+    { ...feedTask, status: "done", completionNotes: "Fed the laying flock before morning harvest." },
+    { clock: deps.clock, idGenerator: deps.idGenerator, repository: deps.planningRepository },
+  );
+
+  await setFarmWorkPackActive(
+    { farmId: farm.id, packId: "chickenCareWork", isActive: false },
+    { clock: deps.clock, repository: deps.planningRepository },
+  );
+
+  const summaries = await getFarmWorkPackSetupSummary(
+    { farmId: farm.id },
+    { repository: deps.planningRepository },
+  );
+  assert.equal(summaries.find((summary) => summary.id === "chickenCareWork")?.isActive, false);
+
+  const allGoals = await deps.planningRepository.listGoals(farm.id);
+  const allTasks = await deps.planningRepository.listTasks(farm.id);
+  const visible = filterPlanningForActiveFarmWorkPacks(allGoals, allTasks, ["chickenCareWork"]);
+  assert.equal(visible.goals.length, 0);
+  assert.equal(visible.tasks.length, 0);
+
+  const retainedTask = await deps.planningRepository.getTask(farm.id, feedTask.id);
+  assert.equal(retainedTask?.status, "done");
+  assert.equal(retainedTask?.completionNotes, "Fed the laying flock before morning harvest.");
+  assert.ok(retainedTask?.completedAt);
+
+  const recovery = await buildMobilePilotRecoveryCopyPayload(
+    { farmId: farm.id },
+    {
+      clock: deps.clock,
+      farmReferenceRepository: deps.farmReferenceRepository,
+      localRecordRepository: deps.localRecordRepository,
+      planningRepository: deps.planningRepository,
+    },
+  );
+  assert.equal(recovery.planningTasks.some((task) => task.id === feedTask.id && task.status === "done"), true);
+  assert.equal(recovery.farmWorkPackStates.find((state) => state.packId === "chickenCareWork")?.isActive, false);
+});
+
+test("default farm work packs reject unknown pack IDs", async () => {
+  const deps = dependencies();
+  await deps.farmReferenceRepository.createFarm(farm);
+
+  await assert.rejects(
+    () => ensureFarmWorkPacks(
+      { farmId: farm.id, packIds: ["marketGardenPlanning", "unknown-pack"] },
+      { clock: deps.clock, idGenerator: deps.idGenerator, repository: deps.planningRepository },
+    ),
+    /Farm work pack does not exist/,
+  );
+});
+
 test("organic certification template creates standalone certification subgoals and preserves adjusted timelines", async () => {
   const deps = dependencies();
   await deps.farmReferenceRepository.createFarm(farm);
@@ -236,14 +523,23 @@ test("organic certification template creates standalone certification subgoals a
     { clock: deps.clock, idGenerator: deps.idGenerator, repository: deps.planningRepository },
   );
 
-  assert.equal(created.goal.title, "Complete organic certification readiness");
-  assert.equal(created.subgoals.length, 13);
-  assert.equal(created.tasks.length, 68);
+  assert.equal(created.goal.title, "Complete certification administration work");
+  assert.deepEqual(created.goals.map((goal) => goal.title), [
+    "Complete certification administration work",
+    "Complete certification farm work",
+  ]);
+  assert.equal(created.administrationGoal.parentGoalId, undefined);
+  assert.equal(created.farmWorkGoal.parentGoalId, undefined);
+  assert.equal(created.subgoals.length, 14);
+  assert.equal(created.tasks.length, 123);
   const subgoalTitles = created.subgoals.map((goal) => goal.title);
   assert.deepEqual(subgoalTitles, [
     "Set up certification profile",
-    "Document land and transition status",
+    "Set up recordkeeping and audit trail administration",
     "Review input approvals and restrictions",
+    "Draft OSP practices, inputs, and monitoring",
+    "Document OSP recordkeeping and prevention procedures",
+    "Document land and transition status",
     "Track input applications and evidence",
     "Organize seed and planting records",
     "Document soil fertility and crop rotation practices",
@@ -252,21 +548,38 @@ test("organic certification template creates standalone certification subgoals a
     "Document pest, weed, disease, and mulch practices",
     "Prepare lot traceability records",
     "Review handling, storage, sales, and mass balance",
-    "Draft OSP practices, inputs, and monitoring",
-    "Document OSP recordkeeping and prevention procedures",
   ]);
-  assert.equal(created.tasks.some((task) => task.title === "Record hot compost evidence for windrow batches"), true);
+  assert.equal(created.subgoals.filter((goal) => goal.parentGoalId === created.administrationGoal.id).length, 5);
+  assert.equal(created.subgoals.filter((goal) => goal.parentGoalId === created.farmWorkGoal.id).length, 9);
+  const certificationBoards = await ensureDefaultPlanningBoards(
+    { farmId: farm.id },
+    { clock: deps.clock, idGenerator: deps.idGenerator, repository: deps.planningRepository },
+  );
   assert.equal(
-    created.tasks.some((task) => task.notes?.includes("temperature logs showing 131-170 F for 15 days") && task.notes?.includes("at least five turns")),
+    certificationBoards.some((board) => board.scopeType === "goal" && board.goalId === created.administrationGoal.id),
     true,
   );
-  assert.equal(created.tasks.some((task) => task.title === "Flag cold compost or aged piles for review"), true);
+  assert.equal(
+    certificationBoards.some((board) => board.scopeType === "goal" && board.goalId === created.farmWorkGoal.id),
+    true,
+  );
+  assert.equal(certificationBoards.some((board) => board.title === "Complete certification administration work"), true);
+  assert.equal(certificationBoards.some((board) => board.title === "Complete certification farm work"), true);
+  assert.equal(created.tasks.some((task) => task.title === "Turn windrow compost pile"), true);
+  assert.equal(
+    created.tasks.some((task) => task.title === "Confirm windrow temperature window" && task.notes?.includes("131-170 F for 15 days") && task.notes?.includes("at least five turns")),
+    true,
+  );
+  assert.equal(created.tasks.some((task) => task.title === "Check windrow compost temperature"), true);
+  assert.equal(created.tasks.some((task) => task.title === "Flag cold or unfinished pile for review"), true);
   assert.equal(created.tasks.some((task) => task.notes?.includes("90-day or 120-day earliest harvest date")), true);
-  assert.equal(created.tasks.some((task) => task.title === "Confirm certifier approval before use"), true);
-  assert.equal(created.tasks.some((task) => task.title === "Reconcile input applications with material-use records"), true);
-  assert.equal(created.tasks.some((task) => task.title === "Create lot records for products with organic claims"), true);
-  assert.equal(created.tasks.some((task) => task.title === "Review sale invoices and organic claim wording"), true);
-  assert.equal(created.tasks.some((task) => task.title === "Track OSP gaps as follow-up tasks"), true);
+  assert.equal(created.tasks.some((task) => task.title === "Confirm input approval before use"), true);
+  assert.equal(created.tasks.some((task) => task.title === "Record each input application date"), true);
+  assert.equal(created.tasks.some((task) => task.title === "Record input quantity and rate"), true);
+  assert.equal(created.tasks.some((task) => task.title === "Create lot record for organic-claim product"), true);
+  assert.equal(created.tasks.some((task) => task.title === "Assign lot code"), true);
+  assert.equal(created.tasks.some((task) => task.title === "Record exact organic claim wording"), true);
+  assert.equal(created.tasks.some((task) => task.title === "Create follow-up tasks for OSP gaps"), true);
   assert.equal(created.subgoals.some((goal) => goal.title === "Prepare inspection evidence"), false);
   assert.equal(created.subgoals.some((goal) => goal.title === "Generate certification or renewal package"), false);
   assert.equal(await deps.planningRepository.getGoal(farm.id, retiredGoal.id), null);
@@ -276,9 +589,9 @@ test("organic certification template creates standalone certification subgoals a
   const manureGoal = created.subgoals.find((goal) => goal.title === "Track raw manure applications and harvest intervals");
   const inputApplicationsGoal = created.subgoals.find((goal) => goal.title === "Track input applications and evidence");
   const handlingGoal = created.subgoals.find((goal) => goal.title === "Review handling, storage, sales, and mass balance");
-  assert.equal(created.tasks.find((task) => task.title === "Record hot compost evidence for windrow batches")?.goalId, compostGoal?.id);
-  assert.equal(created.tasks.find((task) => task.title === "Review manure interval planning dates")?.goalId, manureGoal?.id);
-  assert.equal(created.tasks.find((task) => task.title === "Check input application evidence")?.goalId, inputApplicationsGoal?.id);
+  assert.equal(created.tasks.find((task) => task.title === "Turn windrow compost pile")?.goalId, compostGoal?.id);
+  assert.equal(created.tasks.find((task) => task.title === "Calculate manure harvest interval date")?.goalId, manureGoal?.id);
+  assert.equal(created.tasks.find((task) => task.title === "Record each input application date")?.goalId, inputApplicationsGoal?.id);
   assert.equal(created.tasks.find((task) => task.title === "Run mass-balance review")?.goalId, handlingGoal?.id);
 
   const firstTask = created.tasks[0];
@@ -292,8 +605,8 @@ test("organic certification template creates standalone certification subgoals a
     { clock: deps.clock, idGenerator: deps.idGenerator, repository: deps.planningRepository },
   );
 
-  assert.equal(rerun.tasks.length, 68);
-  assert.equal((await deps.planningRepository.listTasks(farm.id, { source: "organicCertificationTemplate" })).length, 68);
+  assert.equal(rerun.tasks.length, 123);
+  assert.equal((await deps.planningRepository.listTasks(farm.id, { source: "organicCertificationTemplate" })).length, 123);
   assert.equal((await deps.planningRepository.getTask(farm.id, firstTask.id))?.dueDate, "2026-08-15");
   assert.equal((await deps.planningRepository.getTask(farm.id, firstTask.id))?.status, "inProgress");
 });

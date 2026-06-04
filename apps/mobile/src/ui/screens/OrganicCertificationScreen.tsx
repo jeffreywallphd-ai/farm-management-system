@@ -40,12 +40,14 @@ import { Card } from "../components/Card";
 import { CollapsibleCard } from "../components/CollapsibleCard";
 import { DateField } from "../components/DateField";
 import { FormField } from "../components/FormField";
+import { OrganicCertificationTaskRequirementDisclosure } from "../components/OrganicCertificationTaskRequirementDisclosure";
 import { PageHeader } from "../components/PageHeader";
 import { Screen } from "../components/Screen";
 import { SelectField } from "../components/SelectField";
 import { SectionHeading } from "../components/SectionHeading";
 import { theme } from "../theme/theme";
 import { replaceRoute } from "../navigation";
+import { isOrganicCertificationPursuitActive } from "../organicCertificationPlanningVisibility";
 
 export function OrganicCertificationScreen({
   farm,
@@ -93,6 +95,8 @@ export function OrganicCertificationScreen({
     setMissingSetupItems(dashboard.missingSetupItems);
 
     if (dashboard.profile) {
+      const isCertificationActive = isOrganicCertificationPursuitActive(dashboard.profile);
+
       setOrganicStatus(dashboard.profile.organicStatus);
       setSelectedScopes(new Set(dashboard.enabledScopes.map((scope) => scope.scopeType)));
       setCertifierName(dashboard.profile.certifierName ?? "");
@@ -103,11 +107,19 @@ export function OrganicCertificationScreen({
       setInspectionDueWindow(dashboard.profile.inspectionDueWindow ?? "");
       setRecordRetentionYears(String(dashboard.profile.recordRetentionYears));
       setNotes(dashboard.profile.notes ?? "");
-      await ensureOrganicCertificationPlan(
-        { farmId: farm.id, targetDate: dashboard.profile.annualUpdateDueDate },
-        { clock: systemClock, idGenerator: localIdGenerator, repository: planningRepository },
-      );
-      await loadCertificationPlanning();
+      if (isCertificationActive) {
+        await ensureOrganicCertificationPlan(
+          { farmId: farm.id, targetDate: dashboard.profile.annualUpdateDueDate },
+          { clock: systemClock, idGenerator: localIdGenerator, repository: planningRepository },
+        );
+        await loadCertificationPlanning();
+      } else {
+        setCertificationGoals([]);
+        setCertificationTasks([]);
+      }
+    } else {
+      setCertificationGoals([]);
+      setCertificationTasks([]);
     }
 
     setIsLoading(false);
@@ -223,14 +235,28 @@ export function OrganicCertificationScreen({
     });
   }
 
+  const isCertificationActive = isOrganicCertificationPursuitActive(profile);
+
   return (
     <Screen>
       <PageHeader
         eyebrow="Organic Certification"
-        supportingText="Organize USDA organic readiness records locally for certifier review."
-        title={profile ? "Organic dashboard" : "Set up organic tracking"}
+        supportingText={isCertificationActive ? "Organize USDA organic readiness records locally for certifier review." : "Turn this on from Farm setup when organic certification work is part of the farm plan."}
+        title={isCertificationActive ? "Organic dashboard" : "Organic certification is off"}
       />
-      {profile ? (
+      {!isCertificationActive ? (
+        <Card>
+          <SectionHeading
+            detail="Certification goals, certification boards, and organic readiness tools stay hidden while certification planning is off."
+            title="Certification is currently off"
+          />
+          <Text style={styles.body}>
+            Turn on organic certification pursuit in Farm setup when this farm is preparing for, continuing, or organizing organic certification work.
+          </Text>
+          <Button label="Open farm setup" onPress={() => replaceRoute(router, "/setup?section=organicCertification")} size="large" />
+        </Card>
+      ) : null}
+      {isCertificationActive ? (
         <CollapsibleCard
           detail="Certifier, scope, renewal, and record-retention setup."
           isExpanded={isProfileExpanded}
@@ -265,38 +291,8 @@ export function OrganicCertificationScreen({
             selectedScopes={selectedScopes}
           />
         </CollapsibleCard>
-      ) : (
-        <Card>
-          <OrganicProfileContent
-            annualUpdateDueDate={annualUpdateDueDate}
-            certificateEffectiveDate={certificateEffectiveDate}
-            certificateNumber={certificateNumber}
-            certifierContact={certifierContact}
-            certifierName={certifierName}
-            error={error}
-            inspectionDueWindow={inspectionDueWindow}
-            isLoading={isLoading}
-            isSaving={isSaving}
-            notes={notes}
-            onAnnualUpdateDueDateChange={setAnnualUpdateDueDate}
-            onCertificateEffectiveDateChange={setCertificateEffectiveDate}
-            onCertificateNumberChange={setCertificateNumber}
-            onCertifierContactChange={setCertifierContact}
-            onCertifierNameChange={setCertifierName}
-            onInspectionDueWindowChange={setInspectionDueWindow}
-            onNotesChange={setNotes}
-            onRecordRetentionYearsChange={setRecordRetentionYears}
-            onSave={handleSave}
-            onStatusChange={handleStatusChange}
-            onToggleScope={toggleScope}
-            organicStatus={organicStatus}
-            profileExists={Boolean(profile)}
-            recordRetentionYears={recordRetentionYears}
-            selectedScopes={selectedScopes}
-          />
-        </Card>
-      )}
-      {profile ? (
+      ) : null}
+      {isCertificationActive ? (
         <>
           <Card>
             <SectionHeading title="Enabled scopes" />
@@ -312,7 +308,7 @@ export function OrganicCertificationScreen({
           </Card>
           <Card>
             <SectionHeading title="Upcoming annual update" />
-            <Text style={styles.body}>{profile.annualUpdateDueDate ?? "Add the annual update due date when you know it."}</Text>
+            <Text style={styles.body}>{profile?.annualUpdateDueDate ?? "Add the annual update due date when you know it."}</Text>
           </Card>
           <Card>
             <SectionHeading detail="Review annual renewal notes, inspection-day evidence, and saved organic report packages in one place." title="Certification reporting" />
@@ -492,8 +488,7 @@ function CertificationPlanningCard({
   tasks: PlanningTask[];
 }) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const rootGoal = goals.find((goal) => !goal.parentGoalId);
-  const subgoals = rootGoal ? goals.filter((goal) => goal.parentGoalId === rootGoal.id) : [];
+  const rootGoals = goals.filter((goal) => !goal.parentGoalId);
   const openTasks = tasks.filter((task) => task.status !== "done" && task.status !== "canceled");
 
   return (
@@ -503,14 +498,15 @@ function CertificationPlanningCard({
       onToggle={() => setIsExpanded((current) => !current)}
       title="Certification plan"
     >
-      {rootGoal ? (
-        <View style={styles.planBlock}>
+      {rootGoals.length ? rootGoals.map((rootGoal) => (
+        <View key={rootGoal.id} style={styles.planBlock}>
           <Text style={styles.planTitle}>{rootGoal.title}</Text>
+          {rootGoal.description ? <Text style={styles.body}>{rootGoal.description}</Text> : null}
           <Text style={styles.body}>
             {PLANNING_GOAL_STATUS_LABELS[rootGoal.status]}
             {rootGoal.targetDate ? ` - target ${rootGoal.targetDate}` : ""}
           </Text>
-          <Button label="Adjust overall timeline" onPress={() => onEditGoal(rootGoal)} size="large" variant="secondary" />
+          <Button label="Adjust goal timeline" onPress={() => onEditGoal(rootGoal)} size="large" variant="secondary" />
           {editingGoalId === rootGoal.id ? (
             <CertificationGoalEditForm
               editingGoalStatus={editingGoalStatus}
@@ -521,48 +517,51 @@ function CertificationPlanningCard({
             />
           ) : null}
           <Button label="Open certification work board" onPress={() => onOpenBoard(rootGoal.id)} size="large" />
-        </View>
-      ) : (
-        <Text style={styles.body}>Certification planning will be created after organic tracking is enabled.</Text>
-      )}
-      {subgoals.map((goal) => (
-        <View key={goal.id} style={styles.planBlock}>
-          <Text style={styles.planTitle}>{goal.title}</Text>
-          <Text style={styles.body}>
-            {PLANNING_GOAL_STATUS_LABELS[goal.status]}
-            {goal.targetDate ? ` - target ${goal.targetDate}` : ""}
-          </Text>
-          <Button label="Adjust subgoal timeline" onPress={() => onEditGoal(goal)} size="large" variant="secondary" />
-          {editingGoalId === goal.id ? (
-            <CertificationGoalEditForm
-              editingGoalStatus={editingGoalStatus}
-              editingGoalTargetDate={editingGoalTargetDate}
-              onGoalStatusChange={onGoalStatusChange}
-              onGoalTargetDateChange={onGoalTargetDateChange}
-              onSaveGoal={onSaveGoal}
-            />
-          ) : null}
-          {tasks.filter((task) => task.goalId === goal.id).slice(0, 3).map((task) => (
-            <View key={task.id} style={styles.taskBlock}>
-              <Text style={styles.body}>{task.title}</Text>
-              <Text style={styles.detail}>
-                {PLANNING_TASK_STATUS_LABELS[task.status]} - {PLANNING_TASK_PRIORITY_LABELS[task.priority]}
-                {task.dueDate ? ` - due ${task.dueDate}` : ""}
+          {goals.filter((goal) => goal.parentGoalId === rootGoal.id).map((goal) => (
+            <View key={goal.id} style={styles.planBlock}>
+              <Text style={styles.planTitle}>{goal.title}</Text>
+              {goal.description ? <Text style={styles.body}>{goal.description}</Text> : null}
+              <Text style={styles.body}>
+                {PLANNING_GOAL_STATUS_LABELS[goal.status]}
+                {goal.targetDate ? ` - target ${goal.targetDate}` : ""}
               </Text>
-              <Button label="Adjust task" onPress={() => onEditTask(task)} size="large" variant="secondary" />
-              {editingTaskId === task.id ? (
-                <CertificationTaskEditForm
-                  editingTaskDueDate={editingTaskDueDate}
-                  editingTaskStatus={editingTaskStatus}
-                  onSaveTask={onSaveTask}
-                  onTaskDueDateChange={onTaskDueDateChange}
-                  onTaskStatusChange={onTaskStatusChange}
+              <Button label="Adjust subgoal timeline" onPress={() => onEditGoal(goal)} size="large" variant="secondary" />
+              {editingGoalId === goal.id ? (
+                <CertificationGoalEditForm
+                  editingGoalStatus={editingGoalStatus}
+                  editingGoalTargetDate={editingGoalTargetDate}
+                  onGoalStatusChange={onGoalStatusChange}
+                  onGoalTargetDateChange={onGoalTargetDateChange}
+                  onSaveGoal={onSaveGoal}
                 />
               ) : null}
+              {tasks.filter((task) => task.goalId === goal.id).map((task) => (
+                <View key={task.id} style={styles.taskBlock}>
+                  <Text style={styles.body}>{task.title}</Text>
+                  <Text style={styles.detail}>
+                    {PLANNING_TASK_STATUS_LABELS[task.status]} - {PLANNING_TASK_PRIORITY_LABELS[task.priority]}
+                    {task.dueDate ? ` - due ${task.dueDate}` : ""}
+                  </Text>
+                  {task.notes ? <Text style={styles.detail}>{task.notes}</Text> : null}
+                  <OrganicCertificationTaskRequirementDisclosure task={task} />
+                  <Button label="Adjust task" onPress={() => onEditTask(task)} size="large" variant="secondary" />
+                  {editingTaskId === task.id ? (
+                    <CertificationTaskEditForm
+                      editingTaskDueDate={editingTaskDueDate}
+                      editingTaskStatus={editingTaskStatus}
+                      onSaveTask={onSaveTask}
+                      onTaskDueDateChange={onTaskDueDateChange}
+                      onTaskStatusChange={onTaskStatusChange}
+                    />
+                  ) : null}
+                </View>
+              ))}
             </View>
           ))}
         </View>
-      ))}
+      )) : (
+        <Text style={styles.body}>Certification planning will be created after organic tracking is enabled.</Text>
+      )}
       <Text style={styles.body}>{openTasks.length} certification task{openTasks.length === 1 ? "" : "s"} still open.</Text>
     </CollapsibleCard>
   );
@@ -664,7 +663,7 @@ function OrganicProfileForm({
       <SelectField
         label="Organic status"
         onChange={onStatusChange}
-        options={ORGANIC_OPERATION_STATUSES.map((status) => ({
+        options={ORGANIC_OPERATION_STATUSES.filter((status) => status !== "notOrganic").map((status) => ({
           label: ORGANIC_OPERATION_STATUS_LABELS[status],
           value: status,
         }))}

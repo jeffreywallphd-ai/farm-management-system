@@ -42,8 +42,10 @@ export function Button({
       <View style={styles.content}>
         <ThemedIcon color={iconColor} name={resolvedIcon} size={iconSize} />
         <Text
+          numberOfLines={2}
           style={[
             styles.label,
+            size === "standard" ? styles.standardLabel : null,
             size === "large" ? styles.largeLabel : null,
             size === "hero" ? styles.heroLabel : null,
             variant === "secondary" ? styles.secondaryLabel : styles.primaryLabel,
@@ -61,7 +63,7 @@ const styles = StyleSheet.create({
   button: {
     alignItems: "center",
     borderRadius: theme.radius.lg,
-    minHeight: theme.spacing.touchTarget,
+    minHeight: theme.spacing.primaryTouchTarget,
     justifyContent: "center",
     paddingHorizontal: theme.spacing.lg,
     paddingVertical: theme.spacing.md,
@@ -112,6 +114,9 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.body,
     fontWeight: "700",
     textAlign: "left",
+  },
+  standardLabel: {
+    lineHeight: 20,
   },
   largeLabel: {
     fontSize: theme.typography.section,

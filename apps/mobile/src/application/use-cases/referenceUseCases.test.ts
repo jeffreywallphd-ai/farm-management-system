@@ -4,6 +4,7 @@ import test from "node:test";
 import { addLocation } from "./add-location/addLocation";
 import { addTrackedItem } from "./add-tracked-item/addTrackedItem";
 import { completeCorePlacesSetup } from "./complete-core-places-setup/completeCorePlacesSetup";
+import { completeStarterWorkPacksSetup } from "./complete-starter-work-packs-setup/completeStarterWorkPacksSetup";
 import { listLocations } from "./list-locations/listLocations";
 import { listTrackedItems } from "./list-tracked-items/listTrackedItems";
 import { setupFarm } from "./setup-farm/setupFarm";
@@ -42,6 +43,18 @@ test("core farm places setup can be completed after the farm name step", async (
 
   assert.equal(updatedFarm?.corePlacesSetupCompletedAt, "2026-05-29T12:00:00.000Z");
   assert.equal((await deps.repository.getFarm())?.corePlacesSetupCompletedAt, "2026-05-29T12:00:00.000Z");
+});
+
+test("starter work packs setup can be completed after places setup", async () => {
+  const deps = dependencies();
+  const farm = await setupFarm({ name: "Green Hill Farm" }, deps);
+
+  assert.equal(farm.starterWorkPacksSetupCompletedAt, undefined);
+
+  const updatedFarm = await completeStarterWorkPacksSetup(farm.id, deps);
+
+  assert.equal(updatedFarm?.starterWorkPacksSetupCompletedAt, "2026-05-29T12:00:00.000Z");
+  assert.equal((await deps.repository.getFarm())?.starterWorkPacksSetupCompletedAt, "2026-05-29T12:00:00.000Z");
 });
 
 test("a location can be added and listed for its farm", async () => {

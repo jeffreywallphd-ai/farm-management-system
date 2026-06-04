@@ -7,6 +7,7 @@ export type PlanningGoalId = string;
 export type PlanningTaskId = string;
 export type PlanningLinkId = string;
 export type PlanningBoardId = string;
+export type PlanningFarmWorkPackId = string;
 
 export const PLANNING_GOAL_CATEGORIES = [
   "general",
@@ -117,7 +118,7 @@ export const PLANNING_RECORD_LINK_TYPE_LABELS: Record<PlanningRecordLinkType, st
   other: "Other",
 };
 
-export const PLANNING_SOURCES = ["farmer", "organicCertificationTemplate", "organicCertification"] as const;
+export const PLANNING_SOURCES = ["farmer", "farmWorkTemplate", "organicCertificationTemplate", "organicCertification"] as const;
 
 export type PlanningSource = (typeof PLANNING_SOURCES)[number];
 
@@ -203,6 +204,22 @@ export interface PlanningBoard {
   scopeType: PlanningBoardScopeType;
   goalId?: PlanningGoalId;
   wipLimit?: number;
+  createdAt: IsoDateTimeString;
+  updatedAt: IsoDateTimeString;
+}
+
+export interface PlanningFarmWorkPackState {
+  farmId: FarmId;
+  packId: PlanningFarmWorkPackId;
+  isActive: boolean;
+  createdAt: IsoDateTimeString;
+  updatedAt: IsoDateTimeString;
+}
+
+export interface PlanningFarmWorkPackItemState {
+  farmId: FarmId;
+  templateKey: string;
+  isActive: boolean;
   createdAt: IsoDateTimeString;
   updatedAt: IsoDateTimeString;
 }

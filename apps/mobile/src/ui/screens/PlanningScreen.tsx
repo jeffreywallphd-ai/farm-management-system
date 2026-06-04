@@ -15,7 +15,13 @@ import { useRouter } from "expo-router";
 import { z } from "zod";
 
 import type { FarmhandRepository } from "../../application/ports/FarmhandRepository";
+import type { OrganicCertificationRepository } from "../../application/ports/OrganicCertificationRepository";
 import type { PlanningRepository } from "../../application/ports/PlanningRepository";
+import { getOrganicCertificationDashboard } from "../../application/use-cases/manage-organic-certification/GetOrganicCertificationDashboard";
+import {
+  listInactiveFarmWorkPackIds,
+  listInactiveFarmWorkPackItemTemplateKeys,
+} from "../../application/use-cases/manage-planning/DefaultFarmWorkPacks";
 import { getPlanningOverview } from "../../application/use-cases/manage-planning/ListPlanning";
 import { savePlanningGoal, savePlanningTask } from "../../application/use-cases/manage-planning/ManagePlanning";
 import type { Farm } from "../../domain/farm/Farm";
@@ -54,6 +60,11 @@ import { SearchableSelectField, type SearchableSelectOption } from "../component
 import { SelectField } from "../components/SelectField";
 import { SectionHeading } from "../components/SectionHeading";
 import { buildFarmPlaceDisplays, type FarmPlaceDisplay } from "../farmPlaceDisplay";
+import { filterPlanningForActiveFarmWorkPacks } from "../farmWorkPackPlanningVisibility";
+import {
+  filterPlanningForOrganicCertificationPursuit,
+  isOrganicCertificationPursuitActive,
+} from "../organicCertificationPlanningVisibility";
 import { theme } from "../theme/theme";
 import { pushRoute } from "../navigation";
 import {
@@ -78,12 +89,14 @@ export function PlanningScreen({
   farmhandRepository,
   farmhands,
   locations,
+  organicCertificationRepository,
   repository,
 }: {
   farm: Farm;
   farmhandRepository?: FarmhandRepository;
   farmhands: Farmhand[];
   locations: FarmLocation[];
+  organicCertificationRepository: OrganicCertificationRepository;
   repository: PlanningRepository;
 }) {
   const router = useRouter();
@@ -123,14 +136,31 @@ export function PlanningScreen({
   const voiceMemoStorageRepository = useMemo(() => new ExpoVoiceMemoStorageRepository(), []);
 
   async function loadPlanning() {
-    const overview = await getPlanningOverview({ farmId: farm.id }, { repository });
-    setGoals(overview.goals);
-    setTasks(overview.tasks);
+    const [overview, certificationDashboard, inactiveFarmWorkPackIds, inactiveFarmWorkPackItemTemplateKeys] = await Promise.all([
+      getPlanningOverview({ farmId: farm.id }, { repository }),
+      getOrganicCertificationDashboard({ farmId: farm.id }, { repository: organicCertificationRepository }),
+      listInactiveFarmWorkPackIds({ farmId: farm.id }, { repository }),
+      listInactiveFarmWorkPackItemTemplateKeys({ farmId: farm.id }, { repository }),
+    ]);
+    const certificationFiltered = filterPlanningForOrganicCertificationPursuit(
+      overview.goals,
+      overview.tasks,
+      isOrganicCertificationPursuitActive(certificationDashboard.profile),
+    );
+    const filtered = filterPlanningForActiveFarmWorkPacks(
+      certificationFiltered.goals,
+      certificationFiltered.tasks,
+      inactiveFarmWorkPackIds,
+      inactiveFarmWorkPackItemTemplateKeys,
+    );
+
+    setGoals(filtered.goals);
+    setTasks(filtered.tasks);
   }
 
   useEffect(() => {
     loadPlanning().catch(() => setError("Planning records could not be loaded from this device."));
-  }, [farm.id, repository]);
+  }, [farm.id, organicCertificationRepository, repository]);
 
   useEffect(() => {
     if (!pendingScrollTaskId || editingTaskId !== pendingScrollTaskId) {

@@ -65,7 +65,8 @@ export async function ensureDefaultPlanningBoards(
   const boards = [...existingBoards];
 
   for (const goal of rootGoals) {
-    const existingGoalBoard = boards.find((board) => board.scopeType === "goal" && board.goalId === goal.id);
+    const existingGoalBoardIndex = boards.findIndex((board) => board.scopeType === "goal" && board.goalId === goal.id);
+    const existingGoalBoard = existingGoalBoardIndex >= 0 ? boards[existingGoalBoardIndex] : undefined;
     if (!existingGoalBoard) {
       boards.push(await savePlanningBoard(
         {
@@ -73,6 +74,17 @@ export async function ensureDefaultPlanningBoards(
           title: goal.title,
           scopeType: "goal",
           goalId: goal.id,
+        },
+        dependencies,
+      ));
+      continue;
+    }
+
+    if (existingGoalBoard.title !== goal.title) {
+      boards.splice(existingGoalBoardIndex, 1, await savePlanningBoard(
+        {
+          ...existingGoalBoard,
+          title: goal.title,
         },
         dependencies,
       ));

@@ -50,7 +50,9 @@ function SetupRouteContent({ farm, database }: { farm: Farm; database: ReadyData
       locations={locations}
       materials={materials}
       farmMapRepository={database.farmMapRepository}
+      organicCertificationRepository={database.organicCertificationRepository}
       onReferenceSaved={loadReferences}
+      planningRepository={database.planningRepository}
       repository={database.farmReferenceRepository}
     />
   );
@@ -63,6 +65,8 @@ function parseSetupSection(section?: string | string[]): SetupSectionId | undefi
     value === "farmProfile" ||
     value === "farmPlaces" ||
     value === "farmMapLocation" ||
+    value === "organicCertification" ||
+    value === "farmWorkPacks" ||
     value === "scheduleWeek" ||
     value === "crops" ||
     value === "materials"

@@ -83,7 +83,7 @@ export function RecordMaterialUseScreen({
         <Card>
           <SectionHeading title="Finish setup first" />
           <EmptyState text="Add a material before recording use." />
-          <Button label="Back to farm setup" onPress={() => replaceRoute(router, "/")} variant="secondary" />
+          <Button label="Back to farm setup" onPress={() => replaceRoute(router, "/setup")} variant="secondary" />
         </Card>
       ) : (
         <Card>

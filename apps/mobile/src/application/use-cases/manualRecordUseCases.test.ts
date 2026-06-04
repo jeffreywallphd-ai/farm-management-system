@@ -161,6 +161,7 @@ test("expanded recovery copy includes all implemented manual records", async () 
   assert.equal(payload.materialUseRecords.length, 1);
   assert.equal(payload.inventoryCountRecords.length, 1);
   assert.equal(payload.locations[0].kind, "field");
+  assert.deepEqual(payload.farmWorkPackItemStates, []);
   assert.equal(payload.syncState, undefined);
   assert.equal(payload.aiDrafts, undefined);
   assert.equal(payload.authentication, undefined);
@@ -212,6 +213,8 @@ test("expanded recovery copy rejects malformed manual record payloads", async ()
       planningBoards: [],
       planningTasks: [],
       planningLinks: [],
+      farmWorkPackStates: [],
+      farmWorkPackItemStates: [],
       materialUseRecords: [
         {
           id: "material-use-1",

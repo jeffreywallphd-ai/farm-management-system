@@ -7,4 +7,5 @@ export interface Farm {
   name: string;
   createdAt: IsoDateTimeString;
   corePlacesSetupCompletedAt?: IsoDateTimeString;
+  starterWorkPacksSetupCompletedAt?: IsoDateTimeString;
 }

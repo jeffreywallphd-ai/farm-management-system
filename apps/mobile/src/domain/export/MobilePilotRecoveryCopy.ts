@@ -27,10 +27,17 @@ import type { OrganicInspectionReadinessItem, OrganicSystemPlanSection } from ".
 import type { OrganicReportPackage } from "../organic/OrganicReportPackage";
 import type { OrganicAdvancedScopeRecord } from "../organic/OrganicAdvancedScope";
 import type { OrganicEvidenceLink } from "../organic/OrganicEvidenceLink";
-import type { PlanningBoard, PlanningGoal, PlanningLink, PlanningTask } from "../planning/Planning";
+import type {
+  PlanningBoard,
+  PlanningFarmWorkPackItemState,
+  PlanningFarmWorkPackState,
+  PlanningGoal,
+  PlanningLink,
+  PlanningTask,
+} from "../planning/Planning";
 
-export const MOBILE_PILOT_RECOVERY_COPY_EXPORT_VERSION = 18;
-export const MOBILE_PILOT_APP_DATA_SCHEMA_VERSION = 22;
+export const MOBILE_PILOT_RECOVERY_COPY_EXPORT_VERSION = 20;
+export const MOBILE_PILOT_APP_DATA_SCHEMA_VERSION = 24;
 
 export interface MobilePilotRecoveryCopy {
   exportVersion: typeof MOBILE_PILOT_RECOVERY_COPY_EXPORT_VERSION;
@@ -78,4 +85,6 @@ export interface MobilePilotRecoveryCopy {
   planningBoards: PlanningBoard[];
   planningTasks: PlanningTask[];
   planningLinks: PlanningLink[];
+  farmWorkPackStates: PlanningFarmWorkPackState[];
+  farmWorkPackItemStates: PlanningFarmWorkPackItemState[];
 }

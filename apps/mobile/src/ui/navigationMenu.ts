@@ -1,10 +1,12 @@
+import type { ThemedIconName } from "./components/ThemedIcon";
+
 export const menuItems = [
-  { label: "Home", route: "/home" },
-  { label: "Farm planning", route: "/planning" },
-  { label: "Manage farm tasks", route: "/planning/boards" },
-  { label: "Farmhands", route: "/farmhands" },
-  { label: "Farm setup", route: "/setup" },
-  { label: "Organic certification", route: "/organic" },
-] as const;
+  { icon: "home", label: "Home", route: "/home" },
+  { icon: "task", label: "Farm planning", route: "/planning" },
+  { icon: "board", label: "Manage farm tasks", route: "/planning/boards" },
+  { icon: "farmhand", label: "Farmhands", route: "/farmhands" },
+  { icon: "setup", label: "Farm setup", route: "/setup" },
+  { icon: "organic", label: "Organic certification", route: "/organic" },
+] as const satisfies readonly { icon: ThemedIconName; label: string; route: string }[];
 
 export type MenuRoute = (typeof menuItems)[number]["route"];

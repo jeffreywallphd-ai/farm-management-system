@@ -1,12 +1,14 @@
 import { useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 
+import { ThemedIcon } from "./ThemedIcon";
 import { pushRoute } from "../navigation";
 import { menuItems, type MenuRoute } from "../navigationMenu";
 import { theme } from "../theme/theme";
 
 const appDisplayName = "Fazendio";
+const logoVineOverlay = require("../../../assets/images/logo-vine-overlay.png");
 
 function HeaderMenuIcon({ isOpen }: { isOpen: boolean }) {
   if (isOpen) {
@@ -47,7 +49,11 @@ export function AppHeader() {
           onPress={() => handleNavigate("/home")}
           style={styles.titleButton}
         >
-          <Text style={styles.title}>{appDisplayName}</Text>
+          <View style={styles.logoLockup}>
+            <Image accessible={false} resizeMode="contain" source={logoVineOverlay} style={styles.logoVine} />
+            <Text style={styles.title}>{appDisplayName}</Text>
+            <Text style={styles.betaBadge}>BETA</Text>
+          </View>
         </Pressable>
         <Pressable
           accessibilityLabel={isOpen ? "Close menu" : "Open menu"}
@@ -67,7 +73,9 @@ export function AppHeader() {
               onPress={() => handleNavigate(item.route)}
               style={styles.menuItem}
             >
+              <ThemedIcon accentColor={theme.colors.secondary} color={theme.colors.primary} name={item.icon} size={24} />
               <Text style={styles.menuItemText}>{item.label}</Text>
+              <ThemedIcon color={theme.colors.primary} name="arrowRight" size={22} />
             </Pressable>
           ))}
         </View>
@@ -82,8 +90,8 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.primary,
     borderBottomColor: theme.colors.border,
     borderBottomWidth: 1,
-    borderBottomLeftRadius: theme.radius.xl,
-    borderBottomRightRadius: theme.radius.xl,
+    borderBottomLeftRadius: theme.radius.md,
+    borderBottomRightRadius: theme.radius.md,
     elevation: 4,
     flexDirection: "row",
     justifyContent: "space-between",
@@ -95,15 +103,40 @@ const styles = StyleSheet.create({
     shadowRadius: 16,
   },
   container: {
-    backgroundColor: theme.colors.background,
+    backgroundColor: "transparent",
     zIndex: 10,
   },
   hamburgerLines: {
     gap: 5,
   },
+  betaBadge: {
+    bottom: 3,
+    color: theme.colors.primarySoft,
+    fontFamily: theme.typography.logoFontFamily,
+    fontSize: 10,
+    fontWeight: "800",
+    lineHeight: 12,
+    letterSpacing: 0.6,
+    position: "absolute",
+    right: -33,
+    zIndex: 2,
+  },
+  logoLockup: {
+    justifyContent: "center",
+    position: "relative",
+  },
+  logoVine: {
+    bottom: 7,
+    height: 42,
+    left: -6,
+    opacity: 0.32,
+    position: "absolute",
+    width: 158,
+    zIndex: 0,
+  },
   menu: {
-    backgroundColor: theme.colors.surface,
-    borderBottomColor: theme.colors.border,
+    backgroundColor: theme.colors.primarySubtle,
+    borderBottomColor: theme.colors.iconBorder,
     borderBottomLeftRadius: theme.radius.lg,
     borderBottomRightRadius: theme.radius.lg,
     borderBottomWidth: 1,
@@ -141,13 +174,17 @@ const styles = StyleSheet.create({
     width: 24,
   },
   menuItem: {
+    alignItems: "center",
     borderRadius: theme.radius.sm,
+    flexDirection: "row",
+    gap: theme.spacing.md,
+    justifyContent: "space-between",
     minHeight: theme.spacing.primaryTouchTarget,
-    justifyContent: "center",
     paddingHorizontal: theme.spacing.md,
   },
   menuItemText: {
     color: theme.colors.textPrimary,
+    flex: 1,
     fontSize: theme.typography.body,
     fontWeight: "700",
   },
@@ -156,6 +193,7 @@ const styles = StyleSheet.create({
     fontFamily: theme.typography.logoFontFamily,
     fontSize: 34,
     fontWeight: theme.typography.headingFontWeight,
+    zIndex: 1,
   },
   titleButton: {
     justifyContent: "center",

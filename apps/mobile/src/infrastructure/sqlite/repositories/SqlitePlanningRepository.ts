@@ -6,6 +6,8 @@ import type { FarmhandId } from "../../../domain/farmhand/Farmhand";
 import type {
   PlanningGoal,
   PlanningGoalCategory,
+  PlanningFarmWorkPackItemState,
+  PlanningFarmWorkPackState,
   PlanningGoalId,
   PlanningGoalStatus,
   PlanningBoard,
@@ -85,6 +87,22 @@ interface LinkRow {
   linked_record_id: string;
   notes: string | null;
   created_at: string;
+}
+
+interface FarmWorkPackStateRow {
+  farm_id: string;
+  pack_id: string;
+  is_active: number;
+  created_at: string;
+  updated_at: string;
+}
+
+interface FarmWorkPackItemStateRow {
+  farm_id: string;
+  template_key: string;
+  is_active: number;
+  created_at: string;
+  updated_at: string;
 }
 
 interface LocationRow {
@@ -344,6 +362,44 @@ export class SqlitePlanningRepository implements PlanningRepository {
     if (filters?.taskId) links = links.filter((link) => link.taskId === filters.taskId);
     return links;
   }
+
+  async saveFarmWorkPackState(state: PlanningFarmWorkPackState): Promise<void> {
+    await this.database.runAsync(
+      `INSERT INTO farm_work_pack_states (farm_id, pack_id, is_active, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?)
+       ON CONFLICT(farm_id, pack_id) DO UPDATE SET
+        is_active = excluded.is_active,
+        updated_at = excluded.updated_at;`,
+      [state.farmId, state.packId, state.isActive ? 1 : 0, state.createdAt, state.updatedAt],
+    );
+  }
+
+  async listFarmWorkPackStates(farmId: FarmId): Promise<PlanningFarmWorkPackState[]> {
+    const rows = await this.database.getAllAsync<FarmWorkPackStateRow>(
+      "SELECT farm_id, pack_id, is_active, created_at, updated_at FROM farm_work_pack_states WHERE farm_id = ? ORDER BY updated_at DESC;",
+      [farmId],
+    );
+    return rows.map(mapFarmWorkPackState);
+  }
+
+  async saveFarmWorkPackItemState(state: PlanningFarmWorkPackItemState): Promise<void> {
+    await this.database.runAsync(
+      `INSERT INTO farm_work_pack_item_states (farm_id, template_key, is_active, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?)
+       ON CONFLICT(farm_id, template_key) DO UPDATE SET
+        is_active = excluded.is_active,
+        updated_at = excluded.updated_at;`,
+      [state.farmId, state.templateKey, state.isActive ? 1 : 0, state.createdAt, state.updatedAt],
+    );
+  }
+
+  async listFarmWorkPackItemStates(farmId: FarmId): Promise<PlanningFarmWorkPackItemState[]> {
+    const rows = await this.database.getAllAsync<FarmWorkPackItemStateRow>(
+      "SELECT farm_id, template_key, is_active, created_at, updated_at FROM farm_work_pack_item_states WHERE farm_id = ? ORDER BY updated_at DESC;",
+      [farmId],
+    );
+    return rows.map(mapFarmWorkPackItemState);
+  }
 }
 
 function mapGoal(row: GoalRow): PlanningGoal {
@@ -431,6 +487,26 @@ function mapLink(row: LinkRow): PlanningLink {
     linkedRecordId: row.linked_record_id,
     notes: row.notes ?? undefined,
     createdAt: row.created_at,
+  };
+}
+
+function mapFarmWorkPackState(row: FarmWorkPackStateRow): PlanningFarmWorkPackState {
+  return {
+    farmId: row.farm_id,
+    packId: row.pack_id,
+    isActive: row.is_active === 1,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
+}
+
+function mapFarmWorkPackItemState(row: FarmWorkPackItemStateRow): PlanningFarmWorkPackItemState {
+  return {
+    farmId: row.farm_id,
+    templateKey: row.template_key,
+    isActive: row.is_active === 1,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
   };
 }
 

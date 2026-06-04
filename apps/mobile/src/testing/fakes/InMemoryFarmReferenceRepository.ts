@@ -28,6 +28,12 @@ export class InMemoryFarmReferenceRepository implements FarmReferenceRepository 
     }
   }
 
+  async markStarterWorkPacksSetupComplete(farmId: FarmId, completedAt: string): Promise<void> {
+    if (this.farm?.id === farmId) {
+      this.farm = { ...this.farm, starterWorkPacksSetupCompletedAt: completedAt };
+    }
+  }
+
   async addLocation(location: FarmLocation): Promise<void> {
     if (location.parentId) {
       const parent = this.locations.find(

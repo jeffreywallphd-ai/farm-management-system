@@ -10,7 +10,9 @@ import { Screen } from "../ui/components/Screen";
 import { FarmPlacesSetupScreen } from "../ui/screens/FarmPlacesSetupScreen";
 import { FarmSetupScreen } from "../ui/screens/FarmSetupScreen";
 import { HomeScreen } from "../ui/screens/HomeScreen";
+import { StarterWorkPacksSetupScreen } from "../ui/screens/StarterWorkPacksSetupScreen";
 import { getStartupStep } from "../ui/setupFlow";
+import { rememberFarmRouteContext } from "./FarmRouteGate";
 import { useDatabase } from "./providers/DatabaseProvider";
 
 export function AppBootstrap() {
@@ -33,6 +35,7 @@ export function AppBootstrap() {
       if (nextFarm) {
         const nextLocations = await listLocations(nextFarm.id, database.farmReferenceRepository);
         setLocations(nextLocations);
+        rememberFarmRouteContext(nextFarm, nextLocations);
       }
     } finally {
       setIsLoadingReferences(false);
@@ -82,11 +85,28 @@ export function AppBootstrap() {
         farm={farm}
         locations={locations}
         onReferenceSaved={loadReferences}
-        onSetupCompleted={(updatedFarm) => setFarm(updatedFarm)}
+        onSetupCompleted={(updatedFarm) => {
+          setFarm(updatedFarm);
+          rememberFarmRouteContext(updatedFarm, locations);
+        }}
         repository={database.farmReferenceRepository}
       />
     );
   }
 
-  return farm ? <HomeScreen farmName={farm.name} /> : null;
+  if (startupStep === "starterWorkPacks" && farm) {
+    return (
+      <StarterWorkPacksSetupScreen
+        farm={farm}
+        farmReferenceRepository={database.farmReferenceRepository}
+        onSetupCompleted={(updatedFarm) => {
+          setFarm(updatedFarm);
+          rememberFarmRouteContext(updatedFarm, locations);
+        }}
+        planningRepository={database.planningRepository}
+      />
+    );
+  }
+
+  return farm ? <HomeScreen farm={farm} /> : null;
 }

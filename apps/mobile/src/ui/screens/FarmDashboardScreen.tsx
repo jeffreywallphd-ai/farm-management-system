@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import type { Farm } from "../../domain/farm/Farm";
 import type { FarmLocation } from "../../domain/farm/FarmLocation";
@@ -15,6 +15,8 @@ import {
 import type { FarmMapRepository } from "../../application/ports/FarmMapRepository";
 import type { FarmDeviceCoordinates } from "../../application/ports/FarmLocationDeviceService";
 import type { FarmReferenceRepository } from "../../application/ports/FarmReferenceRepository";
+import type { OrganicCertificationRepository } from "../../application/ports/OrganicCertificationRepository";
+import type { PlanningRepository } from "../../application/ports/PlanningRepository";
 import {
   archiveFarmPlaceGeometry,
   createFarmPlaceGeometry,
@@ -23,8 +25,25 @@ import {
   saveFarmMapViewport,
   updateFarmPlaceGeometry,
 } from "../../application/use-cases/manage-farm-map/ManageFarmMap";
+import { getOrganicCertificationDashboard } from "../../application/use-cases/manage-organic-certification/GetOrganicCertificationDashboard";
+import { saveOrganicOperationProfile } from "../../application/use-cases/manage-organic-certification/SaveOrganicOperationProfile";
+import {
+  ensureFarmWorkPacks,
+  getFarmWorkPackSetupSummary,
+  setFarmWorkPackActive,
+  setFarmWorkPackItemActive,
+  type FarmWorkPackGroup,
+  type FarmWorkPackId,
+  type FarmWorkPackGoalSetupSummary,
+  type FarmWorkPackSetupSummary,
+  type FarmWorkPackSubgoalSetupSummary,
+} from "../../application/use-cases/manage-planning/DefaultFarmWorkPacks";
+import { ensureOrganicCertificationPlan } from "../../application/use-cases/manage-planning/CreateOrganicCertificationPlan";
+import { ensureDefaultPlanningBoards } from "../../application/use-cases/manage-planning/ManagePlanning";
 import type { WeekStartsOn } from "../../application/use-cases/manage-farmhands/ListFarmhandWork";
 import { updateFarmName } from "../../application/use-cases/update-farm-name/updateFarmName";
+import { ORGANIC_CERTIFICATION_SCOPE_LABELS, type OrganicCertificationScopeType, type OrganicOperationProfile } from "../../domain/organic/OrganicCertification";
+import { defaultRecordRetentionYearsForStatus } from "../../domain/validation/organicCertificationValidation";
 import { expoFarmLocationDeviceService } from "../../infrastructure/location/ExpoFarmLocationDeviceService";
 import { systemClock } from "../../infrastructure/system/clock";
 import { localIdGenerator } from "../../infrastructure/system/idGenerator";
@@ -40,7 +59,14 @@ import { Screen } from "../components/Screen";
 import { SelectField } from "../components/SelectField";
 import { useDatePreferences } from "../datePreferences";
 import { buildFarmPlaceOptions } from "../farmPlaceDisplay";
+import { isOrganicCertificationPursuitActive } from "../organicCertificationPlanningVisibility";
 import { theme } from "../theme/theme";
+import {
+  isStarterPackHierarchyChecked,
+  selectedStarterPackTaskCount,
+  starterPackTaskCountLabel,
+  toggleStarterPackTaskKeys,
+} from "./FarmWorkPackSetupModel";
 
 type ReferenceSection = {
   type: TrackedItemKind;
@@ -50,7 +76,15 @@ type ReferenceSection = {
   items: TrackedItem[];
 };
 
-export type SetupSectionId = "farmProfile" | "farmMapLocation" | "scheduleWeek" | "farmPlaces" | "crops" | "materials";
+export type SetupSectionId =
+  | "farmProfile"
+  | "farmMapLocation"
+  | "organicCertification"
+  | "farmWorkPacks"
+  | "scheduleWeek"
+  | "farmPlaces"
+  | "crops"
+  | "materials";
 
 export function FarmDashboardScreen({
   farm,
@@ -58,6 +92,8 @@ export function FarmDashboardScreen({
   crops,
   materials,
   farmMapRepository,
+  organicCertificationRepository,
+  planningRepository,
   repository,
   onReferenceSaved,
   initialExpandedSection,
@@ -67,6 +103,8 @@ export function FarmDashboardScreen({
   crops: TrackedItem[];
   materials: TrackedItem[];
   farmMapRepository: FarmMapRepository;
+  organicCertificationRepository: OrganicCertificationRepository;
+  planningRepository: PlanningRepository;
   repository: FarmReferenceRepository;
   onReferenceSaved: () => Promise<void>;
   initialExpandedSection?: SetupSectionId;
@@ -184,6 +222,26 @@ export function FarmDashboardScreen({
         />
       </CollapsibleCard>
       <CollapsibleCard
+        detail="Show or hide organic certification planning and boards for this farm."
+        isExpanded={expandedSection === "organicCertification"}
+        onToggle={() => toggle("organicCertification")}
+        title="Organic certification"
+      >
+        <OrganicCertificationSetup
+          farmId={farm.id}
+          organicCertificationRepository={organicCertificationRepository}
+          planningRepository={planningRepository}
+        />
+      </CollapsibleCard>
+      <CollapsibleCard
+        detail="Choose starter goals and tasks for the work this farm actually does."
+        isExpanded={expandedSection === "farmWorkPacks"}
+        onToggle={() => toggle("farmWorkPacks")}
+        title="Starter work packs"
+      >
+        <FarmWorkPackSetup farmId={farm.id} planningRepository={planningRepository} />
+      </CollapsibleCard>
+      <CollapsibleCard
         detail={`${locations.length} saved place${locations.length === 1 ? "" : "s"}`}
         isExpanded={expandedSection === "farmPlaces"}
         onToggle={() => toggle("farmPlaces")}
@@ -236,6 +294,532 @@ function sectionIdForType(type: TrackedItemKind): SetupSectionId {
   return type === "crop" ? "crops" : "materials";
 }
 
+export function FarmWorkPackSetup({
+  farmId,
+  planningRepository,
+}: {
+  farmId: string;
+  planningRepository: PlanningRepository;
+}) {
+  const [summaries, setSummaries] = useState<FarmWorkPackSetupSummary[]>([]);
+  const [selectedTaskKeysByPackId, setSelectedTaskKeysByPackId] = useState<Partial<Record<FarmWorkPackId, string[]>>>({});
+  const [expandedPackIds, setExpandedPackIds] = useState<Set<FarmWorkPackId>>(new Set());
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [message, setMessage] = useState<string | undefined>();
+  const [error, setError] = useState<string | undefined>();
+  const packGroups: Array<{ group: FarmWorkPackGroup; title: string; detail: string }> = [
+    {
+      group: "administrationPlanning",
+      title: "Administration and planning work",
+      detail: "Planning, ordering, records, schedules, and follow-up decisions.",
+    },
+    {
+      group: "farmWork",
+      title: "Farm work",
+      detail: "Hands-on field, greenhouse, livestock, harvest, and equipment tasks.",
+    },
+  ];
+
+  const loadPackSummaries = useCallback(async () => {
+    setIsLoading(true);
+    setError(undefined);
+
+    try {
+      setSummaries(await getFarmWorkPackSetupSummary({ farmId }, { repository: planningRepository }));
+    } catch {
+      setError("Starter work packs could not be loaded.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [farmId, planningRepository]);
+
+  useEffect(() => {
+    void loadPackSummaries();
+  }, [loadPackSummaries]);
+
+  function toggleExpandedPack(packId: FarmWorkPackId) {
+    setExpandedPackIds((current) => {
+      const next = new Set(current);
+      if (next.has(packId)) next.delete(packId);
+      else next.add(packId);
+      return next;
+    });
+  }
+
+  function togglePackTaskKeys(packId: FarmWorkPackId, taskKeys: string[]) {
+    setSelectedTaskKeysByPackId((current) => {
+      return toggleStarterPackTaskKeys(current, packId, taskKeys);
+    });
+  }
+
+  async function handleTogglePackActive(summary: FarmWorkPackSetupSummary) {
+    setIsSaving(true);
+    setError(undefined);
+    setMessage(undefined);
+
+    try {
+      const nextIsActive = !summary.isActive;
+      await setFarmWorkPackActive(
+        { farmId, packId: summary.id, isActive: nextIsActive },
+        { clock: systemClock, repository: planningRepository },
+      );
+      if (nextIsActive) {
+        await ensureDefaultPlanningBoards(
+          { farmId },
+          { clock: systemClock, idGenerator: localIdGenerator, repository: planningRepository },
+        );
+      }
+      await loadPackSummaries();
+      setMessage(`${summary.shortTitle} starter pack is now ${nextIsActive ? "active" : "inactive"}.`);
+    } catch (caughtError) {
+      setError(caughtError instanceof Error ? caughtError.message : "Starter work pack status could not be changed.");
+    } finally {
+      setIsSaving(false);
+    }
+  }
+
+  async function handleTogglePackItemActive(templateKey: string, isActive: boolean) {
+    setIsSaving(true);
+    setError(undefined);
+    setMessage(undefined);
+
+    try {
+      const nextIsActive = !isActive;
+      await setFarmWorkPackItemActive(
+        { farmId, templateKey, isActive: nextIsActive },
+        { clock: systemClock, repository: planningRepository },
+      );
+      await loadPackSummaries();
+      setMessage(`Starter pack item is now ${nextIsActive ? "active" : "inactive"}.`);
+    } catch (caughtError) {
+      setError(caughtError instanceof Error ? caughtError.message : "Starter work pack item status could not be changed.");
+    } finally {
+      setIsSaving(false);
+    }
+  }
+
+  async function handleAddPack(summary: FarmWorkPackSetupSummary) {
+    const selectedTaskKeys = selectedTaskKeysByPackId[summary.id] ?? unappliedTaskKeys(summary);
+    if (!selectedTaskKeys.length) return;
+
+    setIsSaving(true);
+    setError(undefined);
+    setMessage(undefined);
+
+    try {
+      const result = await ensureFarmWorkPacks(
+        { farmId, packIds: [summary.id], taskTemplateKeysByPackId: { [summary.id]: selectedTaskKeys } },
+        { clock: systemClock, idGenerator: localIdGenerator, repository: planningRepository },
+      );
+      await ensureDefaultPlanningBoards(
+        { farmId },
+        { clock: systemClock, idGenerator: localIdGenerator, repository: planningRepository },
+      );
+      setSelectedTaskKeysByPackId((current) => {
+        const next = { ...current };
+        delete next[summary.id];
+        return next;
+      });
+      await loadPackSummaries();
+      setMessage(
+        `Added ${summary.shortTitle} starter pack with ${result.tasks.length} task${result.tasks.length === 1 ? "" : "s"}.`,
+      );
+    } catch (caughtError) {
+      setError(caughtError instanceof Error ? caughtError.message : "Starter work pack could not be added.");
+    } finally {
+      setIsSaving(false);
+    }
+  }
+
+  function renderPackGroup(group: FarmWorkPackGroup, title: string, detail: string) {
+    const groupSummaries = summaries.filter((summary) => summary.group === group);
+    if (!isLoading && groupSummaries.length === 0) return null;
+
+    return (
+      <View key={group} style={styles.packGroupPanel}>
+        <Text style={styles.packGroupTitle}>{title}</Text>
+        <Text style={styles.helperText}>{detail}</Text>
+        <View style={styles.packList}>
+          {groupSummaries.map((summary) => {
+            const selectedKeys = selectedTaskKeysByPackId[summary.id] ?? [];
+            const remainingTaskKeys = unappliedTaskKeys(summary);
+            const taskKeysToAdd = selectedKeys.length ? selectedKeys : remainingTaskKeys;
+            const isExpanded = expandedPackIds.has(summary.id);
+            const statusText = summary.isApplied
+              ? summary.isActive ? "Active" : "Inactive"
+              : selectedKeys.length ? `${selectedKeys.length} selected` : "Not added";
+            return (
+              <View
+                key={summary.id}
+                style={[
+                  styles.packOption,
+                  selectedKeys.length ? styles.packOptionSelected : null,
+                  summary.isApplied ? styles.packOptionApplied : null,
+                ]}
+              >
+                <View style={styles.packHeader}>
+                  <Text style={styles.packTitle}>{summary.shortTitle}</Text>
+                  <Text style={summary.isApplied ? styles.packStatusApplied : styles.packStatus}>
+                    {statusText}
+                  </Text>
+                </View>
+                <Text style={styles.statusText}>{summary.setupQuestion}</Text>
+                <Text style={styles.helperText}>{summary.description}</Text>
+                <Text style={styles.placeDetail}>
+                  {summary.goalCount} goal{summary.goalCount === 1 ? "" : "s"} - {summary.taskCount} task{summary.taskCount === 1 ? "" : "s"}
+                </Text>
+                <Text style={styles.placeDetail}>Good for: {summary.suggestedFor.join(", ")}</Text>
+                <View style={styles.packActionRow}>
+                  {remainingTaskKeys.length ? (
+                    <Pressable
+                      accessibilityRole="button"
+                      disabled={isSaving}
+                      onPress={() => handleAddPack(summary)}
+                      style={[styles.packInlineButton, styles.packPrimaryInlineButton]}
+                    >
+                      <Text style={[styles.packInlineButtonText, styles.packPrimaryInlineButtonText]}>
+                        {selectedKeys.length
+                          ? `Add ${taskKeysToAdd.length} selected task${taskKeysToAdd.length === 1 ? "" : "s"}`
+                          : "Add starter pack tasks"}
+                      </Text>
+                    </Pressable>
+                  ) : null}
+                  {summary.isApplied ? (
+                    <Pressable
+                      accessibilityRole="button"
+                      disabled={isSaving}
+                      onPress={() => handleTogglePackActive(summary)}
+                      style={styles.packInlineButton}
+                    >
+                      <Text style={styles.packInlineButtonText}>{summary.isActive ? "Deactivate pack" : "Activate pack"}</Text>
+                    </Pressable>
+                  ) : null}
+                  <Pressable accessibilityRole="button" onPress={() => toggleExpandedPack(summary.id)} style={styles.packInlineButton}>
+                    <Text style={styles.packInlineButtonText}>{isExpanded ? "Hide goals" : "Show goals"}</Text>
+                  </Pressable>
+                </View>
+                {isExpanded ? (
+                  <FarmWorkPackTaskPicker
+                    isSaving={isSaving}
+                    onToggleItemActive={handleTogglePackItemActive}
+                    onToggleTaskKeys={(taskKeys) => togglePackTaskKeys(summary.id, taskKeys)}
+                    selectedTaskKeys={selectedKeys}
+                    summary={summary}
+                  />
+                ) : null}
+              </View>
+            );
+          })}
+        </View>
+      </View>
+    );
+  }
+
+  return (
+    <View style={styles.actionStack}>
+      <Text style={styles.sectionTitle}>What kind of farm work should the app start with?</Text>
+      <Text style={styles.helperText}>
+        Pick only the work this farm does. Starter packs create editable goals and tasks in Farm Planning and Farm Work Boards.
+      </Text>
+      {isLoading ? <Text style={styles.helperText}>Opening starter work packs...</Text> : null}
+      {packGroups.map((group) => renderPackGroup(group.group, group.title, group.detail))}
+      {message ? <Text style={styles.statusText}>{message}</Text> : null}
+      {error ? <Text style={styles.error}>{error}</Text> : null}
+    </View>
+  );
+}
+
+function FarmWorkPackTaskPicker({
+  isSaving,
+  onToggleItemActive,
+  onToggleTaskKeys,
+  selectedTaskKeys,
+  summary,
+}: {
+  isSaving: boolean;
+  onToggleItemActive: (templateKey: string, isActive: boolean) => void;
+  onToggleTaskKeys: (taskKeys: string[]) => void;
+  selectedTaskKeys: string[];
+  summary: FarmWorkPackSetupSummary;
+}) {
+  const selectedSet = new Set(selectedTaskKeys);
+  return (
+    <View style={styles.packTaskList}>
+      {summary.goals.map((goal) => {
+        const goalTaskKeys = unappliedTaskKeysForGoal(goal);
+        const selectedGoalTaskCount = selectedStarterPackTaskCount(goalTaskKeys, selectedSet);
+        return (
+          <View key={goal.templateKey} style={styles.packGoalGroup}>
+            <PackCheckRow
+              disabled={isSaving || goal.isApplied || goalTaskKeys.length === 0}
+              isChecked={goal.isApplied || isStarterPackHierarchyChecked(goalTaskKeys, selectedSet)}
+              label={goal.title}
+              meta={goal.isApplied ? "Added" : starterPackTaskCountLabel(goalTaskKeys.length, selectedGoalTaskCount, false)}
+              metaLabel="Goal"
+              onPress={() => onToggleTaskKeys(goalTaskKeys)}
+              title
+            />
+            {goal.subgoals.map((subgoal) => (
+              <FarmWorkPackSubgoalPicker
+                isSaving={isSaving}
+                onToggleItemActive={onToggleItemActive}
+                key={subgoal.templateKey}
+                onToggleTaskKeys={onToggleTaskKeys}
+                selectedSet={selectedSet}
+                subgoal={subgoal}
+              />
+            ))}
+          </View>
+        );
+      })}
+    </View>
+  );
+}
+
+function FarmWorkPackSubgoalPicker({
+  isSaving,
+  onToggleItemActive,
+  onToggleTaskKeys,
+  selectedSet,
+  subgoal,
+}: {
+  isSaving: boolean;
+  onToggleItemActive: (templateKey: string, isActive: boolean) => void;
+  onToggleTaskKeys: (taskKeys: string[]) => void;
+  selectedSet: Set<string>;
+  subgoal: FarmWorkPackSubgoalSetupSummary;
+}) {
+  const subgoalTaskKeys = unappliedTaskKeysForSubgoal(subgoal);
+  const selectedSubgoalTaskCount = selectedStarterPackTaskCount(subgoalTaskKeys, selectedSet);
+  return (
+    <View style={styles.packSubgoalGroup}>
+      <PackCheckRow
+        actionLabel={subgoal.isApplied ? subgoal.isActive ? "Deactivate" : "Activate" : undefined}
+        actionDisabled={isSaving}
+        onActionPress={subgoal.isApplied ? () => onToggleItemActive(subgoal.templateKey, subgoal.isActive) : undefined}
+        disabled={isSaving || subgoal.isApplied || subgoalTaskKeys.length === 0}
+        isChecked={subgoal.isApplied || isStarterPackHierarchyChecked(subgoalTaskKeys, selectedSet)}
+        label={subgoal.title}
+        meta={subgoal.isApplied ? subgoal.isActive ? "Added" : "Inactive" : starterPackTaskCountLabel(subgoalTaskKeys.length, selectedSubgoalTaskCount, false)}
+        metaLabel="Subgoal"
+        onPress={() => onToggleTaskKeys(subgoalTaskKeys)}
+      />
+      <View style={styles.packTaskItemGroup}>
+        {subgoal.tasks.map((task) => (
+          <PackCheckRow
+            actionLabel={task.isApplied ? task.isActive ? "Deactivate" : "Activate" : undefined}
+            actionDisabled={isSaving}
+            disabled={isSaving || task.isApplied}
+            isChecked={task.isApplied || selectedSet.has(task.templateKey)}
+            key={task.templateKey}
+            label={task.title}
+            meta={task.isApplied ? task.isActive ? "Added" : "Inactive" : "Task"}
+            onActionPress={task.isApplied ? () => onToggleItemActive(task.templateKey, task.isActive) : undefined}
+            onPress={() => onToggleTaskKeys([task.templateKey])}
+          />
+        ))}
+      </View>
+    </View>
+  );
+}
+
+function PackItemToggle({
+  disabled,
+  label,
+  onPress,
+}: {
+  disabled: boolean;
+  label: string;
+  onPress: () => void;
+}) {
+  return (
+    <Pressable
+      accessibilityRole="button"
+      disabled={disabled}
+      onPress={onPress}
+      style={[styles.packItemToggle, disabled ? styles.packCheckRowDisabled : null]}
+    >
+      <Text style={styles.packItemToggleText}>{label}</Text>
+    </Pressable>
+  );
+}
+
+function PackCheckRow({
+  actionDisabled = false,
+  actionLabel,
+  disabled,
+  isChecked,
+  label,
+  meta,
+  metaLabel,
+  onActionPress,
+  onPress,
+  title = false,
+}: {
+  actionDisabled?: boolean;
+  actionLabel?: string;
+  disabled: boolean;
+  isChecked: boolean;
+  label: string;
+  meta: string;
+  metaLabel?: string;
+  onActionPress?: () => void;
+  onPress: () => void;
+  title?: boolean;
+}) {
+  return (
+    <View style={styles.packCheckRow}>
+      <Pressable
+        accessibilityRole="checkbox"
+        accessibilityState={{ checked: isChecked, disabled }}
+        disabled={disabled}
+        onPress={onPress}
+        style={[styles.packCheckMain, disabled ? styles.packCheckRowDisabled : null]}
+      >
+        <Text style={styles.packCheckBox}>{isChecked ? "[x]" : "[ ]"}</Text>
+        <Text style={[styles.packCheckLabel, title ? styles.packCheckLabelTitle : null]}>{label}</Text>
+        <View style={styles.packCheckMetaGroup}>
+          {metaLabel ? <Text style={styles.packCheckMetaLabel}>{metaLabel}</Text> : null}
+          <Text style={styles.packCheckMeta}>{meta}</Text>
+        </View>
+      </Pressable>
+      {actionLabel && onActionPress ? (
+        <PackItemToggle
+          disabled={actionDisabled}
+          label={actionLabel}
+          onPress={onActionPress}
+        />
+      ) : null}
+    </View>
+  );
+}
+
+function unappliedTaskKeys(summary: FarmWorkPackSetupSummary): string[] {
+  return summary.goals.flatMap(unappliedTaskKeysForGoal);
+}
+
+function unappliedTaskKeysForGoal(goal: FarmWorkPackGoalSetupSummary): string[] {
+  return goal.subgoals.flatMap(unappliedTaskKeysForSubgoal);
+}
+
+function unappliedTaskKeysForSubgoal(subgoal: FarmWorkPackSubgoalSetupSummary): string[] {
+  return subgoal.tasks.filter((task) => !task.isApplied).map((task) => task.templateKey);
+}
+
+function OrganicCertificationSetup({
+  farmId,
+  organicCertificationRepository,
+  planningRepository,
+}: {
+  farmId: string;
+  organicCertificationRepository: OrganicCertificationRepository;
+  planningRepository: PlanningRepository;
+}) {
+  const [profile, setProfile] = useState<OrganicOperationProfile | null>(null);
+  const [enabledScopes, setEnabledScopes] = useState<OrganicCertificationScopeType[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [message, setMessage] = useState<string | undefined>();
+  const [error, setError] = useState<string | undefined>();
+  const isActive = isOrganicCertificationPursuitActive(profile);
+
+  const loadCertificationSetup = useCallback(async () => {
+    setIsLoading(true);
+
+    try {
+      const dashboard = await getOrganicCertificationDashboard(
+        { farmId },
+        { repository: organicCertificationRepository },
+      );
+      setProfile(dashboard.profile);
+      setEnabledScopes(dashboard.enabledScopes.map((scope) => scope.scopeType));
+    } catch {
+      setError("Organic certification setup could not be loaded.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [farmId, organicCertificationRepository]);
+
+  useEffect(() => {
+    void loadCertificationSetup();
+  }, [loadCertificationSetup]);
+
+  async function handleToggle(nextIsActive: boolean) {
+    setIsSaving(true);
+    setError(undefined);
+    setMessage(undefined);
+
+    try {
+      const organicStatus = nextIsActive
+        ? profile && profile.organicStatus !== "notOrganic"
+          ? profile.organicStatus
+          : "transitioning"
+        : "notOrganic";
+      const nextEnabledScopes = nextIsActive ? (enabledScopes.length ? enabledScopes : ["crops"]) : [];
+      const retentionYears = profile && profile.organicStatus === organicStatus
+        ? profile.recordRetentionYears
+        : defaultRecordRetentionYearsForStatus(organicStatus);
+      const saved = await saveOrganicOperationProfile(
+        {
+          farmId,
+          organicStatus,
+          certifierName: profile?.certifierName,
+          certifierContact: profile?.certifierContact,
+          certificateNumber: profile?.certificateNumber,
+          certificateEffectiveDate: profile?.certificateEffectiveDate,
+          annualUpdateDueDate: profile?.annualUpdateDueDate,
+          inspectionDueWindow: profile?.inspectionDueWindow,
+          recordRetentionYears: retentionYears,
+          notes: profile?.notes,
+          enabledScopes: nextEnabledScopes,
+        },
+        { clock: systemClock, idGenerator: localIdGenerator, repository: organicCertificationRepository },
+      );
+
+      if (nextIsActive) {
+        await ensureOrganicCertificationPlan(
+          { farmId, targetDate: saved.profile.annualUpdateDueDate },
+          { clock: systemClock, idGenerator: localIdGenerator, repository: planningRepository },
+        );
+      }
+
+      setMessage(nextIsActive ? "Organic certification planning is on." : "Organic certification planning is off.");
+      await loadCertificationSetup();
+    } catch (caughtError) {
+      setError(caughtError instanceof Error ? caughtError.message : "Organic certification setup could not be saved.");
+    } finally {
+      setIsSaving(false);
+    }
+  }
+
+  return (
+    <View style={styles.actionStack}>
+      <Text style={styles.sectionTitle}>Organic certification pursuit</Text>
+      <Text style={styles.helperText}>
+        {isActive
+          ? "Certification planning is on. The two certification goal boards appear in Farm Planning and Farm Work Boards."
+          : "Certification planning is off. Certification goals and boards stay hidden until this is turned on."}
+      </Text>
+      {enabledScopes.length ? (
+        <Text style={styles.statusText}>
+          Active scope{enabledScopes.length === 1 ? "" : "s"}: {enabledScopes.map((scope) => ORGANIC_CERTIFICATION_SCOPE_LABELS[scope]).join(", ")}
+        </Text>
+      ) : null}
+      {isLoading ? <Text style={styles.helperText}>Opening certification setup...</Text> : null}
+      <Button
+        disabled={isSaving || isLoading}
+        label={isSaving ? "Saving..." : isActive ? "Turn certification planning off" : "Turn certification planning on"}
+        onPress={() => handleToggle(!isActive)}
+        size="large"
+        variant={isActive ? "secondary" : "primary"}
+      />
+      {message ? <Text style={styles.statusText}>{message}</Text> : null}
+      {error ? <Text style={styles.error}>{error}</Text> : null}
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
   actionStack: {
     gap: theme.spacing.sm,
@@ -247,6 +831,172 @@ const styles = StyleSheet.create({
   },
   inlineGrid: {
     gap: theme.spacing.sm,
+  },
+  packGroupPanel: {
+    backgroundColor: theme.colors.surface,
+    borderColor: theme.colors.border,
+    borderRadius: theme.radius.sm,
+    borderWidth: 1,
+    gap: theme.spacing.sm,
+    padding: theme.spacing.md,
+  },
+  packGroupTitle: {
+    color: theme.colors.textPrimary,
+    fontFamily: theme.typography.headingFontFamily,
+    fontSize: theme.typography.body,
+    fontWeight: theme.typography.headingFontWeight,
+  },
+  packList: {
+    gap: theme.spacing.sm,
+  },
+  packOption: {
+    backgroundColor: theme.colors.surfaceMuted,
+    borderColor: theme.colors.border,
+    borderRadius: theme.radius.sm,
+    borderWidth: 1,
+    gap: theme.spacing.xs,
+    padding: theme.spacing.md,
+  },
+  packOptionApplied: {
+    opacity: 0.72,
+  },
+  packOptionSelected: {
+    backgroundColor: theme.colors.surfaceTint,
+    borderColor: theme.colors.primary,
+  },
+  packHeader: {
+    alignItems: "center",
+    flexDirection: "row",
+    gap: theme.spacing.sm,
+    justifyContent: "space-between",
+  },
+  packTitle: {
+    color: theme.colors.textPrimary,
+    flex: 1,
+    fontFamily: theme.typography.headingFontFamily,
+    fontSize: theme.typography.body,
+    fontWeight: theme.typography.headingFontWeight,
+  },
+  packStatus: {
+    color: theme.colors.primary,
+    fontSize: theme.typography.small,
+    fontWeight: "800",
+  },
+  packStatusApplied: {
+    color: theme.colors.textSecondary,
+    fontSize: theme.typography.small,
+    fontWeight: "800",
+  },
+  packActionRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: theme.spacing.sm,
+  },
+  packInlineButton: {
+    backgroundColor: theme.colors.surface,
+    borderColor: theme.colors.primary,
+    borderRadius: theme.radius.sm,
+    borderWidth: 1,
+    paddingHorizontal: theme.spacing.md,
+    paddingVertical: theme.spacing.sm,
+  },
+  packPrimaryInlineButton: {
+    backgroundColor: theme.colors.primary,
+  },
+  packInlineButtonText: {
+    color: theme.colors.primary,
+    fontSize: theme.typography.small,
+    fontWeight: "800",
+  },
+  packPrimaryInlineButtonText: {
+    color: theme.colors.onPrimary,
+  },
+  packTaskList: {
+    borderColor: theme.colors.border,
+    borderRadius: theme.radius.sm,
+    borderWidth: 1,
+    gap: theme.spacing.sm,
+    marginTop: theme.spacing.sm,
+    padding: theme.spacing.sm,
+  },
+  packGoalGroup: {
+    gap: theme.spacing.xs,
+  },
+  packSubgoalGroup: {
+    gap: theme.spacing.xs,
+    paddingLeft: theme.spacing.md,
+  },
+  packTaskItemGroup: {
+    gap: theme.spacing.xs,
+    paddingLeft: theme.spacing.md,
+  },
+  packCheckRow: {
+    alignItems: "stretch",
+    backgroundColor: theme.colors.surface,
+    borderColor: theme.colors.border,
+    borderRadius: theme.radius.sm,
+    borderWidth: 1,
+    gap: theme.spacing.xs,
+    minHeight: theme.spacing.primaryTouchTarget,
+    paddingHorizontal: theme.spacing.sm,
+    paddingVertical: theme.spacing.xs,
+  },
+  packCheckMain: {
+    alignItems: "center",
+    flex: 1,
+    flexDirection: "row",
+    gap: theme.spacing.sm,
+    minWidth: 0,
+  },
+  packCheckRowDisabled: {
+    opacity: 0.62,
+  },
+  packCheckBox: {
+    color: theme.colors.primary,
+    fontSize: theme.typography.small,
+    fontWeight: "900",
+  },
+  packCheckLabel: {
+    color: theme.colors.textPrimary,
+    flex: 1,
+    flexShrink: 1,
+    fontSize: theme.typography.small,
+    lineHeight: 18,
+  },
+  packCheckLabelTitle: {
+    fontFamily: theme.typography.headingFontFamily,
+    fontWeight: theme.typography.headingFontWeight,
+  },
+  packCheckMetaGroup: {
+    alignItems: "flex-end",
+    minWidth: 72,
+  },
+  packCheckMetaLabel: {
+    color: theme.colors.primary,
+    fontSize: 10,
+    fontWeight: "900",
+    textTransform: "uppercase",
+  },
+  packCheckMeta: {
+    color: theme.colors.textSecondary,
+    fontSize: theme.typography.small,
+    fontWeight: "700",
+  },
+  packItemToggle: {
+    alignSelf: "flex-end",
+    backgroundColor: theme.colors.surfaceTint,
+    borderColor: theme.colors.border,
+    borderRadius: theme.radius.sm,
+    borderWidth: 1,
+    flexShrink: 0,
+    minHeight: 30,
+    justifyContent: "center",
+    paddingHorizontal: theme.spacing.sm,
+  },
+  packItemToggleText: {
+    color: theme.colors.primary,
+    fontSize: theme.typography.small,
+    fontWeight: "800",
   },
   mapPreview: {
     backgroundColor: theme.colors.surfaceMuted,

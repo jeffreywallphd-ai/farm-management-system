@@ -13,6 +13,7 @@ const farmSchema = z.object({
   name: z.string().min(1),
   createdAt: isoDateTimeString,
   corePlacesSetupCompletedAt: isoDateTimeString.optional(),
+  starterWorkPacksSetupCompletedAt: isoDateTimeString.optional(),
 });
 
 const locationSchema = z.object({
@@ -666,7 +667,7 @@ const planningGoalSchema = z.object({
   category: z.enum(["general", "organicCertification", "cropProduction", "soilHealth", "infrastructure", "equipment", "sales", "team"]),
   status: z.enum(["planned", "active", "paused", "completed", "canceled"]),
   targetDate: z.string().optional(),
-  source: z.enum(["farmer", "organicCertificationTemplate", "organicCertification"]),
+  source: z.enum(["farmer", "farmWorkTemplate", "organicCertificationTemplate", "organicCertification"]),
   templateKey: z.string().optional(),
   sortOrder: z.number().int().min(0),
   createdAt: isoDateTimeString,
@@ -711,7 +712,7 @@ const planningTaskSchema = z.object({
   })),
   completionNotes: z.string().optional(),
   completedAt: isoDateTimeString.optional(),
-  source: z.enum(["farmer", "organicCertificationTemplate", "organicCertification"]),
+  source: z.enum(["farmer", "farmWorkTemplate", "organicCertificationTemplate", "organicCertification"]),
   templateKey: z.string().optional(),
   sortOrder: z.number().int().min(0),
   createdAt: isoDateTimeString,
@@ -749,6 +750,22 @@ const planningLinkSchema = z.object({
   linkedRecordId: z.string().min(1),
   notes: z.string().optional(),
   createdAt: isoDateTimeString,
+});
+
+const farmWorkPackStateSchema = z.object({
+  farmId: z.string().min(1),
+  packId: z.string().min(1),
+  isActive: z.boolean(),
+  createdAt: isoDateTimeString,
+  updatedAt: isoDateTimeString,
+});
+
+const farmWorkPackItemStateSchema = z.object({
+  farmId: z.string().min(1),
+  templateKey: z.string().min(1),
+  isActive: z.boolean(),
+  createdAt: isoDateTimeString,
+  updatedAt: isoDateTimeString,
 });
 
 export const mobilePilotRecoveryCopySchema = z.object({
@@ -797,4 +814,6 @@ export const mobilePilotRecoveryCopySchema = z.object({
   planningBoards: z.array(planningBoardSchema),
   planningTasks: z.array(planningTaskSchema),
   planningLinks: z.array(planningLinkSchema),
+  farmWorkPackStates: z.array(farmWorkPackStateSchema),
+  farmWorkPackItemStates: z.array(farmWorkPackItemStateSchema),
 });

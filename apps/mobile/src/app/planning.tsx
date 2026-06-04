@@ -41,6 +41,7 @@ function PlanningRouteContent({ database, farm }: { database: ReadyDatabase; far
       farmhandRepository={database.farmhandRepository}
       farmhands={farmhands}
       locations={locations}
+      organicCertificationRepository={database.organicCertificationRepository}
       repository={database.planningRepository}
     />
   );

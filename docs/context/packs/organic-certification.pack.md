@@ -19,9 +19,13 @@ Helps agents implement USDA organic certification readiness features without ove
 
 - ADR-0014 accepts a local Organic Certification Readiness module.
 - The module organizes evidence and reports for farmer/certifier preparation. It does not certify farms or make legal determinations.
+- Farm setup owns the pursuit/continuation toggle. Missing profiles and `notOrganic` profiles mean certification is off; show an off-state certification page and hide seeded certification goals/boards until pursuit is turned back on.
 - Voice/photo farm notes are the source capture layer for certification evidence. Use organic evidence links to relate notes to organic categories or records instead of creating a separate evidence inbox or copying media.
 - Organic Certification uses the shared local planning foundation for certification goals, subgoals, and tasks while remaining a standalone certification feature.
+- Seeded certification planning uses two highest-level goals: certification administration work and certification farm work.
 - Certification planning templates should split broad regulatory areas into smaller subgoals when evidence differs, including input approval vs application, soil fertility vs compost vs manure intervals, lot traceability vs handling/mass balance, and OSP practices vs recordkeeping/prevention procedures.
+- Farm-work certification tasks should be highly actionable and atomic when work differs, such as separate tasks for compost temperature checking and windrow turning.
+- Certification task cards should show a task-specific "Summary of USDA Requirements", include expected evidence context, and link to official USDA/eCFR requirement sections after user confirmation when only the default browser is available.
 - Dedicated evidence-review and package-generation workflows replace the former transitional seeded `Prepare inspection evidence` and `Generate certification or renewal package` goals.
 - Certification work boards may display certification planning tasks by status, but they must use the shared planning-board foundation and linked farm events rather than a separate certification task or evidence system.
 - Use official USDA/eCFR sources for each phase before implementation.

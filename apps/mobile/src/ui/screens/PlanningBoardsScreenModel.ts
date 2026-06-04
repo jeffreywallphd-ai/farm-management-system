@@ -1,6 +1,13 @@
 import type { FarmLocation } from "../../domain/farm/FarmLocation";
-import type { FarmhandId } from "../../domain/farmhand/Farmhand";
-import type { PlanningBoard, PlanningGoal, PlanningLink, PlanningTask, PlanningTaskStatus } from "../../domain/planning/Planning";
+import type { Farmhand, FarmhandId } from "../../domain/farmhand/Farmhand";
+import {
+  PLANNING_TASK_PRIORITY_LABELS,
+  type PlanningBoard,
+  type PlanningGoal,
+  type PlanningLink,
+  type PlanningTask,
+  type PlanningTaskStatus,
+} from "../../domain/planning/Planning";
 import { selectTasksForBoard } from "../../application/use-cases/manage-planning/ListPlanning";
 import { buildFarmPlacePath } from "../farmPlaceDisplay";
 
@@ -59,11 +66,25 @@ export function selectBoardsForFarmhand(
   tasks: PlanningTask[],
   farmhandId: FarmhandId | "all",
 ): PlanningBoard[] {
+  const visibleBoards = boards.filter((board) => isBoardLinkedToCurrentPlanningScope(board, goals, tasks));
+
   if (farmhandId === "all") {
-    return boards;
+    return visibleBoards;
   }
 
-  return boards.filter((board) => selectBoardTasksForFarmhand(board, goals, tasks, farmhandId).length > 0);
+  return visibleBoards.filter((board) => selectBoardTasksForFarmhand(board, goals, tasks, farmhandId).length > 0);
+}
+
+function isBoardLinkedToCurrentPlanningScope(
+  board: PlanningBoard,
+  goals: PlanningGoal[],
+  tasks: PlanningTask[],
+): boolean {
+  if (board.scopeType === "nonGoalTasks") {
+    return selectTasksForBoard(board, goals, tasks).length > 0;
+  }
+
+  return Boolean(board.goalId && goals.some((goal) => goal.id === board.goalId && !goal.parentGoalId));
 }
 
 export function countFarmNoteLinksByTask(links: PlanningLink[]): Record<string, number> {
@@ -89,4 +110,24 @@ export function describeBoardTask(task: PlanningTask, locations: FarmLocation[])
     place: buildFarmPlacePath(locations, task.placeId) ?? "No place set",
     targetCompletionDate: task.dueDate ?? "No target completion date set",
   };
+}
+
+export function buildTaskAssignmentOptions(farmhands: Farmhand[]): { label: string; value: string }[] {
+  return [
+    { label: "Unassigned", value: "" },
+    ...farmhands.map((farmhand) => ({
+      label: farmhand.status === "inactive" ? `${farmhand.name} (inactive)` : farmhand.name,
+      value: farmhand.id,
+    })),
+  ];
+}
+
+export function describeBoardTaskSummary(task: PlanningTask, farmNoteCount: number): string {
+  const summaryParts = [`${PLANNING_TASK_PRIORITY_LABELS[task.priority]} priority`];
+
+  if (farmNoteCount) {
+    summaryParts.push(`${farmNoteCount} linked farm event${farmNoteCount === 1 ? "" : "s"}`);
+  }
+
+  return summaryParts.join(" - ");
 }

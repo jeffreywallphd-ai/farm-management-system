@@ -4,6 +4,8 @@ import type { FarmhandId } from "../../domain/farmhand/Farmhand";
 import type {
   PlanningGoal,
   PlanningGoalCategory,
+  PlanningFarmWorkPackItemState,
+  PlanningFarmWorkPackState,
   PlanningGoalId,
   PlanningBoard,
   PlanningBoardId,
@@ -29,4 +31,8 @@ export interface PlanningRepository {
   deleteTask(farmId: FarmId, id: PlanningTaskId): Promise<void>;
   saveLink(link: PlanningLink): Promise<void>;
   listLinks(farmId: FarmId, filters?: { goalId?: PlanningGoalId; taskId?: PlanningTaskId }): Promise<PlanningLink[]>;
+  saveFarmWorkPackState(state: PlanningFarmWorkPackState): Promise<void>;
+  listFarmWorkPackStates(farmId: FarmId): Promise<PlanningFarmWorkPackState[]>;
+  saveFarmWorkPackItemState(state: PlanningFarmWorkPackItemState): Promise<void>;
+  listFarmWorkPackItemStates(farmId: FarmId): Promise<PlanningFarmWorkPackItemState[]>;
 }

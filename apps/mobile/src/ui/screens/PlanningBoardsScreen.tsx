@@ -8,12 +8,17 @@ import type { FarmhandRepository } from "../../application/ports/FarmhandReposit
 import type { OrganicCertificationRepository } from "../../application/ports/OrganicCertificationRepository";
 import type { PlanningRepository } from "../../application/ports/PlanningRepository";
 import type { Farmhand } from "../../domain/farmhand/Farmhand";
-import { ensureDefaultPlanningBoards, movePlanningTaskStatus } from "../../application/use-cases/manage-planning/ManagePlanning";
+import { getOrganicCertificationDashboard } from "../../application/use-cases/manage-organic-certification/GetOrganicCertificationDashboard";
+import { ensureOrganicCertificationPlan } from "../../application/use-cases/manage-planning/CreateOrganicCertificationPlan";
+import {
+  listInactiveFarmWorkPackIds,
+  listInactiveFarmWorkPackItemTemplateKeys,
+} from "../../application/use-cases/manage-planning/DefaultFarmWorkPacks";
+import { ensureDefaultPlanningBoards, movePlanningTaskStatus, savePlanningTask } from "../../application/use-cases/manage-planning/ManagePlanning";
 import { FARM_EVENT_TYPE_LABELS } from "../../domain/events/FarmEvent";
 import type { Farm } from "../../domain/farm/Farm";
 import type { FarmLocation } from "../../domain/farm/FarmLocation";
 import {
-  PLANNING_TASK_PRIORITY_LABELS,
   PLANNING_TASK_STATUS_LABELS,
   type PlanningBoard,
   type PlanningGoal,
@@ -26,20 +31,28 @@ import { localIdGenerator } from "../../infrastructure/system/idGenerator";
 import { Button } from "../components/Button";
 import { Card } from "../components/Card";
 import { EmptyState } from "../components/EmptyState";
+import { OrganicCertificationTaskRequirementDisclosure } from "../components/OrganicCertificationTaskRequirementDisclosure";
 import { PageHeader } from "../components/PageHeader";
 import { Screen } from "../components/Screen";
 import { SelectField } from "../components/SelectField";
 import { SectionHeading } from "../components/SectionHeading";
 import { theme } from "../theme/theme";
 import { formatRecordDate } from "../formatters";
+import { filterPlanningForActiveFarmWorkPacks } from "../farmWorkPackPlanningVisibility";
+import {
+  filterPlanningForOrganicCertificationPursuit,
+  isOrganicCertificationPursuitActive,
+} from "../organicCertificationPlanningVisibility";
 import { RecordFarmEventForm } from "./RecordFarmEventScreen";
 import {
   BOARD_COLUMN_FILTER_LABELS,
   BOARD_COLUMN_FILTERS,
   BOARD_COLUMN_STATUSES,
   type BoardColumnFilter,
+  buildTaskAssignmentOptions,
   countFarmNoteLinksByTask,
   describeBoardTask,
+  describeBoardTaskSummary,
   isWipLimitExceeded,
   selectBoardColumnTasks,
   selectBoardsForFarmhand,
@@ -81,7 +94,28 @@ export function PlanningBoardsScreen({
   const [error, setError] = useState<string | undefined>();
 
   async function loadBoards(preferredBoardId = selectedBoardId) {
-    const [ensuredBoards, nextGoals, nextTasks, nextLinks, nextFarmhands] = await Promise.all([
+    const dashboard = await getOrganicCertificationDashboard(
+      { farmId: farm.id },
+      { repository: organicCertificationRepository },
+    );
+    const isCertificationPlanningActive = isOrganicCertificationPursuitActive(dashboard.profile);
+
+    if (isCertificationPlanningActive) {
+      await ensureOrganicCertificationPlan(
+        { farmId: farm.id, targetDate: dashboard.profile?.annualUpdateDueDate },
+        { clock: systemClock, idGenerator: localIdGenerator, repository },
+      );
+    }
+
+    const [
+      ensuredBoards,
+      nextGoals,
+      nextTasks,
+      nextLinks,
+      nextFarmhands,
+      inactiveFarmWorkPackIds,
+      inactiveFarmWorkPackItemTemplateKeys,
+    ] = await Promise.all([
       ensureDefaultPlanningBoards(
         { farmId: farm.id },
         { clock: systemClock, idGenerator: localIdGenerator, repository },
@@ -90,9 +124,27 @@ export function PlanningBoardsScreen({
       repository.listTasks(farm.id),
       repository.listLinks(farm.id),
       farmhandRepository ? farmhandRepository.listFarmhands(farm.id) : Promise.resolve([]),
+      listInactiveFarmWorkPackIds({ farmId: farm.id }, { repository }),
+      listInactiveFarmWorkPackItemTemplateKeys({ farmId: farm.id }, { repository }),
     ]);
+    const certificationFilteredPlanning = filterPlanningForOrganicCertificationPursuit(
+      nextGoals,
+      nextTasks,
+      isCertificationPlanningActive,
+    );
+    const filteredPlanning = filterPlanningForActiveFarmWorkPacks(
+      certificationFilteredPlanning.goals,
+      certificationFilteredPlanning.tasks,
+      inactiveFarmWorkPackIds,
+      inactiveFarmWorkPackItemTemplateKeys,
+    );
     const linkedEventsByTask = await loadLinkedFarmEvents(farm.id, nextLinks, farmEventRepository);
-    const visibleBoards = selectBoardsForFarmhand(ensuredBoards, nextGoals, nextTasks, selectedFarmhandId);
+    const visibleBoards = selectBoardsForFarmhand(
+      ensuredBoards,
+      filteredPlanning.goals,
+      filteredPlanning.tasks,
+      selectedFarmhandId,
+    );
     const nextSelectedBoardId =
       (preferredBoardId && visibleBoards.some((board) => board.id === preferredBoardId) ? preferredBoardId : "") ||
       (initialGoalId ? visibleBoards.find((board) => board.goalId === initialGoalId)?.id : "") ||
@@ -100,8 +152,8 @@ export function PlanningBoardsScreen({
       "";
     setBoards(ensuredBoards);
     setFarmhands(nextFarmhands);
-    setGoals(nextGoals);
-    setTasks(nextTasks);
+    setGoals(filteredPlanning.goals);
+    setTasks(filteredPlanning.tasks);
     setLinks(nextLinks);
     setLinkedFarmEventsByTask(linkedEventsByTask);
     setSelectedBoardId(nextSelectedBoardId);
@@ -109,7 +161,7 @@ export function PlanningBoardsScreen({
 
   useEffect(() => {
     loadBoards().catch(() => setError("Farm work boards could not be loaded from this device."));
-  }, [farm.id, initialGoalId, repository]);
+  }, [farm.id, initialGoalId, organicCertificationRepository, repository]);
 
   async function handleSelectBoard(boardId: string) {
     setError(undefined);
@@ -142,6 +194,19 @@ export function PlanningBoardsScreen({
     }
   }
 
+  async function handleAssignTask(task: PlanningTask, assignedFarmhandId: string) {
+    setError(undefined);
+    try {
+      await savePlanningTask(
+        { ...task, assignedFarmhandId },
+        { clock: systemClock, farmhandRepository, idGenerator: localIdGenerator, repository },
+      );
+      await loadBoards(selectedBoardId);
+    } catch {
+      setError("Task assignment could not be updated.");
+    }
+  }
+
   const visibleBoards = selectBoardsForFarmhand(boards, goals, tasks, selectedFarmhandId);
   const selectedBoard = visibleBoards.find((board) => board.id === selectedBoardId);
   const boardTasks = selectedBoard ? selectBoardTasksForFarmhand(selectedBoard, goals, tasks, selectedFarmhandId) : [];
@@ -167,19 +232,19 @@ export function PlanningBoardsScreen({
 
       <Card>
         <SectionHeading
-          detail={selectedBoard?.wipLimit ? `WIP limit: ${selectedBoard.wipLimit}` : "Choose a board and a work view. Default boards are created for each highest-level goal and for tasks without a goal."}
-          title="Board"
+          detail={selectedBoard?.wipLimit ? `WIP limit: ${selectedBoard.wipLimit}` : "Choose a task source and status view."}
+          title="Task filters"
         />
         {farmhands.length ? (
           <SelectField label="Show work for" onChange={handleSelectFarmhand} options={farmhandOptions} value={selectedFarmhandId} />
         ) : null}
         {visibleBoards.length ? (
-          <SelectField label="Board" onChange={handleSelectBoard} options={boardOptions} value={selectedBoardId} />
+          <SelectField label="Show tasks from" onChange={handleSelectBoard} options={boardOptions} value={selectedBoardId} />
         ) : (
           <EmptyState text={selectedFarmhandId === "all" ? "Create a goal or task to start a board." : "No boards contain work for this farmhand yet."} />
         )}
         <SelectField
-          label={selectedBoard ? `${selectedBoard.title} work view` : "Work view"}
+          label="Show tasks with status"
           onChange={(value) => setSelectedColumnFilter(value as BoardColumnFilter)}
           options={BOARD_COLUMN_FILTERS.map((filter) => ({ label: `${BOARD_COLUMN_FILTER_LABELS[filter]} (${selectBoardColumnTasks(boardTasks, filter).length})`, value: filter }))}
           value={selectedColumnFilter}
@@ -195,6 +260,8 @@ export function PlanningBoardsScreen({
             isOpen={openTaskId === task.id}
             key={task.id}
             linkedEvents={linkedFarmEventsByTask[task.id] ?? []}
+            farmhands={farmhands}
+            onAssign={(farmhandId) => handleAssignTask(task, farmhandId)}
             onMove={(status) => handleMoveTask(task, status)}
             onOpenPhoto={setFullScreenPhotoUri}
             onRecordEvent={() => setRecordingTaskId(task.id)}
@@ -228,11 +295,13 @@ function TaskBoardCard({
   farm,
   farmEventRepository,
   farmReferenceRepository,
+  farmhands,
   isOpen,
   isRecordingEvent,
   linkedEvents,
   locations,
   organicCertificationRepository,
+  onAssign,
   onMove,
   onOpenPhoto,
   onRecordEvent,
@@ -248,11 +317,13 @@ function TaskBoardCard({
   farm: Farm;
   farmEventRepository: FarmEventRepository;
   farmReferenceRepository: FarmReferenceRepository;
+  farmhands: Farmhand[];
   isOpen: boolean;
   isRecordingEvent: boolean;
   linkedEvents: FarmEventView[];
   locations: FarmLocation[];
   organicCertificationRepository: OrganicCertificationRepository;
+  onAssign: (assignedFarmhandId: string) => void;
   onMove: (status: PlanningTaskStatus) => void;
   onOpenPhoto: (uri: string) => void;
   onRecordEvent: () => void;
@@ -265,18 +336,27 @@ function TaskBoardCard({
   task: PlanningTask;
 }) {
   const taskDetails = describeBoardTask(task, locations);
+  const assignmentOptions = buildTaskAssignmentOptions(farmhands);
   return (
     <View style={styles.taskCard}>
       <Text style={styles.taskTitle}>{task.title} - {PLANNING_TASK_STATUS_LABELS[task.status]}</Text>
-      <Text style={styles.taskDetail}>
-        {PLANNING_TASK_PRIORITY_LABELS[task.priority]}
-        {task.assignedFarmhandId ? " - assigned" : ""}
-        {farmNoteCount ? ` - ${farmNoteCount} linked farm event${farmNoteCount === 1 ? "" : "s"}` : ""}
-      </Text>
-      <Button label={isOpen ? "Close task" : "Open task"} onPress={onToggleOpen} size="large" variant="secondary" />
+      <Text style={styles.taskDetail}>{describeBoardTaskSummary(task, farmNoteCount)}</Text>
+      {!isOpen ? (
+        <>
+          <Text style={styles.taskDetail}><Text style={styles.detailLabel}>Due date: </Text>{taskDetails.targetCompletionDate}</Text>
+          <SelectField
+            label="Assigned farmhand"
+            onChange={onAssign}
+            options={assignmentOptions}
+            value={task.assignedFarmhandId ?? ""}
+          />
+        </>
+      ) : null}
+      <Button label={isOpen ? "Close task" : "Task details"} onPress={onToggleOpen} size="large" variant="secondary" />
       {isOpen ? (
         <>
           <Text style={styles.taskDetail}><Text style={styles.detailLabel}>Description: </Text>{taskDetails.description}</Text>
+          <OrganicCertificationTaskRequirementDisclosure task={task} />
           <Text style={styles.taskDetail}><Text style={styles.detailLabel}>Place: </Text>{taskDetails.place}</Text>
           <Text style={styles.taskDetail}><Text style={styles.detailLabel}>Desired start: </Text>{task.plannedStartDate ?? "No desired start date set"}</Text>
           <Text style={styles.taskDetail}><Text style={styles.detailLabel}>Target completion: </Text>{taskDetails.targetCompletionDate}</Text>

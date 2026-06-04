@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-import { getSelectDropdownHint, type SelectSelectionMode } from "./SelectFieldModel";
+import { formatGridOptionLabel, getSelectDropdownHint, getSelectOptionLayout, type SelectOptionLayout, type SelectSelectionMode } from "./SelectFieldModel";
+import { getThemedIconForText, ThemedIcon, type ThemedIconName } from "./ThemedIcon";
 import { theme } from "../theme/theme";
 
 export interface SelectOption {
+  icon?: ThemedIconName;
   label: string;
   value: string;
 }
@@ -15,6 +17,7 @@ export function SelectField({
   value,
   onChange,
   error,
+  optionLayout,
   selectionMode = "single",
 }: {
   label: string;
@@ -22,10 +25,13 @@ export function SelectField({
   value: string;
   onChange: (value: string) => void;
   error?: string;
+  optionLayout?: SelectOptionLayout;
   selectionMode?: SelectSelectionMode;
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const selectedOption = options.find((option) => option.value === value);
+  const resolvedOptionLayout = optionLayout ?? getSelectOptionLayout(label);
+  const isGridLayout = resolvedOptionLayout === "grid";
 
   return (
     <View style={styles.container}>
@@ -35,9 +41,11 @@ export function SelectField({
         <Text style={styles.dropdownHint}>{getSelectDropdownHint(isOpen, selectionMode)}</Text>
       </Pressable>
       {isOpen ? (
-        <View style={styles.options}>
+        <View style={[styles.options, isGridLayout ? styles.gridOptions : null]}>
           {options.map((option) => {
             const isSelected = option.value === value;
+            const iconName = option.icon ?? getThemedIconForText(`${option.label} ${option.value}`, isSelected ? "check" : "leaf");
+            const displayLabel = isGridLayout ? formatGridOptionLabel(option.label) : option.label;
 
             return (
               <Pressable
@@ -47,11 +55,23 @@ export function SelectField({
                   onChange(option.value);
                   setIsOpen(false);
                 }}
-                style={[styles.option, isSelected ? styles.selectedOption : null]}
+                style={[styles.option, isGridLayout ? styles.gridOption : null, isSelected ? styles.selectedOption : null]}
               >
-                <Text style={[styles.optionText, isSelected ? styles.selectedOptionText : null]}>
-                  {option.label}
+                <Text numberOfLines={3} style={[styles.optionText, isSelected ? styles.selectedOptionText : null]}>
+                  {displayLabel}
                 </Text>
+                {isGridLayout ? (
+                  <View style={styles.optionIconFrame}>
+                    <View style={styles.optionIconStretch}>
+                      <ThemedIcon
+                        accentColor={isSelected ? theme.colors.secondary : theme.colors.accent}
+                        color={theme.colors.primary}
+                        name={iconName}
+                        size={34}
+                      />
+                    </View>
+                  </View>
+                ) : null}
               </Pressable>
             );
           })}
@@ -95,14 +115,38 @@ const styles = StyleSheet.create({
   options: {
     gap: theme.spacing.sm,
   },
+  gridOptions: {
+    columnGap: theme.spacing.sm,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    rowGap: theme.spacing.sm,
+  },
   option: {
+    alignItems: "center",
     backgroundColor: theme.colors.dropdownSurface,
     borderColor: theme.colors.dropdownBorder,
     borderRadius: theme.radius.sm,
     borderWidth: 1,
+    flexDirection: "row",
+    gap: theme.spacing.xs,
     justifyContent: "center",
     minHeight: theme.spacing.primaryTouchTarget,
     padding: theme.spacing.md,
+  },
+  gridOption: {
+    minHeight: 96,
+    paddingHorizontal: theme.spacing.sm,
+    width: "48%",
+  },
+  optionIconFrame: {
+    alignItems: "center",
+    height: 44,
+    justifyContent: "center",
+    overflow: "visible",
+    width: 26,
+  },
+  optionIconStretch: {
+    transform: [{ scaleX: 0.65 }, { scaleY: 1.25 }],
   },
   selectedOption: {
     backgroundColor: theme.colors.primarySoft,
@@ -110,8 +154,10 @@ const styles = StyleSheet.create({
   },
   optionText: {
     color: theme.colors.textPrimary,
+    flex: 1,
     fontSize: theme.typography.body,
     fontWeight: "700",
+    lineHeight: 20,
   },
   selectedOptionText: {
     color: theme.colors.primary,

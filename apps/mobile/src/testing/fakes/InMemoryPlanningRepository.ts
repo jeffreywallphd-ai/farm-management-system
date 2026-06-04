@@ -4,6 +4,8 @@ import type { FarmhandId } from "../../domain/farmhand/Farmhand";
 import type {
   PlanningGoal,
   PlanningGoalCategory,
+  PlanningFarmWorkPackItemState,
+  PlanningFarmWorkPackState,
   PlanningGoalId,
   PlanningBoard,
   PlanningBoardId,
@@ -21,6 +23,8 @@ export class InMemoryPlanningRepository implements PlanningRepository {
   private goals = new Map<FarmId, PlanningGoal[]>();
   private tasks = new Map<FarmId, PlanningTask[]>();
   private links = new Map<FarmId, PlanningLink[]>();
+  private farmWorkPackStates = new Map<FarmId, PlanningFarmWorkPackState[]>();
+  private farmWorkPackItemStates = new Map<FarmId, PlanningFarmWorkPackItemState[]>();
 
   addLocation(location: FarmLocation): void {
     this.locations.set(location.farmId, [
@@ -142,6 +146,30 @@ export class InMemoryPlanningRepository implements PlanningRepository {
       records = records.filter((link) => link.taskId === filters.taskId);
     }
     return records;
+  }
+
+  async saveFarmWorkPackState(state: PlanningFarmWorkPackState): Promise<void> {
+    const existing = this.farmWorkPackStates.get(state.farmId) ?? [];
+    this.farmWorkPackStates.set(state.farmId, [
+      state,
+      ...existing.filter((candidate) => candidate.packId !== state.packId),
+    ].sort((left, right) => right.updatedAt.localeCompare(left.updatedAt)));
+  }
+
+  async listFarmWorkPackStates(farmId: FarmId): Promise<PlanningFarmWorkPackState[]> {
+    return this.farmWorkPackStates.get(farmId) ?? [];
+  }
+
+  async saveFarmWorkPackItemState(state: PlanningFarmWorkPackItemState): Promise<void> {
+    const existing = this.farmWorkPackItemStates.get(state.farmId) ?? [];
+    this.farmWorkPackItemStates.set(state.farmId, [
+      state,
+      ...existing.filter((candidate) => candidate.templateKey !== state.templateKey),
+    ].sort((left, right) => right.updatedAt.localeCompare(left.updatedAt)));
+  }
+
+  async listFarmWorkPackItemStates(farmId: FarmId): Promise<PlanningFarmWorkPackItemState[]> {
+    return this.farmWorkPackItemStates.get(farmId) ?? [];
   }
 }
 

@@ -27,6 +27,9 @@ go.work.sum
 # env file
 .env
 
+# Local scratch files
+tmp/
+
 # JavaScript / Expo generated project files
 node_modules/
 package-lock.json

@@ -132,7 +132,7 @@ export function RecoveryCopyExportScreen({
           variant="secondary"
         />
       </Card>
-      <Button label="Back to farm" onPress={() => replaceRoute(router, "/")} variant="secondary" />
+      <Button label="Back to farm" onPress={() => replaceRoute(router, "/home")} variant="secondary" />
     </Screen>
   );
 }

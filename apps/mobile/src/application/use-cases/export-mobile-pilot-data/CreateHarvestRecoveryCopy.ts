@@ -101,6 +101,8 @@ export async function buildMobilePilotRecoveryCopyPayload(
     planningBoards,
     planningTasks,
     planningLinks,
+    farmWorkPackStates,
+    farmWorkPackItemStates,
   ] = await Promise.all([
     dependencies.farmReferenceRepository.listLocations(input.farmId),
     dependencies.farmMapRepository?.getByFarmId(input.farmId) ?? Promise.resolve(undefined),
@@ -143,6 +145,8 @@ export async function buildMobilePilotRecoveryCopyPayload(
     dependencies.planningRepository?.listBoards(input.farmId) ?? Promise.resolve([]),
     dependencies.planningRepository?.listTasks(input.farmId) ?? Promise.resolve([]),
     dependencies.planningRepository?.listLinks(input.farmId) ?? Promise.resolve([]),
+    dependencies.planningRepository?.listFarmWorkPackStates(input.farmId) ?? Promise.resolve([]),
+    dependencies.planningRepository?.listFarmWorkPackItemStates(input.farmId) ?? Promise.resolve([]),
   ]);
 
   const createdAt = dependencies.clock.now().toISOString();
@@ -192,6 +196,8 @@ export async function buildMobilePilotRecoveryCopyPayload(
     planningBoards,
     planningTasks,
     planningLinks,
+    farmWorkPackStates,
+    farmWorkPackItemStates,
   };
 }
 

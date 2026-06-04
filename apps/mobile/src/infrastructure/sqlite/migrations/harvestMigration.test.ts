@@ -29,6 +29,10 @@ import { createFarmPlaceGeometries } from "./0027_create_farm_place_geometries";
 import { addFarmPlaceGeometryMapView } from "./0028_add_farm_place_geometry_map_view";
 import { refinePlanningTaskFields } from "./0029_refine_planning_task_fields";
 import { removeReadyPlanningStatus } from "./0030_remove_ready_planning_status";
+import { addFarmWorkTemplatePlanningSource } from "./0031_add_farm_work_template_planning_source";
+import { createFarmWorkPackStates } from "./0032_create_farm_work_pack_states";
+import { addStarterWorkPacksSetupState } from "./0033_add_starter_work_packs_setup_state";
+import { createFarmWorkPackItemStates } from "./0034_create_farm_work_pack_item_states";
 import { runMigrations } from "./migrationRunner";
 
 test("harvest migration creates only harvest record storage", () => {
@@ -330,6 +334,61 @@ test("planning status cleanup migration removes Ready status and preserves local
   assert.match(sql, /CASE WHEN status = 'ready' THEN 'notStarted' ELSE status END/);
   assert.match(sql, /status IN \('notStarted', 'inProgress', 'blocked', 'done', 'canceled'\)/);
   assert.doesNotMatch(sql, /status IN \('notStarted', 'ready'/);
+  assert.doesNotMatch(sql, /server/i);
+  assert.doesNotMatch(sql, /sync/i);
+  assert.doesNotMatch(sql, /notification/i);
+  assert.doesNotMatch(sql, /auth/i);
+});
+
+test("farm work template source migration preserves local planning data", () => {
+  const sql = addFarmWorkTemplatePlanningSource.statements.join("\n");
+
+  assert.equal(addFarmWorkTemplatePlanningSource.version, 31);
+  assert.match(sql, /CREATE TABLE IF NOT EXISTS planning_goals_source_rebuilt/);
+  assert.match(sql, /CREATE TABLE IF NOT EXISTS planning_tasks_source_rebuilt/);
+  assert.match(sql, /'farmWorkTemplate'/);
+  assert.match(sql, /INSERT INTO planning_goals_source_rebuilt/);
+  assert.match(sql, /INSERT INTO planning_tasks_source_rebuilt/);
+  assert.doesNotMatch(sql, /server/i);
+  assert.doesNotMatch(sql, /sync/i);
+  assert.doesNotMatch(sql, /notification/i);
+  assert.doesNotMatch(sql, /auth/i);
+});
+
+test("farm work pack state migration stores local setup visibility only", () => {
+  const sql = createFarmWorkPackStates.statements.join("\n");
+
+  assert.equal(createFarmWorkPackStates.version, 32);
+  assert.match(sql, /CREATE TABLE IF NOT EXISTS farm_work_pack_states/);
+  assert.match(sql, /pack_id TEXT NOT NULL/);
+  assert.match(sql, /is_active INTEGER NOT NULL/);
+  assert.match(sql, /PRIMARY KEY \(farm_id, pack_id\)/);
+  assert.doesNotMatch(sql, /server/i);
+  assert.doesNotMatch(sql, /sync/i);
+  assert.doesNotMatch(sql, /notification/i);
+  assert.doesNotMatch(sql, /auth/i);
+});
+
+test("starter work pack onboarding migration stores local setup completion only", () => {
+  const sql = addStarterWorkPacksSetupState.statements.join("\n");
+
+  assert.equal(addStarterWorkPacksSetupState.version, 33);
+  assert.match(sql, /ALTER TABLE farms ADD COLUMN starter_work_packs_setup_completed_at TEXT/);
+  assert.match(sql, /SET starter_work_packs_setup_completed_at = created_at/);
+  assert.doesNotMatch(sql, /server/i);
+  assert.doesNotMatch(sql, /sync/i);
+  assert.doesNotMatch(sql, /notification/i);
+  assert.doesNotMatch(sql, /auth/i);
+});
+
+test("farm work pack item state migration stores local item visibility only", () => {
+  const sql = createFarmWorkPackItemStates.statements.join("\n");
+
+  assert.equal(createFarmWorkPackItemStates.version, 34);
+  assert.match(sql, /CREATE TABLE IF NOT EXISTS farm_work_pack_item_states/);
+  assert.match(sql, /template_key TEXT NOT NULL/);
+  assert.match(sql, /is_active INTEGER NOT NULL/);
+  assert.match(sql, /PRIMARY KEY \(farm_id, template_key\)/);
   assert.doesNotMatch(sql, /server/i);
   assert.doesNotMatch(sql, /sync/i);
   assert.doesNotMatch(sql, /notification/i);

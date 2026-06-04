@@ -4,7 +4,7 @@ import { FarmRouteGate } from "../bootstrap/FarmRouteGate";
 export default function HomeRoute() {
   return (
     <FarmRouteGate>
-      {({ farm }) => <HomeScreen farmName={farm.name} />}
+      {({ farm }) => <HomeScreen farm={farm} />}
     </FarmRouteGate>
   );
 }

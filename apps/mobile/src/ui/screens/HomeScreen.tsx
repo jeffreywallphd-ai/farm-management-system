@@ -1,7 +1,9 @@
+import { useCallback, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { useRouter } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 
 import type { Farm } from "../../domain/farm/Farm";
+import { useDatabase } from "../../bootstrap/providers/DatabaseProvider";
 import { Button } from "../components/Button";
 import { Card } from "../components/Card";
 import { PageHeader } from "../components/PageHeader";
@@ -9,16 +11,46 @@ import { Screen } from "../components/Screen";
 import { ThemedIcon, type ThemedIconName } from "../components/ThemedIcon";
 import { pushRoute } from "../navigation";
 import { theme } from "../theme/theme";
+import { summarizeHomeTaskCounts } from "./HomeScreenModel";
 
-export function HomeScreen({ farmName }: { farmName: Farm["name"] }) {
+export function HomeScreen({ farm }: { farm: Farm }) {
+  const database = useDatabase();
   const router = useRouter();
+  const [taskCounts, setTaskCounts] = useState({ blockedTasks: 0, workableTasks: 0 });
+
+  useFocusEffect(
+    useCallback(() => {
+      let isActive = true;
+
+      async function loadTaskCounts() {
+        if (database.status !== "ready") {
+          return;
+        }
+
+        const tasks = await database.planningRepository.listTasks(farm.id);
+        if (isActive) {
+          setTaskCounts(summarizeHomeTaskCounts(tasks));
+        }
+      }
+
+      loadTaskCounts().catch(() => {
+        if (isActive) {
+          setTaskCounts({ blockedTasks: 0, workableTasks: 0 });
+        }
+      });
+
+      return () => {
+        isActive = false;
+      };
+    }, [database, farm.id]),
+  );
 
   return (
     <Screen>
       <PageHeader
         eyebrow="Home"
-        supportingText="Voice and photos first. Capture the note while the work is still fresh."
-        title={farmName}
+        supportingText="Private records. Clear work. Farm-owned evidence."
+        title={farm.name}
       />
       <Card variant="primary">
         <View style={styles.featuredAction}>
@@ -43,7 +75,11 @@ export function HomeScreen({ farmName }: { farmName: Farm["name"] }) {
             <Text style={styles.prompt}>Track Farm Tasks</Text>
           </View>
           <Text style={styles.description}>Move planned work through task boards and record farm events from task cards.</Text>
-          <Button icon="board" label="Manage Tasks" onPress={() => pushRoute(router, "/planning/boards")} size="hero" />
+          <View style={styles.taskIndicatorGrid}>
+            <TaskIndicator label="Workable" value={taskCounts.workableTasks} />
+            <TaskIndicator label="Blocked" value={taskCounts.blockedTasks} />
+          </View>
+          <Button icon="board" label="Track Work" onPress={() => pushRoute(router, "/planning/boards")} size="hero" />
         </View>
       </Card>
       <Card>
@@ -81,6 +117,15 @@ export function HomeScreen({ farmName }: { farmName: Farm["name"] }) {
         </View>
       </Card>
     </Screen>
+  );
+}
+
+function TaskIndicator({ label, value }: { label: string; value: number }) {
+  return (
+    <View style={styles.taskIndicator}>
+      <Text style={styles.taskIndicatorValue}>{value}</Text>
+      <Text style={styles.taskIndicatorLabel}>{label}</Text>
+    </View>
   );
 }
 
@@ -142,6 +187,37 @@ const styles = StyleSheet.create({
     color: theme.colors.textSecondary,
     fontSize: theme.typography.body,
     lineHeight: 24,
+  },
+  taskIndicator: {
+    alignItems: "center",
+    backgroundColor: theme.colors.surfaceTint,
+    borderColor: theme.colors.controlBorder,
+    borderRadius: theme.radius.md,
+    borderWidth: 1,
+    flex: 1,
+    minHeight: 84,
+    justifyContent: "center",
+    paddingHorizontal: theme.spacing.sm,
+    paddingVertical: theme.spacing.md,
+  },
+  taskIndicatorGrid: {
+    flexDirection: "row",
+    gap: theme.spacing.md,
+  },
+  taskIndicatorLabel: {
+    color: theme.colors.textSecondary,
+    fontSize: theme.typography.small,
+    fontWeight: "700",
+    letterSpacing: 0,
+    textAlign: "center",
+    textTransform: "uppercase",
+  },
+  taskIndicatorValue: {
+    color: theme.colors.primary,
+    fontFamily: theme.typography.headingFontFamily,
+    fontSize: theme.typography.title,
+    fontWeight: theme.typography.headingFontWeight,
+    lineHeight: 36,
   },
   iconBadge: {
     alignItems: "center",

@@ -1,6 +1,6 @@
 import type { Farm } from "../domain/farm/Farm";
 
-export type StartupStep = "farmName" | "coreFarmPlaces" | "home";
+export type StartupStep = "farmName" | "coreFarmPlaces" | "starterWorkPacks" | "home";
 
 export function getStartupStep(farm: Farm | null): StartupStep {
   if (!farm) {
@@ -9,6 +9,10 @@ export function getStartupStep(farm: Farm | null): StartupStep {
 
   if (!farm.corePlacesSetupCompletedAt) {
     return "coreFarmPlaces";
+  }
+
+  if (!farm.starterWorkPacksSetupCompletedAt) {
+    return "starterWorkPacks";
   }
 
   return "home";

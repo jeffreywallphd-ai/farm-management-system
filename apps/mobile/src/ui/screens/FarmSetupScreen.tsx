@@ -45,7 +45,7 @@ export function FarmSetupScreen({
   return (
     <Screen>
       <PageHeader
-        eyebrow="Step 1 of 2"
+        eyebrow="Step 1 of 3"
         supportingText="Name this device-local farm setup before adding the main places where work happens."
         title="Set up your farm"
       />
