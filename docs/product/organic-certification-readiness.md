@@ -46,7 +46,7 @@ This keeps daily farm work and certification work together. Marking a note for o
 
 ## Certification Planning
 
-Organic Certification uses the shared local farm planning foundation for certification goals, subgoals, planning periods, and preparation tasks, while remaining a standalone feature area in the mobile UX.
+Organic Certification uses the shared local farm planning foundation for certification goals, subgoals, and preparation tasks, while remaining a standalone feature area in the mobile UX.
 
 The certification area should seed a practical certification plan with meaningful subgoals for profile setup, land context, input review, seed and planting records, soil fertility, pest hierarchy, traceability, Organic System Plan drafting, inspection preparation, reports, and advanced scopes where relevant. Farmers may adjust timelines and task status locally. These planning records organize work for certification preparation; they do not determine compliance, submit records, assign legal responsibility, create worker accounts, or replace certifier instructions.
 

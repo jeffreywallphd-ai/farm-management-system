@@ -19,14 +19,15 @@ Planning does not introduce a server, synchronization protocol, authentication, 
 Planning adds local SQLite storage for:
 
 - planning goals;
-- planning periods;
 - planning tasks;
 - planning links;
 - planning boards.
 
 Goals support parent/child relationships by storing an optional `parent_goal_id`. Goals and tasks may also store an optional local `place_id` reference to `farm_locations` so planning screens can scope work to farm places. Cycle prevention and place ownership validation are enforced in the use-case/repository boundary.
 
-Planning links store only IDs and local relationship metadata. They do not copy farm note audio, photos, transcripts, organic evidence media, or other linked records.
+Tasks store optional desired start dates, target completion dates, assigned farmhand references, and local task instruction attachment metadata. Task instruction audio/photos are private local task context copied into app-owned local storage before save. Completed-work evidence remains a normal linked farm event; planning links do not copy farm note audio, photos, transcripts, organic evidence media, or other linked records.
+
+Planning links store only IDs and local relationship metadata.
 
 Planning boards store local board title, scope, optional goal reference, optional work-in-progress limit, and timestamps. They are saved views over `planning_tasks`, not a separate task membership or workflow-engine table. Goal boards derive their cards from the associated highest-level goal tree. The non-goal board derives its cards from tasks with no `goal_id`.
 
@@ -42,4 +43,4 @@ Planning records, including planning boards, are included in the existing local 
 
 ## Future Compatibility
 
-The task model includes a local responsible-person text field so future farmhand assignment can map to the same work item. This field is intentionally not an account, user ID, role, or authorization mechanism.
+The task model includes an optional local farmhand reference for the implemented farmhand-management slice. That reference is not an account, role, authorization mechanism, notification target, or synchronization identity.

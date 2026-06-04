@@ -32,6 +32,8 @@ Product scope is currently defined by:
 - [Mobile Pilot 1 Implementation Scope](product/mobile-pilot-1-implementation-scope.md)
 - [Organic Certification Readiness](product/organic-certification-readiness.md)
 - [Farm Planning and Roadmapping](product/farm-planning-roadmapping.md)
+- [Farmhand Management](product/farmhand-management.md)
+- [Basic GIS and Farm Location](product/basic-gis-and-farm-location.md)
 - [Field Workflows](product/field-workflows.md)
 - [User Research and Validation](product/user-research-and-validation.md)
 - [AI-Assisted Capture Validation Plan](product/ai-assisted-capture-validation-plan.md)
@@ -53,6 +55,8 @@ Farm-domain behavior is currently defined by:
 - [Privacy, Visibility, and Sharing Rules](domain/privacy-visibility-and-sharing-rules.md)
 - [Organic Certification Domain Rules](domain/organic-certification-rules.md)
 - [Farm Planning Domain Rules](domain/farm-planning-rules.md)
+- [Farmhand Management Domain Rules](domain/farmhand-management-rules.md)
+- [GIS Map and Geometry Domain Rules](domain/gis-map-and-geometry-rules.md)
 
 These documents are proposed domain guidance and should be refined as farmer terminology and workflow evidence is gathered.
 
@@ -66,6 +70,8 @@ Architecture is currently defined by:
 - [Identity, Privacy, and Sharing](architecture/identity-privacy-and-sharing.md)
 - [Organic Certification Architecture](architecture/organic-certification-architecture.md)
 - [Planning Architecture](architecture/planning-architecture.md)
+- [Farmhand Management Architecture](architecture/farmhand-management-architecture.md)
+- [GIS Map and Geometry Architecture](architecture/gis-map-and-geometry-architecture.md)
 - [Server and Deployment Operating Model](architecture/server-and-deployment-operating-model.md)
 
 These documents are proposed architecture guidance and intentionally defer implementation technology choices.
@@ -87,6 +93,7 @@ Foundational ADRs are currently defined by:
 - [ADR-0011: Mobile Pilot 1 Runtime Boundary Validation](adr/ADR-0011-mobile-pilot-1-runtime-boundary-validation.md)
 - [ADR-0012: Voice/Photo-First Farm Event Capture Pilot](adr/ADR-0012-voice-photo-first-farm-event-capture-pilot.md)
 - [ADR-0015: Local Farm Planning Foundation](adr/ADR-0015-local-farm-planning-foundation.md)
+- [ADR-0016: Local GIS Map and Geometry Foundation](adr/ADR-0016-local-gis-map-and-geometry-foundation.md)
 
 Accepted ADRs govern the decisions they record. ADR-0007 establishes the current implementation sequence: standalone mobile pilot first, with server synchronization, shared publication, and server deployment deferred. ADR-0008 through ADR-0011 select only the Mobile Pilot 1 app stack, local persistence, export/recovery-copy mechanism, and runtime boundary validation. Proposed ADRs and deferred topics in the decision-readiness register must not be treated as accepted implementation authority.
 
@@ -133,6 +140,7 @@ Task-specific AI context packs are currently defined in:
 - [Dependency and Technology Selection Pack](context/packs/dependency-and-technology-selection.pack.md)
 - [Documentation and ADR Governance Pack](context/packs/documentation-and-adr-governance.pack.md)
 - [Farm Planning Pack](context/packs/planning.pack.md)
+- [GIS Map and Geometry Pack](context/packs/gis-map-and-geometry.pack.md)
 
 Context packs are derived routing aids only. They never override accepted ADRs or canonical documents.
 

@@ -53,7 +53,8 @@ Accepted ADRs are binding architecture guidance for the decisions they record. P
 | [ADR-0012](ADR-0012-voice-photo-first-farm-event-capture-pilot.md) | accepted | The next farmer-shareable standalone mobile pilot is voice/photo-first farm-event capture rather than manual-form-first recordkeeping |
 | [ADR-0013](ADR-0013-on-device-farm-note-transcription-with-whisper-rn.md) | accepted | Saved farm-note voice memos may be transcribed on device with `whisper.rn` as generated local draft transcripts |
 | [ADR-0014](ADR-0014-organic-certification-readiness-module.md) | accepted | Add a local USDA organic certification readiness module without certifier-replacement claims |
-| [ADR-0015](ADR-0015-local-farm-planning-foundation.md) | accepted | Add a local planning foundation for goals, subgoals, planning periods, tasks, and certification planning |
+| [ADR-0015](ADR-0015-local-farm-planning-foundation.md) | accepted | Add a local planning foundation for goals, subgoals, assignment-ready tasks, and certification planning |
+| [ADR-0016](ADR-0016-local-gis-map-and-geometry-foundation.md) | accepted | Add a local GIS foundation for farm map settings and farm-owned GeoJSON geometry |
 
 ## ADR Rules
 

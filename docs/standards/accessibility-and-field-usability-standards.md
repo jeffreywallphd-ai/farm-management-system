@@ -1,7 +1,7 @@
 # Accessibility and Field Usability Standards
 
 - Status: proposed
-- Last reviewed: 2026-05-28
+- Last reviewed: 2026-06-03
 - Canonical for: practical farm-field usability, accessibility posture, offline status clarity, and manual alternatives
 - Related ADRs: [ADR-0001](../adr/ADR-0001-offline-first-field-operation.md), [ADR-0003](../adr/ADR-0003-ai-interpretations-require-confirmation.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md)
 - Related docs: [Product Vision and Scope](../product/product-vision-and-scope.md), [Field Workflows](../product/field-workflows.md), [AI-Assisted Capture Validation Plan](../product/ai-assisted-capture-validation-plan.md), [Deployment and Data-Control Validation Plan](../product/deployment-and-data-control-validation-plan.md), [Naming and Domain Language Standards](naming-and-domain-language-standards.md)
@@ -23,11 +23,25 @@ Future user-facing implementation must prioritize:
 - Visible offline, synchronization, and publication state.
 - For the standalone pilot, visible local saved state, local history, and export/backup status or risk.
 - Minimal forced typing where practical.
+- Dropdown-style single-choice controls for option sets so long lists do not crowd field screens.
 - Clear confirmation before AI-assisted records become facts.
 - Clear distinction between private internal records and externally shared information.
 - Safe recovery from interruption or failed connectivity.
 - Plain farmer-facing language consistent with the glossary.
 - Avoidance of technical infrastructure or sync jargon in ordinary field workflows.
+
+## Edit Flow Standard
+
+List, timeline, dashboard, setup, planning, certification, and comparable mobile screens must keep editing close to the item being edited:
+
+- Edit forms for existing user-created records are hidden by default.
+- A large labeled edit action must appear on or immediately next to the item details it edits.
+- After the user taps the edit action, the edit form appears directly below that edit action within the same item row, card, or detail block.
+- Saving the edit closes the edit form and returns the item to its normal display state.
+- Cancel actions, when present, also close the edit form without moving the user elsewhere.
+- Do not use one stationary page-level edit form for a list of records when that form can be separated by scrolling from the selected item.
+
+If an edit flow is too large for an inline panel, route to a dedicated detail/edit screen from the selected item instead of placing a shared edit form far away on the same page. Create forms for new records may remain separate, but they should be hidden while an inline edit form is active when showing both would make the page harder to understand.
 
 ## Accessibility Baseline
 

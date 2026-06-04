@@ -14,12 +14,13 @@
 | --- | --- |
 | Planning goal | A farmer-entered future outcome or roadmap item. |
 | Subgoal | A planning goal with a parent goal. Subgoals chunk large goals into meaningful smaller outcomes. |
-| Planning period | A selected time box for organizing work, such as day, week, two weeks, month, season, year, or custom. |
 | Planning task | A concrete work item that can be planned, statused, and later assigned. |
 | Farm work board | A local kanban-style view over planning tasks for a highest-level goal tree or for non-goal tasks. |
-| Responsible person | A local text field identifying who may handle a task. It is not an authenticated account or permission. |
+| Assigned farmhand | An optional local reference from a task to a farmhand record. It is not an authenticated account or permission. |
+| Desired start date | An optional farmer-entered date indicating when work should ideally begin. It is not a calendar appointment or reminder. |
 | Planning link | A local relationship from a goal or task to another local record such as a farm note, farm place, crop, organic record, or report. |
 | Planning place | An optional local farm-place reference on a goal or task. It helps scope planned work without adding maps, GIS, or scheduling automation. |
+| Task instructions | Optional local audio/photo attachments that describe how to do a task. They are private task context, not completed-work evidence. |
 
 ## Goal Rules
 
@@ -35,11 +36,13 @@
 
 - Tasks are future or current work, not historical operational records.
 - Task completion means the farmer marked the task done; it does not create a harvest, material use, inventory count, farm note, organic record, or certification determination.
-- Tasks may be associated with a goal, a planning period, both, or neither.
+- Tasks may be associated with a goal or may stand alone.
 - Tasks may reference a local farm place. When a task belongs to a goal with a place, the task place should stay within the goal place or embedded child places.
-- Task status is one of `notStarted`, `ready`, `inProgress`, `blocked`, `done`, or `canceled`.
+- Task status is one of `notStarted`, `inProgress`, `blocked`, `done`, or `canceled`.
 - Task priority is one of `low`, `normal`, `high`, or `urgent`.
-- `responsiblePerson` is a farmer-entered label only. It must not imply accounts, authentication, payroll, or access control.
+- A task may have an optional desired start date and an optional target completion date.
+- A task may have an optional assigned farmhand reference. Assignment must not imply accounts, authentication, payroll, notification delivery, or access control.
+- A task may include optional recorded instructions and instruction photos. These attachments help explain planned work; evidence of completed work should remain a normal linked farm event.
 
 ## Board Rules
 
@@ -48,16 +51,11 @@
 - A goal board includes tasks attached to the board's goal or any child goal inside that goal tree.
 - A non-goal board includes tasks with no goal.
 - Board columns are task statuses. Moving a card updates the task status; it does not create an operational record.
+- Board views may group multiple statuses for scanning, such as all incomplete work or all workable tasks, without creating new stored statuses.
 - Work-in-progress limits are farmer guidance only. They warn about crowded active columns but do not block saving or moving tasks.
 - Recording a farm event from a board task creates a normal local voice/photo farm event and a planning link to that task.
+- Farm events linked to a task may be displayed on the board as collapsed event cards with their normal farm-note details and media.
 - Boards must not copy farm-note media or become a separate certification evidence inbox.
-
-## Period Rules
-
-- Planning periods are local farmer-selected time boxes.
-- Periods may overlap.
-- Period assignment is planning intent, not a calendar commitment.
-- The app may provide common period types but must allow a custom date range.
 
 ## Organic Certification Rules
 

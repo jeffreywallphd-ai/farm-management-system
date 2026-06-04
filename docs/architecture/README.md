@@ -12,6 +12,7 @@
 - [Identity, Privacy, and Sharing](identity-privacy-and-sharing.md): architecture boundaries among identity, authorized access, synchronization, publication, visibility, local-network distribution, AI captures, and attachment access.
 - [Organic Certification Architecture](organic-certification-architecture.md): local architecture boundaries for USDA organic readiness records, reports, and exports.
 - [Planning Architecture](planning-architecture.md): local architecture boundaries for goals, subgoals, periods, tasks, planning links, and certification planning templates.
+- [Farmhand Management Architecture](farmhand-management-architecture.md): local architecture boundaries for farmhand directory, schedules, task assignments, and farmhand work boards.
 - [Server and Deployment Operating Model](server-and-deployment-operating-model.md): deployment-mode architecture constraints and the relationship among mobile offline use, server operation, private/shared boundaries, data portability, and future technical choices.
 
 Architecture guidance now distinguishes the accepted standalone mobile pilot from future server-connected expansion. These documents do not choose implementation technologies.

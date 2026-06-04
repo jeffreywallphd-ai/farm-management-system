@@ -2,7 +2,7 @@
 
 - Pack name: `mobile-field-capture`
 - Status: active
-- Last reviewed: 2026-05-28
+- Last reviewed: 2026-06-03
 - Authority posture: Derived context aid only; canonical docs and accepted ADRs govern.
 
 ## Purpose
@@ -38,6 +38,7 @@ Helps agents work on user-facing mobile workflows involving activity entry, fiel
 - The next capture screens should emphasize one primary `Quick record farm events` action, local save, optional light context, and later timeline review.
 - Record forms should present farm-place paths such as `Field 1 > Bed 1` when nested places exist, avoiding generic or technical location wording.
 - Future mobile screens should reuse the established earthy theme tokens and small UI component foundation.
+- Edit flows for existing records should follow the field-usability edit standard: hide edit forms until a large labeled edit action is tapped, render the form directly below that action in the same item row/card/detail block, and close the form after save or cancel.
 - ADR-0008 accepts Expo, React Native, TypeScript, development builds, and EAS/internal distribution for Mobile Pilot 1.
 - Structured interpretation of captures, photo-count inference, cloud transcription, and automatic record creation remain later scope and must not be pulled into local capture or transcript-review work.
 - Local saved state and local history must be understandable in the standalone pilot.

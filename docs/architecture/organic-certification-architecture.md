@@ -123,7 +123,7 @@ The mobile UX must not introduce a separate evidence inbox or organic review que
 
 ## Certification Planning Boundary
 
-Organic Certification uses the shared local planning repository for seeded certification goals, subgoals, planning periods, and preparation tasks. The Organic Certification UX remains standalone, but timeline and task data are stored through the planning foundation so generic Planning and certification preparation share one local work model.
+Organic Certification uses the shared local planning repository for seeded certification goals, subgoals, and preparation tasks. The Organic Certification UX remains standalone, but timeline and task data are stored through the planning foundation so generic Planning and certification preparation share one local work model.
 
 Certification planning must not introduce accounts, cloud calendars, push notifications, server sync, automatic task generation, compliance scoring, certifier submission, or worker permission models. A task may include a farmer-entered responsible-person label for future assignment readiness, but that label is not an authenticated user or access-control boundary.
 

@@ -27,11 +27,37 @@ go.work.sum
 # env file
 .env
 
+# JavaScript / Expo generated project files
+node_modules/
+package-lock.json
+.npm-cache/
+.expo-home/
+.expo/
+dist/
+.test-build/
+.test-build-codex/
+.test-build-*/
+.codex-test-build-*/
+
 # Mobile pilot local transcription models
 apps/mobile/assets/models/*.bin
 apps/mobile/models/*.bin
 apps/mobile/.models/
 apps/mobile/.transcription-models/
+
+# Mobile generated dependencies and native build artifacts
+apps/mobile/node_modules/
+apps/mobile/.npm-cache/
+apps/mobile/.expo-home/
+apps/mobile/.expo/
+apps/mobile/dist/
+apps/mobile/.test-build/
+apps/mobile/.test-build-codex/
+apps/mobile/.test-build-*/
+apps/mobile/.codex-test-build-*/
+apps/mobile/android/
+apps/mobile/ios/
+apps/mobile/expo-env.d.ts
 
 # Editor/IDE
 # .idea/

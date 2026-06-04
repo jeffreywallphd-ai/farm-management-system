@@ -123,7 +123,7 @@ This document defines the domain meaning of organic certification readiness reco
 
 ## Certification Planning Rules
 
-- Organic Certification may seed local certification goals, subgoals, planning periods, and tasks from the shared planning foundation.
+- Organic Certification may seed local certification goals, subgoals, and tasks from the shared planning foundation.
 - Certification goals and tasks must remain editable by the farmer, including timeline and status fields.
 - Certification planning records are preparation aids. They must not be presented as certifier-approved work, legal assignments, or proof that a requirement has been satisfied.
 - Farm notes remain the source evidence records. Planning tasks may link to farm notes or organic records, but they must not duplicate audio, photos, or farm-note content into a separate evidence inbox.

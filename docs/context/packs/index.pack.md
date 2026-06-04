@@ -45,6 +45,7 @@ This is an open-source small-farm support platform. The active implementation ta
 - [ADR-0011](../../adr/ADR-0011-mobile-pilot-1-runtime-boundary-validation.md): Mobile Pilot 1 uses Zod for runtime boundary validation.
 - [ADR-0012](../../adr/ADR-0012-voice-photo-first-farm-event-capture-pilot.md): The next farmer-shareable pilot prioritizes local voice/photo farm-event capture before AI interpretation or server-connected features.
 - [ADR-0014](../../adr/ADR-0014-organic-certification-readiness-module.md): USDA organic certification readiness is accepted as a local evidence/reporting module, not as certifier replacement or legal determination.
+- [ADR-0016](../../adr/ADR-0016-local-gis-map-and-geometry-foundation.md): Local GIS stores map view settings separately from farm-owned GeoJSON geometry and keeps basemap availability separate from local geometry availability.
 
 ## Current Pilot Sequencing
 
@@ -80,7 +81,8 @@ Do not use this baseline pack to skip specialized packs, broaden product scope, 
 | Dependency/provider/technology evaluation | `dependency-and-technology-selection.pack.md` |
 | Documentation/ADR/governance review | `documentation-and-adr-governance.pack.md` |
 | USDA organic certification readiness | `organic-certification.pack.md` |
-| Local farm planning, goals, subgoals, tasks, or certification planning templates | `planning.pack.md` |
+| Local farm planning, goals, subgoals, tasks, certification planning templates, farmhands, schedules, or farmhand assignments | `planning.pack.md` |
+| Farm map settings, farm address/location, GPS/geocoding, GeoJSON, field/place geometry, map previews, or organic geometry overlays | `gis-map-and-geometry.pack.md` |
 
 ## Minimal-Source Posture
 
@@ -97,10 +99,16 @@ This pack identifies the baseline. It does not remove the requirement to read ac
 - `docs/operations/mobile-pilot-data-safety-requirements.md`: accepted Pilot 1 data-safety requirements.
 - `docs/product/organic-certification-readiness.md`: accepted organic readiness scope and phase sequence.
 - `docs/product/farm-planning-roadmapping.md`: accepted local planning and task foundation scope.
+- `docs/product/farmhand-management.md`: accepted local farmhand directory, schedules, task assignment, and farmhand work-board scope.
+- `docs/product/basic-gis-and-farm-location.md`: accepted local farm map/location and basic geometry scope.
 - `docs/domain/organic-certification-rules.md`: accepted organic readiness domain rules.
 - `docs/domain/farm-planning-rules.md`: accepted local planning domain rules.
+- `docs/domain/farmhand-management-rules.md`: accepted local farmhand and schedule domain rules.
+- `docs/domain/gis-map-and-geometry-rules.md`: accepted spatial domain and validation rules.
 - `docs/architecture/organic-certification-architecture.md`: accepted organic readiness architecture boundaries.
 - `docs/architecture/planning-architecture.md`: accepted local planning architecture boundaries.
+- `docs/architecture/farmhand-management-architecture.md`: accepted local farmhand architecture boundaries.
+- `docs/architecture/gis-map-and-geometry-architecture.md`: accepted local GIS architecture boundaries.
 - `apps/mobile/README.md`: current Mobile Pilot 1 app structure and stack notes.
 - `docs/context/prompt-routing.md`: task classification and pack assembly.
 
