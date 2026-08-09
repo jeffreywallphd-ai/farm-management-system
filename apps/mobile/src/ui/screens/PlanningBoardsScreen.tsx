@@ -230,7 +230,7 @@ export function PlanningBoardsScreen({
         title="Farm work boards"
       />
 
-      <Card>
+      <Card rootLevelHeader>
         <SectionHeading
           detail={selectedBoard?.wipLimit ? `WIP limit: ${selectedBoard.wipLimit}` : "Choose a task source and status view."}
           title="Task filters"

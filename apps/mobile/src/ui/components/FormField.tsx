@@ -1,5 +1,6 @@
 import { StyleSheet, Text, TextInput, View } from "react-native";
 
+import { useUiDensity } from "../theme/UiDensity";
 import { theme } from "../theme/theme";
 
 export function FormField({
@@ -21,8 +22,10 @@ export function FormField({
   keyboardType?: "default" | "decimal-pad";
   multiline?: boolean;
 }) {
+  const density = useUiDensity();
+
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { gap: density.fieldGap }]}>
       <Text style={styles.label}>{label}</Text>
       <TextInput
         accessibilityLabel={label}
@@ -33,7 +36,17 @@ export function FormField({
         placeholder={placeholder}
         placeholderTextColor={theme.colors.textSecondary}
         returnKeyType="done"
-        style={[styles.input, multiline ? styles.multilineInput : null, error ? styles.inputError : null]}
+        style={[
+          styles.input,
+          density.isUngloved ? styles.compactInput : null,
+          {
+            minHeight: multiline ? (density.isUngloved ? 78 : 96) : density.inputMinHeight,
+            paddingHorizontal: density.inputPaddingHorizontal,
+            paddingVertical: density.inputPaddingVertical,
+          },
+          multiline ? styles.multilineInput : null,
+          error ? styles.inputError : null,
+        ]}
         value={value}
       />
       {error ? <Text style={styles.error}>{error}</Text> : null}
@@ -43,7 +56,6 @@ export function FormField({
 
 const styles = StyleSheet.create({
   container: {
-    gap: theme.spacing.sm,
   },
   label: {
     color: theme.colors.primary,
@@ -57,12 +69,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     color: theme.colors.textPrimary,
     fontSize: theme.typography.body,
-    minHeight: theme.spacing.touchTarget,
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.md,
+  },
+  compactInput: {
+    fontSize: theme.typography.caption,
+    lineHeight: 16,
   },
   multilineInput: {
-    minHeight: 96,
     textAlignVertical: "top",
   },
   inputError: {

@@ -182,7 +182,7 @@ export function OrganicPlacesScreen({
         </Card>
       ) : (
         <>
-          <Card>
+          <Card rootLevelHeader>
             <SectionHeading
               detail="These details help organize land eligibility and boundary evidence for certifier review."
               title="Organic place details"
@@ -223,7 +223,7 @@ export function OrganicPlacesScreen({
             {error ? <Text style={styles.error}>{error}</Text> : null}
             <Button label="Save organic place details" onPress={handleSavePlaceProfile} size="large" />
           </Card>
-          <Card>
+          <Card rootLevelHeader>
             <SectionHeading detail="Record boundary photos, maps, notes, or document references that stay local to this device." title="Boundary and buffer evidence" />
             <OrganicFarmEventPrompt category="land" />
             <SelectField
@@ -236,8 +236,8 @@ export function OrganicPlacesScreen({
             <FormField label="Optional local attachment URI or note link" onChangeText={setEvidenceAttachmentUri} placeholder="Optional local URI" value={evidenceAttachmentUri} />
             <Button label="Add boundary evidence" onPress={handleAddEvidence} size="large" variant="secondary" />
           </Card>
-          <Card>
-            <SectionHeading title="Organic place reports" />
+          <Card rootLevelHeader>
+            <SectionHeading detail="Create local land, transition, boundary, and contamination review reports." title="Organic place reports" />
             <View style={styles.buttonStack}>
               <Button label="Land Eligibility Report" onPress={() => handleCreateReport("landEligibility")} size="large" variant="secondary" />
               <Button label="Transition Status Report" onPress={() => handleCreateReport("transitionStatus")} size="large" variant="secondary" />

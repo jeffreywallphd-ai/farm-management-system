@@ -1,0 +1,61 @@
+import type { Migration } from "./migrationRunner";
+
+export const createInventoryManagement: Migration = {
+  version: 35,
+  name: "create_inventory_management",
+  statements: [
+    `CREATE TABLE IF NOT EXISTS inventory_items (
+      id TEXT PRIMARY KEY NOT NULL,
+      farm_id TEXT NOT NULL,
+      kind TEXT NOT NULL CHECK (kind IN ('material', 'equipment')),
+      tracked_item_id TEXT,
+      name TEXT NOT NULL,
+      category TEXT,
+      common_item_key TEXT,
+      acquisition_source TEXT NOT NULL DEFAULT 'alreadyOwned' CHECK (acquisition_source IN ('purchase', 'donation', 'selfProduced', 'alreadyOwned')),
+      status TEXT NOT NULL CHECK (status IN ('active', 'inactive')),
+      storage_location_id TEXT,
+      default_unit TEXT,
+      current_amount REAL,
+      current_unit TEXT,
+      supplier TEXT,
+      reorder_point TEXT,
+      notes TEXT,
+      purchase_note_farm_event_id TEXT,
+      organic_relevance TEXT NOT NULL CHECK (organic_relevance IN (
+        'none',
+        'cropProductionInput',
+        'soilAmendment',
+        'pestControlInput',
+        'seedOrPlantingStock',
+        'cleaningOrSanitation',
+        'packagingOrHandling',
+        'sharedEquipment'
+      )),
+      organic_approval_status TEXT NOT NULL CHECK (organic_approval_status IN (
+        'notNeeded',
+        'unknown',
+        'needsReview',
+        'approvedByCertifier',
+        'omriListed',
+        'wsdaListed',
+        'allowedByNationalList',
+        'restricted',
+        'prohibited'
+      )),
+      organic_regulation_notes TEXT,
+      organic_evidence_notes TEXT,
+      equipment_contact_risk TEXT,
+      cleaning_required INTEGER NOT NULL CHECK (cleaning_required IN (0, 1)),
+      last_cleaned_at TEXT,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL,
+      FOREIGN KEY (farm_id) REFERENCES farms(id),
+      FOREIGN KEY (tracked_item_id) REFERENCES tracked_items(id),
+      FOREIGN KEY (storage_location_id) REFERENCES farm_locations(id),
+      FOREIGN KEY (purchase_note_farm_event_id) REFERENCES farm_events(id)
+    );`,
+    "CREATE UNIQUE INDEX IF NOT EXISTS idx_inventory_items_tracked_item ON inventory_items(farm_id, tracked_item_id) WHERE tracked_item_id IS NOT NULL;",
+    "CREATE INDEX IF NOT EXISTS idx_inventory_items_farm_kind ON inventory_items(farm_id, kind);",
+  ],
+};

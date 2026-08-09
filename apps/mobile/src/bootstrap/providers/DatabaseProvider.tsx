@@ -6,6 +6,7 @@ import type { FarmEventRepository } from "../../application/ports/FarmEventRepos
 import type { FarmhandRepository } from "../../application/ports/FarmhandRepository";
 import type { FarmNoteTranscriptRepository } from "../../application/ports/FarmNoteTranscriptRepository";
 import type { LocalRecordRepository } from "../../application/ports/LocalRecordRepository";
+import type { InventoryRepository } from "../../application/ports/InventoryRepository";
 import type { OrganicCertificationRepository } from "../../application/ports/OrganicCertificationRepository";
 import type { PlanningRepository } from "../../application/ports/PlanningRepository";
 import { openMobilePilotDatabase } from "../../infrastructure/sqlite/database";
@@ -15,6 +16,7 @@ import { SqliteFarmEventRepository } from "../../infrastructure/sqlite/repositor
 import { SqliteFarmhandRepository } from "../../infrastructure/sqlite/repositories/SqliteFarmhandRepository";
 import { SqliteFarmNoteTranscriptRepository } from "../../infrastructure/sqlite/repositories/SqliteFarmNoteTranscriptRepository";
 import { SqliteHarvestRecordRepository } from "../../infrastructure/sqlite/repositories/SqliteHarvestRecordRepository";
+import { SqliteInventoryRepository } from "../../infrastructure/sqlite/repositories/SqliteInventoryRepository";
 import { SqliteOrganicCertificationRepository } from "../../infrastructure/sqlite/repositories/SqliteOrganicCertificationRepository";
 import { SqlitePlanningRepository } from "../../infrastructure/sqlite/repositories/SqlitePlanningRepository";
 
@@ -27,6 +29,7 @@ type DatabaseState =
       farmMapRepository: FarmMapRepository;
       farmNoteTranscriptRepository: FarmNoteTranscriptRepository;
       farmReferenceRepository: FarmReferenceRepository;
+      inventoryRepository: InventoryRepository;
       localRecordRepository: LocalRecordRepository;
       organicCertificationRepository: OrganicCertificationRepository;
       planningRepository: PlanningRepository;
@@ -53,6 +56,7 @@ export function DatabaseProvider({ children }: { children: ReactNode }) {
             farmMapRepository: new SqliteFarmMapRepository(database),
             farmNoteTranscriptRepository: new SqliteFarmNoteTranscriptRepository(database),
             farmReferenceRepository: new SqliteFarmReferenceRepository(database),
+            inventoryRepository: new SqliteInventoryRepository(database),
             localRecordRepository: new SqliteHarvestRecordRepository(database),
             organicCertificationRepository: new SqliteOrganicCertificationRepository(database),
             planningRepository: new SqlitePlanningRepository(database),

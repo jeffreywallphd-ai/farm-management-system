@@ -45,6 +45,7 @@ import { PageHeader } from "../components/PageHeader";
 import { Screen } from "../components/Screen";
 import { SelectField } from "../components/SelectField";
 import { SectionHeading } from "../components/SectionHeading";
+import { useUiDensity } from "../theme/UiDensity";
 import { theme } from "../theme/theme";
 import { replaceRoute } from "../navigation";
 import { isOrganicCertificationPursuitActive } from "../organicCertificationPlanningVisibility";
@@ -245,7 +246,7 @@ export function OrganicCertificationScreen({
         title={isCertificationActive ? "Organic dashboard" : "Organic certification is off"}
       />
       {!isCertificationActive ? (
-        <Card>
+        <Card rootLevelHeader>
           <SectionHeading
             detail="Certification goals, certification boards, and organic readiness tools stay hidden while certification planning is off."
             title="Certification is currently off"
@@ -261,6 +262,7 @@ export function OrganicCertificationScreen({
           detail="Certifier, scope, renewal, and record-retention setup."
           isExpanded={isProfileExpanded}
           onToggle={() => setIsProfileExpanded((current) => !current)}
+          rootLevelHeader
           title="Certification profile"
         >
           <OrganicProfileContent
@@ -294,8 +296,8 @@ export function OrganicCertificationScreen({
       ) : null}
       {isCertificationActive ? (
         <>
-          <Card>
-            <SectionHeading title="Enabled scopes" />
+          <Card rootLevelHeader>
+            <SectionHeading detail="These are the organic certification scopes currently included in local readiness tracking." title="Enabled scopes" />
             {enabledScopes.length > 0 ? (
               enabledScopes.map((scope) => (
                 <Text key={scope.scopeType} style={styles.body}>
@@ -306,16 +308,16 @@ export function OrganicCertificationScreen({
               <Text style={styles.body}>No scopes selected yet.</Text>
             )}
           </Card>
-          <Card>
-            <SectionHeading title="Upcoming annual update" />
+          <Card rootLevelHeader>
+            <SectionHeading detail="Use this date to keep renewal and inspection preparation visible." title="Upcoming annual update" />
             <Text style={styles.body}>{profile?.annualUpdateDueDate ?? "Add the annual update due date when you know it."}</Text>
           </Card>
-          <Card>
+          <Card rootLevelHeader>
             <SectionHeading detail="Review annual renewal notes, inspection-day evidence, and saved organic report packages in one place." title="Certification reporting" />
             <Button label="Open certification reporting" onPress={() => replaceRoute(router, "/organic/reports")} size="large" variant="secondary" />
           </Card>
           {organicWorkAreas.map((area) => (
-            <Card key={area.route}>
+            <Card key={area.route} rootLevelHeader>
               <SectionHeading detail={area.description} title={area.title} />
               <Button label={area.buttonLabel} onPress={() => replaceRoute(router, area.route)} size="large" variant="secondary" />
             </Card>
@@ -339,8 +341,8 @@ export function OrganicCertificationScreen({
             onTaskStatusChange={(value) => setEditingTaskStatus(value as PlanningTaskStatus)}
             tasks={certificationTasks}
           />
-          <Card>
-            <SectionHeading title="Missing setup items" />
+          <Card rootLevelHeader>
+            <SectionHeading detail="Complete these local setup items to make the dashboard more useful for certifier review." title="Missing setup items" />
             {missingSetupItems.length > 0 ? (
               missingSetupItems.map((item) => (
                 <Text key={item} style={styles.warning}>
@@ -351,8 +353,8 @@ export function OrganicCertificationScreen({
               <Text style={styles.body}>Phase 1 profile setup looks complete.</Text>
             )}
           </Card>
-          <Card>
-            <SectionHeading title="Organic Profile Report" />
+          <Card rootLevelHeader>
+            <SectionHeading detail="Create a local text report from the saved certification profile details." title="Organic Profile Report" />
             <Button label="Create Organic Profile Report" onPress={handleCreateReport} size="large" variant="secondary" />
             {report ? <Text style={styles.report}>{report}</Text> : null}
           </Card>
@@ -415,6 +417,8 @@ function OrganicProfileContent({
   onNotesChange: (value: string) => void;
   onSave: () => void;
 }) {
+  const density = useUiDensity();
+
   return (
     <View style={styles.form}>
       <SectionHeading
@@ -496,6 +500,7 @@ function CertificationPlanningCard({
       detail="Certification has its own plan here, built from the shared local planning foundation."
       isExpanded={isExpanded}
       onToggle={() => setIsExpanded((current) => !current)}
+      rootLevelHeader
       title="Certification plan"
     >
       {rootGoals.length ? rootGoals.map((rootGoal) => (
@@ -580,6 +585,8 @@ function CertificationGoalEditForm({
   onGoalTargetDateChange: (value: string) => void;
   onSaveGoal: () => void;
 }) {
+  const density = useUiDensity();
+
   return (
     <View style={styles.planEditBlock}>
       <SectionHeading title="Adjust certification goal" />
@@ -658,6 +665,8 @@ function OrganicProfileForm({
   onRecordRetentionYearsChange: (value: string) => void;
   onNotesChange: (value: string) => void;
 }) {
+  const density = useUiDensity();
+
   return (
     <View style={styles.form}>
       <SelectField
@@ -679,9 +688,17 @@ function OrganicProfileForm({
                 accessibilityRole="button"
                 key={scopeType}
                 onPress={() => onToggleScope(scopeType)}
-                style={[styles.scopeButton, isSelected ? styles.scopeButtonSelected : null]}
+                style={[
+                  styles.scopeButton,
+                  {
+                    minHeight: density.inputMinHeight,
+                    paddingHorizontal: density.isUngloved ? theme.spacing.sm : theme.spacing.md,
+                    paddingVertical: density.isUngloved ? theme.spacing.xs : theme.spacing.sm,
+                  },
+                  isSelected ? styles.scopeButtonSelected : null,
+                ]}
               >
-                <Text style={[styles.scopeButtonText, isSelected ? styles.scopeButtonTextSelected : null]}>
+                <Text style={[styles.scopeButtonText, density.isUngloved ? styles.compactScopeButtonText : null, isSelected ? styles.scopeButtonTextSelected : null]}>
                   {ORGANIC_CERTIFICATION_SCOPE_LABELS[scopeType]}
                 </Text>
               </Pressable>
@@ -817,9 +834,6 @@ const styles = StyleSheet.create({
     borderRadius: theme.radius.md,
     borderWidth: 1,
     justifyContent: "center",
-    minHeight: theme.spacing.touchTarget,
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.sm,
   },
   scopeButtonSelected: {
     backgroundColor: theme.colors.accent,
@@ -832,6 +846,10 @@ const styles = StyleSheet.create({
   },
   scopeButtonTextSelected: {
     color: theme.colors.onAccent,
+  },
+  compactScopeButtonText: {
+    fontSize: theme.typography.small,
+    lineHeight: 18,
   },
   taskBlock: {
     backgroundColor: theme.colors.surfaceMuted,

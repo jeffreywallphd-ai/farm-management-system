@@ -4,8 +4,8 @@ import type { FarmLocation } from "../farm/FarmLocation";
 import type { IsoDateTimeString } from "../records/OperationalRecord";
 import type { MobilePilotRecoveryCopy } from "./MobilePilotRecoveryCopy";
 
-export const FARM_EVENT_RECOVERY_PACKAGE_VERSION = 2;
-export const FARM_EVENT_RECOVERY_PACKAGE_SCHEMA_VERSION = 2;
+export const FARM_EVENT_RECOVERY_PACKAGE_VERSION = 3;
+export const FARM_EVENT_RECOVERY_PACKAGE_SCHEMA_VERSION = 3;
 
 export interface FarmEventRecoveryPackageAttachment extends FarmEventAttachment {
   packagePath: string;

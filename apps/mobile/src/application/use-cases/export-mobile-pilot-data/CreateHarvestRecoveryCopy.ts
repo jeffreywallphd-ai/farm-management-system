@@ -9,6 +9,7 @@ import type { ExportRepository, MobilePilotExportFile } from "../../ports/Export
 import type { FarmhandRepository } from "../../ports/FarmhandRepository";
 import type { FarmMapRepository } from "../../ports/FarmMapRepository";
 import type { FarmReferenceRepository } from "../../ports/FarmReferenceRepository";
+import type { InventoryRepository } from "../../ports/InventoryRepository";
 import type { LocalRecordRepository } from "../../ports/LocalRecordRepository";
 import type { OrganicCertificationRepository } from "../../ports/OrganicCertificationRepository";
 import type { PlanningRepository } from "../../ports/PlanningRepository";
@@ -22,6 +23,7 @@ export async function createMobilePilotRecoveryCopy(
     farmReferenceRepository: FarmReferenceRepository;
     farmMapRepository?: FarmMapRepository;
     farmhandRepository?: FarmhandRepository;
+    inventoryRepository?: InventoryRepository;
     localRecordRepository: LocalRecordRepository;
     organicCertificationRepository?: OrganicCertificationRepository;
     planningRepository?: PlanningRepository;
@@ -48,6 +50,7 @@ export async function buildMobilePilotRecoveryCopyPayload(
     farmReferenceRepository: FarmReferenceRepository;
     farmMapRepository?: FarmMapRepository;
     farmhandRepository?: FarmhandRepository;
+    inventoryRepository?: InventoryRepository;
     localRecordRepository: LocalRecordRepository;
     organicCertificationRepository?: OrganicCertificationRepository;
     planningRepository?: PlanningRepository;
@@ -68,6 +71,7 @@ export async function buildMobilePilotRecoveryCopyPayload(
     farmhandRecurringSchedules,
     farmhandWeeklyScheduleBlocks,
     trackedItems,
+    inventoryItems,
     harvestRecords,
     materialUseRecords,
     inventoryCountRecords,
@@ -112,6 +116,7 @@ export async function buildMobilePilotRecoveryCopyPayload(
     dependencies.farmhandRepository?.listRecurringSchedules(input.farmId) ?? Promise.resolve([]),
     dependencies.farmhandRepository?.listWeeklyScheduleBlocks(input.farmId) ?? Promise.resolve([]),
     dependencies.farmReferenceRepository.listTrackedItems(input.farmId),
+    dependencies.inventoryRepository?.listInventoryItems(input.farmId) ?? Promise.resolve([]),
     dependencies.localRecordRepository.listHarvestRecordsForExport(input.farmId),
     dependencies.localRecordRepository.listMaterialUseRecordsForExport(input.farmId),
     dependencies.localRecordRepository.listInventoryCountRecordsForExport(input.farmId),
@@ -163,6 +168,7 @@ export async function buildMobilePilotRecoveryCopyPayload(
     farmhandRecurringSchedules,
     farmhandWeeklyScheduleBlocks,
     trackedItems,
+    inventoryItems,
     harvestRecords,
     materialUseRecords,
     inventoryCountRecords,

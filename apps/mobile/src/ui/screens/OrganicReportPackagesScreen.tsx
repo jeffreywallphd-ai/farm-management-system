@@ -99,14 +99,14 @@ export function OrganicReportPackagesScreen({
     <Screen>
       <PageHeader eyebrow="Organic Certification" supportingText="Review renewal and inspection evidence, then generate local report packages from records saved on this device." title="Certification reporting" />
       <OrganicDashboardButton />
-      <Card>
-        <SectionHeading title="Annual renewal report" />
+      <Card rootLevelHeader>
+        <SectionHeading detail="Preview the local annual renewal report before adding it to a package." title="Annual renewal report" />
         <Text style={styles.detail}>Annual update: {profile?.annualUpdateDueDate ?? "Not recorded"}</Text>
         <Text style={styles.detail}>Inspection window: {profile?.inspectionDueWindow ?? "Not recorded"}</Text>
         <Text style={styles.detail}>{links.length} linked farm event{links.length === 1 ? "" : "s"} available for renewal review.</Text>
       </Card>
-      <Card>
-        <SectionHeading title="Inspection day report" />
+      <Card rootLevelHeader>
+        <SectionHeading detail="Preview the local inspection-day report before adding it to a package." title="Inspection day report" />
         {ORGANIC_EVIDENCE_CATEGORIES.map((category) => {
           const count = links.filter((view) => view.link.category === category).length;
           return (
@@ -117,7 +117,7 @@ export function OrganicReportPackagesScreen({
           );
         })}
       </Card>
-      <Card>
+      <Card rootLevelHeader>
         <SectionHeading detail="This creates a local package record and report text. Use your certifier's instructions for formal submission." title="Create package" />
         <SelectField label="Package type" onChange={(value) => setPackageType(value as OrganicReportPackageType)} options={ORGANIC_REPORT_PACKAGE_TYPES.map((type) => ({ label: ORGANIC_REPORT_PACKAGE_TYPE_LABELS[type], value: type }))} value={packageType} />
         <FormField label="Package title" onChangeText={setTitle} value={title} />
@@ -125,8 +125,8 @@ export function OrganicReportPackagesScreen({
         {error ? <Text style={styles.error}>{error}</Text> : null}
         <Button label="Create organic report package" onPress={handleCreatePackage} size="large" />
       </Card>
-      <Card>
-        <SectionHeading title="Saved packages" />
+      <Card rootLevelHeader>
+        <SectionHeading detail="Review report packages generated and saved on this device." title="Saved packages" />
         {packages.length === 0 ? (
           <Text style={styles.detail}>No report packages yet.</Text>
         ) : (

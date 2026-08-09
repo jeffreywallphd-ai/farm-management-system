@@ -28,6 +28,7 @@ Helps agents handle product scope, farmer workflows, farm terminology, tracked i
 
 - First-slice scope is a narrow standalone mobile pilot.
 - The implemented Mobile Pilot 1 manual foundation includes `HarvestRecorded`, `MaterialUseRecorded`, and `InventoryCountRecorded`.
+- Inventory Management is the local farmer-facing home for farm inputs/materials, equipment, category/common-item catalog selection, farmer-entered source and amount-on-hand context, and private purchase-oriented farm-note entry points inside add-item forms. Materials still use tracked-material references for manual records; equipment is currently catalog/reference data only.
 - ADR-0012 accepts voice/photo-first farm-event capture as the next farmer-shareable pilot differentiator.
 - Phase 1 implements only the setup/reference data needed before those records: one local farm, farmer-facing farm places, crops, and materials. Separate countable-item setup has been retired; count observations now target crops or materials.
 - Farm places are the Mobile Pilot 1 UI/domain term for local place references. They have a type and optional parent relationship, but do not imply GIS, maps, dimensions, planning, or spatial modeling.
@@ -38,6 +39,8 @@ Helps agents handle product scope, farmer workflows, farm terminology, tracked i
 - Use farmer-understandable terms from the glossary.
 - Operational records represent confirmed activities or observations.
 - Inventory observations preserve discrepancy/history meaning.
+- Material usage reports derive from confirmed material-use records and must not silently convert units or imply authoritative stock totals.
+- Material-purchase and equipment-purchase farm notes are private farm-event captures with voice and optional photos. They may be linked to the saved inventory catalog item, but they must not imply purchase orders, accounting records, inventory receipts, reconciled authoritative stock totals, or automatic stock adjustment.
 - Farmer workflows in the pilot are local/device-based.
 - Private supply needs may be captured for discovery if scoped.
 - External need-listing publication is deferred server-connected scope.

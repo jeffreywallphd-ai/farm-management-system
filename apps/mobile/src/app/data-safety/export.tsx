@@ -16,6 +16,7 @@ export default function RecoveryCopyExportRoute() {
           farmMapRepository={database.farmMapRepository}
           farmNoteTranscriptRepository={database.farmNoteTranscriptRepository}
           farmReferenceRepository={database.farmReferenceRepository}
+          inventoryRepository={database.inventoryRepository}
           localRecordRepository={database.localRecordRepository}
           organicCertificationRepository={database.organicCertificationRepository}
           planningRepository={database.planningRepository}

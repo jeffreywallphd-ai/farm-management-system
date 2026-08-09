@@ -92,8 +92,8 @@ export function OrganicPestScreen({ crops, farm, farmEventRepository, farmRefere
       <PageHeader eyebrow="Organic Certification" supportingText="Track pest, weed, disease, prevention, control actions, and mulch removal locally." title="Organic pest/weed/disease" />
       <OrganicDashboardButton />
       <OrganicEvidencePanel category="pest" farm={farm} farmEventRepository={farmEventRepository} repository={repository} />
-      <Card>
-        <SectionHeading title="Observation" />
+      <Card rootLevelHeader>
+        <SectionHeading detail="Record pest, weed, or disease observations that support prevention and action decisions." title="Observation" />
         <OrganicFarmEventPrompt category="pest" />
         <SelectField label="Farm place" onChange={setPlaceId} options={placeOptions} value={placeId} />
         <SelectField label="Crop" onChange={setCropId} options={cropOptions} value={cropId} />
@@ -103,8 +103,8 @@ export function OrganicPestScreen({ crops, farm, farmEventRepository, farmRefere
         {error ? <Text style={styles.error}>{error}</Text> : null}
         <Button label="Save observation" onPress={saveObservation} size="large" />
       </Card>
-      <Card>
-        <SectionHeading title="Action" />
+      <Card rootLevelHeader>
+        <SectionHeading detail="Record prevention, mechanical, biological, or allowed-input actions for review." title="Action" />
         <OrganicFarmEventPrompt category="pest" />
         <SelectField label="Observation" onChange={setObservationId} options={observations.map((observation) => ({ label: observation.description, value: observation.id }))} value={observationId} />
         <SelectField label="Action type" onChange={(value) => setActionType(value as PestWeedDiseaseActionType)} options={PEST_WEED_DISEASE_ACTION_TYPES.map((item) => ({ label: PEST_WEED_DISEASE_ACTION_TYPE_LABELS[item], value: item }))} value={actionType} />
@@ -112,15 +112,15 @@ export function OrganicPestScreen({ crops, farm, farmEventRepository, farmRefere
         <FormField label="Why needed" multiline onChangeText={setWhyNeeded} placeholder="Required when escalating beyond prevention" value={whyNeeded} />
         <Button label="Save action" onPress={saveAction} size="large" variant="secondary" />
       </Card>
-      <Card>
-        <SectionHeading title="Plastic mulch" />
+      <Card rootLevelHeader>
+        <SectionHeading detail="Track plastic mulch use and removal notes for organic recordkeeping." title="Plastic mulch" />
         <OrganicFarmEventPrompt category="pest" />
         <FormField label="Material" onChangeText={setMulchMaterial} placeholder="Plastic mulch" value={mulchMaterial} />
         <DateField label="Removed date" onChangeText={setMulchRemovedDate} placeholder="YYYY-MM-DD" value={mulchRemovedDate} />
         <Button label="Record mulch removal" onPress={saveMulch} size="large" variant="secondary" />
       </Card>
-      <Card>
-        <SectionHeading title="Organic pest reports" />
+      <Card rootLevelHeader>
+        <SectionHeading detail="Create local reports for observations, actions, and mulch records." title="Organic pest reports" />
         <View style={styles.buttons}>
           <Button label="Pest Report" onPress={() => createReport("pest")} size="large" variant="secondary" />
           <Button label="Weed Report" onPress={() => createReport("weed")} size="large" variant="secondary" />

@@ -20,11 +20,12 @@ Before a farmer relies on Mobile Pilot 1 for meaningful records:
 2. The app must provide a practical user-controlled export or backup mechanism for:
    - Local farm setup needed to interpret records.
    - Farm places used by included records, including place type and parent relationships needed to interpret nested paths.
-   - Tracked crops, materials, and countable items used by included records, including the crop reference data needed to interpret `HarvestRecorded` records by stable crop ID.
+   - Tracked crops and materials used by included records, including the crop reference data needed to interpret `HarvestRecorded` records by stable crop ID.
+   - Inventory catalog details for farm inputs/materials and equipment, including category/common-item keys, acquisition/source type, amount-on-hand context, organic evidence fields, and linked purchase-note IDs when present.
    - `HarvestRecorded`.
    - `MaterialUseRecorded`.
    - `InventoryCountRecorded`.
-   - Farm-event capture metadata, voice memo files, photo files, and transcript drafts when present.
+   - Farm-event capture metadata, voice memo files, photo files, and transcript drafts when present, including inventory purchase notes and their material, receipt, label, equipment, or storage-place photos.
    - Local planning goals, tasks, boards, links, starter farm-work pack activation state, and starter-pack subgoal/task activation state when present.
    - Essential identifiers, timestamps, quantities, units, location/item relationships, and privacy classification needed to understand the records.
 3. The app must clearly communicate:
@@ -42,7 +43,7 @@ Phase 3 implements a one-way versioned JSON recovery copy for the complete manua
 
 Farm-place hierarchy in the recovery copy is data-safety context only. It helps interpret records such as `Field 1 > Bed 1 > Row 1` after export, but it does not imply restore/import, mapping, GIS, server backup, or cloud backup behavior.
 
-The app now has event metadata and local attachment-reference storage foundation for the ADR-0012 capture-first pilot, plus a user-controlled ZIP media recovery package that includes event metadata with retained audio and photo files. Photo attachments are copied into app-owned local storage before save; older or externally removed files may appear as unavailable on device review without deleting the farm note. ADR-0013 transcript drafts are generated locally after the on-device model is installed and are included in that package when present, clearly as generated local draft text. If transcription fails, the UI reports a safe local cause category when possible, such as missing audio, model-open failure, unsupported audio format, or native-module unavailability. The package remains user-controlled and does not upload, synchronize, or share captured media automatically. Restore/import remains unimplemented.
+The app now has event metadata and local attachment-reference storage foundation for the ADR-0012 capture-first pilot, plus a user-controlled ZIP media recovery package that includes event metadata with retained audio and photo files. Inventory purchase notes use the same private farm-note package path when farmers record material or equipment purchases with photos of the item, receipt, label, or storage place. Photo attachments are copied into app-owned local storage before save; older or externally removed files may appear as unavailable on device review without deleting the farm note. ADR-0013 transcript drafts are generated locally after the on-device model is installed and are included in that package when present, clearly as generated local draft text. If transcription fails, the UI reports a safe local cause category when possible, such as missing audio, model-open failure, unsupported audio format, or native-module unavailability. The package remains user-controlled and does not upload, synchronize, or share captured media automatically. Restore/import remains unimplemented.
 
 ## Scope Boundary
 

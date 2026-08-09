@@ -174,6 +174,7 @@ test("recovery copy export contains farm references and harvest records", async 
   assert.equal(payload.locations[0].name, "North Field");
   assert.equal(payload.locations[0].kind, "field");
   assert.equal(payload.trackedItems[0].name, "Kale");
+  assert.deepEqual(payload.inventoryItems, []);
   assert.equal(payload.harvestRecords[0].kind, "HarvestRecorded");
   assert.deepEqual(payload.materialUseRecords, []);
   assert.deepEqual(payload.inventoryCountRecords, []);

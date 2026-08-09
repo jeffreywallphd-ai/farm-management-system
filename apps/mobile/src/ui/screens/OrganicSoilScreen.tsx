@@ -180,8 +180,8 @@ export function OrganicSoilScreen({
       <OrganicEvidencePanel category="soilFertility" farm={farm} farmEventRepository={farmEventRepository} repository={repository} />
       <OrganicEvidencePanel category="compost" farm={farm} farmEventRepository={farmEventRepository} repository={repository} />
       <OrganicEvidencePanel category="manure" farm={farm} farmEventRepository={farmEventRepository} repository={repository} />
-      <Card>
-        <SectionHeading title="Soil fertility practice" />
+      <Card rootLevelHeader>
+        <SectionHeading detail="Record soil-building practices and evidence notes for certifier review." title="Soil fertility practice" />
         <OrganicFarmEventPrompt category="soilFertility" />
         <SelectField label="Farm place" onChange={setPlaceId} options={placeOptions} value={placeId} />
         <SelectField label="Crop" onChange={setCropId} options={cropOptions} value={cropId} />
@@ -192,8 +192,8 @@ export function OrganicSoilScreen({
         {error ? <Text style={styles.error}>{error}</Text> : null}
         <Button label="Save soil practice" onPress={savePractice} size="large" />
       </Card>
-      <Card>
-        <SectionHeading title="Compost batch" />
+      <Card rootLevelHeader>
+        <SectionHeading detail="Track compost batch details, method, and supporting records." title="Compost batch" />
         <OrganicFarmEventPrompt category="compost" />
         <FormField label="Batch name" onChangeText={setBatchName} placeholder="Spring compost pile" value={batchName} />
         <FormField label="Ingredients" multiline onChangeText={setBatchIngredients} placeholder="Crop residue, leaves, manure" value={batchIngredients} />
@@ -204,16 +204,16 @@ export function OrganicSoilScreen({
         <SelectField label="Turned?" onChange={setTurned} options={[{ label: "No", value: "false" }, { label: "Yes", value: "true" }]} value={turned} />
         <Button label="Record compost temperature" onPress={saveTemperatureLog} size="large" variant="secondary" />
       </Card>
-      <Card>
-        <SectionHeading title="Manure interval" />
+      <Card rootLevelHeader>
+        <SectionHeading detail="Plan and review raw-manure application intervals before harvest." title="Manure interval" />
         <OrganicFarmEventPrompt category="manure" />
         <DateField label="Application date" onChangeText={setManureDate} placeholder="YYYY-MM-DD or blank for now" value={manureDate} />
         <FormField label="Manure type" onChangeText={setManureType} placeholder="Optional" value={manureType} />
         <SelectField label="Edible portion contacts soil?" onChange={setManureContactSoil} options={[{ label: "No, 90-day interval", value: "false" }, { label: "Yes, 120-day interval", value: "true" }]} value={manureContactSoil} />
         <Button label="Record manure application" onPress={saveManure} size="large" variant="secondary" />
       </Card>
-      <Card>
-        <SectionHeading title="Crop rotation" />
+      <Card rootLevelHeader>
+        <SectionHeading detail="Record rotation notes that show how crop families move across places." title="Crop rotation" />
         <OrganicFarmEventPrompt category="soilFertility" />
         <FormField label="Year" keyboardType="decimal-pad" onChangeText={setRotationYear} value={rotationYear} />
         <FormField label="Season" onChangeText={setRotationSeason} placeholder="Spring, summer, fall" value={rotationSeason} />
@@ -221,8 +221,8 @@ export function OrganicSoilScreen({
         <SelectField label="Cover crop used?" onChange={setCoverCropUsed} options={[{ label: "No", value: "false" }, { label: "Yes", value: "true" }]} value={coverCropUsed} />
         <Button label="Record rotation" onPress={saveRotation} size="large" variant="secondary" />
       </Card>
-      <Card>
-        <SectionHeading title="Organic soil reports" />
+      <Card rootLevelHeader>
+        <SectionHeading detail="Create local reports for fertility, compost, manure, and rotation records." title="Organic soil reports" />
         <View style={styles.buttons}>
           <Button label="Soil Fertility Report" onPress={() => createReport("soilFertility")} size="large" variant="secondary" />
           <Button label="Compost Production Log" onPress={() => createReport("compost")} size="large" variant="secondary" />

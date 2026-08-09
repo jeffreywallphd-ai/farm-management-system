@@ -258,8 +258,8 @@ export function FarmEventDetailScreen({
         </Card>
       ) : (
         <>
-          <Card>
-            <SectionHeading title="Details" />
+          <Card rootLevelHeader>
+            <SectionHeading detail="Review the saved farm note context and local status." title="Details" />
             <DetailRow label="Type" value={FARM_EVENT_TYPE_LABELS[event.event.eventType]} />
             <DetailRow label="Farm place" value={placePath ?? "No place"} />
             <DetailRow label="Captured" value={formatRecordDate(event.event.capturedAt)} />
@@ -269,7 +269,7 @@ export function FarmEventDetailScreen({
               <DetailRow label="Organic review" value="Marked for review" />
             ) : null}
           </Card>
-          <Card>
+          <Card rootLevelHeader>
             <SectionHeading
               detail="Link this saved note to organic categories or records. The audio and photos stay with the farm note."
               title="Organic evidence"
@@ -335,7 +335,7 @@ export function FarmEventDetailScreen({
             {evidenceError ? <Text style={styles.error}>{evidenceError}</Text> : null}
             <Button label="Link note as organic evidence" onPress={handleSaveEvidenceLink} size="large" variant="secondary" />
           </Card>
-          <Card>
+          <Card rootLevelHeader>
             <SectionHeading
               detail="Create follow-up work from this note without turning the note itself into a completed record."
               title="Planning follow-up"
@@ -346,7 +346,7 @@ export function FarmEventDetailScreen({
             {taskError ? <Text style={styles.error}>{taskError}</Text> : null}
             <Button label="Create linked planning task" onPress={handleCreateTaskFromNote} size="large" variant="secondary" />
           </Card>
-          <Card>
+          <Card rootLevelHeader>
             <SectionHeading detail="Playback stays on this device." title="Voice memo" />
             {voiceMemo ? (
               <>
@@ -365,7 +365,7 @@ export function FarmEventDetailScreen({
             )}
           </Card>
           {voiceMemo ? (
-            <Card>
+            <Card rootLevelHeader>
               <SectionHeading
                 detail="Download once, then use offline. Audio is not uploaded."
                 title="Local transcription model"
@@ -379,7 +379,7 @@ export function FarmEventDetailScreen({
               />
             </Card>
           ) : null}
-          <Card>
+          <Card rootLevelHeader>
             <SectionHeading
               detail="Generated on this device from the saved voice memo. Check the audio if accuracy matters."
               title="Transcript draft"
@@ -396,7 +396,7 @@ export function FarmEventDetailScreen({
               </Text>
             )}
           </Card>
-          <Card>
+          <Card rootLevelHeader>
             <SectionHeading
               detail="Photos are local attachments for review. If a saved file is missing, this screen shows which photo is unavailable."
               title={photos.length === 0 ? "Photos" : photos.length === 1 ? "1 photo" : `${photos.length} photos`}

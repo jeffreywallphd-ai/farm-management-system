@@ -227,7 +227,7 @@ export function OrganicInputsScreen({
       <OrganicDashboardButton />
       <OrganicEvidencePanel category="inputApprovals" farm={farm} farmEventRepository={farmEventRepository} repository={repository} />
       <OrganicEvidencePanel category="inputApplications" farm={farm} farmEventRepository={farmEventRepository} repository={repository} />
-      <Card>
+      <Card rootLevelHeader>
         <SectionHeading detail="Approval status is farmer-entered. Confirm input acceptability with your certifier." title="Organic input details" />
         <OrganicFarmEventPrompt category="inputApprovals" />
         {inputs.map((input) => (
@@ -310,7 +310,7 @@ export function OrganicInputsScreen({
         ) : null}
         {error ? <Text style={styles.error}>{error}</Text> : null}
       </Card>
-      <Card>
+      <Card rootLevelHeader>
         <SectionHeading detail="Use this for organic input applications that need place, crop, amount, reason, and evidence context." title="Input application" />
         <OrganicFarmEventPrompt category="inputApplications" />
         {inputs.length === 0 ? (
@@ -333,8 +333,8 @@ export function OrganicInputsScreen({
           </>
         )}
       </Card>
-      <Card>
-        <SectionHeading title="Organic input reports" />
+      <Card rootLevelHeader>
+        <SectionHeading detail="Create local reports for input approvals and applications saved on this device." title="Organic input reports" />
         <View style={styles.buttonStack}>
           <Button label="Input List for OSP" onPress={() => handleCreateReport("inputList")} size="large" variant="secondary" />
           <Button label="Input Application Log" onPress={() => handleCreateReport("applicationLog")} size="large" variant="secondary" />

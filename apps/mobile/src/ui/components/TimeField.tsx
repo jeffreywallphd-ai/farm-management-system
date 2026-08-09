@@ -5,6 +5,7 @@ import { theme } from "../theme/theme";
 import { Button } from "./Button";
 import { PickerIconButton } from "./PickerIconButton";
 import { SelectField } from "./SelectField";
+import { useUiDensity } from "../theme/UiDensity";
 import {
   defaultTimeParts,
   formatTimeDisplay,
@@ -28,6 +29,7 @@ export function TimeField({
   onChangeText: (value: string) => void;
   error?: string;
 }) {
+  const density = useUiDensity();
   const [isPickerOpen, setIsPickerOpen] = useState(false);
   const [draftParts, setDraftParts] = useState<TimePickerParts>(() => parseTimeInput(value) ?? defaultTimeParts());
 
@@ -46,18 +48,28 @@ export function TimeField({
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { gap: density.fieldGap }]}>
       <Text style={styles.label}>{label}</Text>
-      <View style={styles.inputRow}>
-        <View style={[styles.displayField, error ? styles.inputError : null]}>
-          <Text style={styles.displayText}>{formatTimeDisplay(value)}</Text>
+      <View style={[styles.inputRow, { gap: density.fieldGap }]}>
+        <View
+          style={[
+            styles.displayField,
+            {
+              minHeight: density.inputMinHeight,
+              paddingHorizontal: density.inputPaddingHorizontal,
+              paddingVertical: density.inputPaddingVertical,
+            },
+            error ? styles.inputError : null,
+          ]}
+        >
+          <Text style={[styles.displayText, density.isUngloved ? styles.compactDisplayText : null]}>{formatTimeDisplay(value)}</Text>
         </View>
         <PickerIconButton accessibilityLabel={`Pick ${label}`} icon="clock" onPress={openPicker} />
       </View>
       {error ? <Text style={styles.error}>{error}</Text> : null}
       <Modal animationType="fade" onRequestClose={() => setIsPickerOpen(false)} transparent visible={isPickerOpen}>
         <View style={styles.modalBackdrop}>
-          <View style={styles.modalCard}>
+          <View style={[styles.modalCard, { gap: density.contentGap, padding: density.isUngloved ? theme.spacing.md : theme.spacing.lg }]}>
             <Text style={styles.modalTitle}>{label}</Text>
             <View style={styles.pickerGrid}>
               <SelectField
@@ -92,7 +104,6 @@ export function TimeField({
 
 const styles = StyleSheet.create({
   container: {
-    gap: theme.spacing.sm,
   },
   label: {
     color: theme.colors.primary,
@@ -102,7 +113,6 @@ const styles = StyleSheet.create({
   inputRow: {
     alignItems: "center",
     flexDirection: "row",
-    gap: theme.spacing.sm,
   },
   displayField: {
     backgroundColor: theme.colors.surface,
@@ -111,14 +121,15 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     flex: 1,
     justifyContent: "center",
-    minHeight: theme.spacing.touchTarget,
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.md,
   },
   displayText: {
     color: theme.colors.textPrimary,
     fontSize: theme.typography.body,
     fontWeight: "700",
+  },
+  compactDisplayText: {
+    fontSize: theme.typography.caption,
+    lineHeight: 16,
   },
   inputError: {
     borderColor: theme.colors.error,
@@ -139,8 +150,6 @@ const styles = StyleSheet.create({
     borderColor: theme.colors.border,
     borderRadius: theme.radius.lg,
     borderWidth: 1,
-    gap: theme.spacing.md,
-    padding: theme.spacing.lg,
   },
   modalTitle: {
     color: theme.colors.textPrimary,

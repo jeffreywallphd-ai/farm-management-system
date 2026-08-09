@@ -80,13 +80,13 @@ export function RecordMaterialUseScreen({
     <Screen>
       <PageHeader eyebrow="Material use" supportingText="Record material use without reception." title="Record material use" />
       {materials.length === 0 ? (
-        <Card>
-          <SectionHeading title="Finish setup first" />
-          <EmptyState text="Add a material before recording use." />
-          <Button label="Back to farm setup" onPress={() => replaceRoute(router, "/setup")} variant="secondary" />
+        <Card rootLevelHeader>
+          <SectionHeading detail="Add at least one farm input before recording material use." title="Add an input first" />
+          <EmptyState text="Add a farm input or material in Inventory Management before recording use." />
+          <Button label="Open inventory" onPress={() => replaceRoute(router, "/inventory")} variant="secondary" />
         </Card>
       ) : (
-        <Card>
+        <Card rootLevelHeader>
           <SectionHeading detail="Saved material-use records stay private on this device." title="Use details" />
           <SelectField error={errors.materialId} label="Material" onChange={setMaterialId} options={materials.map((material) => ({ label: material.name, value: material.id }))} value={materialId} />
           <FormField error={errors.quantityText} keyboardType="decimal-pad" label="Amount" onChangeText={setQuantityText} placeholder="2" value={quantityText} />

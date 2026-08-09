@@ -1,4 +1,4 @@
-declare module "whisper.rn" {
+declare module "whisper.rn/index" {
   export function initWhisper(input: { filePath: string }): Promise<{
     transcribe: (
       audioPath: string,

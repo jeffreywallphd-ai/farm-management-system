@@ -106,14 +106,14 @@ export function RecordHarvestScreen({
         title="Record harvest"
       />
       {missingReferences ? (
-        <Card>
-          <SectionHeading title="Finish setup first" />
+        <Card rootLevelHeader>
+          <SectionHeading detail="Add at least one crop and farm place before recording a harvest." title="Finish setup first" />
           {crops.length === 0 ? <EmptyState text="Add a crop before recording a harvest." /> : null}
           {locations.length === 0 ? <EmptyState text="Add a farm place before recording a harvest." /> : null}
           <Button label="Back to farm setup" onPress={() => replaceRoute(router, "/setup")} variant="secondary" />
         </Card>
       ) : (
-        <Card>
+        <Card rootLevelHeader>
           <SectionHeading detail="Saved harvests stay private on this device." title="Harvest details" />
           <SelectField
             error={errors.cropId}

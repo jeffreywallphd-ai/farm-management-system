@@ -1,7 +1,7 @@
 # Persistence and Attachment Storage
 
 - Status: proposed
-- Last reviewed: 2026-05-28
+- Last reviewed: 2026-06-04
 - Canonical for: architecture-level persistence responsibilities, attachment lifecycle principles, storage boundaries, and export/data ownership implications
 - Related ADRs: [ADR-0002](../adr/ADR-0002-history-preserving-idempotent-synchronization.md), [ADR-0004](../adr/ADR-0004-private-by-default-intentional-sharing.md), [ADR-0005](../adr/ADR-0005-data-portability-and-recoverability.md), [ADR-0007](../adr/ADR-0007-standalone-mobile-pilot-before-server-connected-features.md), [ADR-0009](../adr/ADR-0009-mobile-pilot-1-local-persistence.md), [ADR-0010](../adr/ADR-0010-mobile-pilot-1-export-and-recovery-copy.md), [ADR-0011](../adr/ADR-0011-mobile-pilot-1-runtime-boundary-validation.md), [ADR-0012](../adr/ADR-0012-voice-photo-first-farm-event-capture-pilot.md), [ADR-0013](../adr/ADR-0013-on-device-farm-note-transcription-with-whisper-rn.md)
 - Related docs: [System Overview](system-overview.md), [Offline-First Mobile Architecture](offline-first-mobile-architecture.md), [Synchronization Architecture](synchronization-architecture.md), [AI-Assisted Capture Boundaries](ai-assisted-capture-boundaries.md), [Identity, Privacy, and Sharing](identity-privacy-and-sharing.md), [Server and Deployment Operating Model](server-and-deployment-operating-model.md), [Mobile Pilot Data-Safety Requirements](../operations/mobile-pilot-data-safety-requirements.md), [Backup, Restore, and Data Export Requirements](../operations/backup-restore-and-data-export-requirements.md), [Mobile Pilot 1 Operational Records](../domain/mobile-pilot-1-operational-records.md), [Operational Event Catalog](../domain/operational-event-catalog.md), [Sourcing and Local Network Model](../domain/sourcing-and-local-network-model.md)
@@ -24,7 +24,7 @@ Local and server environments may eventually have different storage implementati
 
 | Data category | Examples | Durability need | Initial sharing posture |
 | --- | --- | --- | --- |
-| Mobile Pilot 1 setup/reference information | farm context, farm places with type and optional parent relationship, crops, materials, countable items needed for included records | Locally available enough for supported offline work; included in export/backup | Private/device-local |
+| Mobile Pilot 1 setup/reference information | farm context, farm places with type and optional parent relationship, crops, materials, inventory catalog details, and equipment entries needed for included records | Locally available enough for supported offline work; included in export/backup | Private/device-local |
 | Mobile Pilot 1 confirmed operational records | harvest, material use, inventory count | Durable locally in the pilot; included in export/backup | Private by default |
 | Local activity history | recent included records and their basic correction/status meaning | Durable enough for pilot review and export/backup | Private/device-local |
 | Export/recovery-copy data | user-controlled copy of pilot data | Complete enough to understand Mobile Pilot 1 records | Private/sensitive |
@@ -46,6 +46,10 @@ Local and server environments may eventually have different storage implementati
 Phase 1 implements the first SQLite-backed local tables for Mobile Pilot 1 setup/reference information: farms, farm places, and tracked items. Farm places are stored through the existing local location concept with a farmer-facing type and optional parent relationship.
 
 Phase 3 adds SQLite-backed local persistence for `HarvestRecorded`, `MaterialUseRecorded`, and `InventoryCountRecorded`, plus unified local activity history and a one-way versioned JSON recovery-copy export for farm setup/reference data and all implemented manual records. The recovery copy includes farm-place type and parent fields so nested place references can be interpreted later.
+
+Inventory Management adds local SQLite storage for inventory catalog details around tracked materials and equipment. Material catalog entries link back to tracked-material records so existing material-use and inventory-count records retain their references. Catalog rows may store selected category/common-item keys, acquisition/source type, farmer-entered amount on hand and unit, storage place, supplier/source, and organic-support fields. Equipment entries are local catalog/reference records only; equipment-use, cleaning, movement, and maintenance operational records remain deferred until separately scoped. Inventory catalog rows are included in the versioned JSON recovery copy.
+
+Inventory purchase notes reuse the ADR-0012 farm-event capture storage path. Material-purchase and equipment-purchase note types are local farm-event metadata with voice and optional photo attachments. Inventory catalog items can store the linked farm-event ID for the purchase note associated while the item is added. Purchase photos should be copied into app-owned attachment storage before save, just like other farm-note photos, so photos of materials, receipts, labels, and storage places are not left only in picker or camera cache.
 
 ADR-0012 adds local farm-event capture metadata and private audio/photo attachment references. The app now includes the first SQLite schema and repository boundary for event metadata and local attachment references, plus local voice memo recording, retained-file copy, playback, optional photo picking/capture, photo preview, durable retained-photo copy from picker/camera cache into app-owned storage before save, previous-note photo review with an unavailable-file state, and a user-controlled ZIP recovery package containing metadata plus retained audio/photo files.
 

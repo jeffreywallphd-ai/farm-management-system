@@ -2,6 +2,8 @@ import { useMemo, useState } from "react";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 
 import { getSelectDropdownHint, type SelectSelectionMode } from "./SelectFieldModel";
+import { ThemedIcon } from "./ThemedIcon";
+import { useUiDensity } from "../theme/UiDensity";
 import { theme } from "../theme/theme";
 
 export interface SearchableSelectOption {
@@ -29,7 +31,13 @@ export function SearchableSelectField({
 }) {
   const [query, setQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
+  const density = useUiDensity();
   const selectedOption = options.find((option) => option.value === value);
+  const selectTextStyle = {
+    fontSize: density.isUngloved ? theme.typography.small : theme.typography.body,
+    fontWeight: density.isUngloved ? "500" : "700",
+    lineHeight: density.isUngloved ? 18 : 20,
+  } as const;
   const filteredOptions = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
     if (!normalizedQuery) {
@@ -43,11 +51,27 @@ export function SearchableSelectField({
   }, [options, query]);
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { gap: density.fieldGap }]}>
       <Text style={styles.label}>{label}</Text>
-      <Pressable accessibilityRole="button" onPress={() => setIsOpen((current) => !current)} style={styles.dropdownButton}>
-        <Text style={styles.dropdownText}>{selectedOption?.label ?? "Choose an option"}</Text>
-        <Text style={styles.dropdownHint}>{getSelectDropdownHint(isOpen, selectionMode)}</Text>
+      <Pressable
+        accessibilityRole="button"
+        onPress={() => setIsOpen((current) => !current)}
+        style={[
+          styles.dropdownButton,
+          {
+            minHeight: density.inputMinHeight,
+            paddingHorizontal: density.inputPaddingHorizontal,
+            paddingVertical: density.inputPaddingVertical,
+          },
+        ]}
+      >
+        <View style={styles.dropdownButtonContent}>
+          <View style={styles.dropdownTextGroup}>
+            <Text style={[styles.dropdownText, selectTextStyle]}>{selectedOption?.label ?? "Choose an option"}</Text>
+            {density.selectHintVisible ? <Text style={styles.dropdownHint}>{getSelectDropdownHint(isOpen, selectionMode)}</Text> : null}
+          </View>
+          <ThemedIcon color={theme.colors.primary} name="arrowDown" size={density.isUngloved ? 18 : 22} />
+        </View>
       </Pressable>
       {isOpen ? (
         <>
@@ -56,10 +80,18 @@ export function SearchableSelectField({
             onChangeText={setQuery}
             placeholder={placeholder}
             placeholderTextColor={theme.colors.textSecondary}
-            style={styles.input}
+            style={[
+              styles.input,
+              density.isUngloved ? styles.compactInput : null,
+              {
+                minHeight: density.inputMinHeight,
+                paddingHorizontal: density.inputPaddingHorizontal,
+                paddingVertical: density.inputPaddingVertical,
+              },
+            ]}
             value={query}
           />
-          <View style={styles.options}>
+          <View style={[styles.options, density.isUngloved ? styles.compactOptionsPanel : { gap: density.fieldGap }]}>
             {filteredOptions.length ? (
               filteredOptions.map((option) => {
                 const isSelected = option.value === value;
@@ -72,9 +104,17 @@ export function SearchableSelectField({
                       onChange(option.value);
                       setIsOpen(false);
                     }}
-                    style={[styles.option, isSelected ? styles.selectedOption : null]}
+                    style={[
+                      styles.option,
+                      {
+                        minHeight: density.optionMinHeight,
+                        padding: density.optionPadding,
+                      },
+                      density.isUngloved ? styles.compactOption : null,
+                      isSelected ? styles.selectedOption : null,
+                    ]}
                   >
-                    <Text style={[styles.optionText, isSelected ? styles.selectedOptionText : null]}>
+                    <Text style={[styles.optionText, selectTextStyle, isSelected ? styles.selectedOptionText : null]}>
                       {option.label}
                     </Text>
                     {option.detail ? (
@@ -98,7 +138,6 @@ export function SearchableSelectField({
 
 const styles = StyleSheet.create({
   container: {
-    gap: theme.spacing.sm,
   },
   emptyText: {
     color: theme.colors.textSecondary,
@@ -109,11 +148,13 @@ const styles = StyleSheet.create({
     borderColor: theme.colors.dropdownBorder,
     borderRadius: theme.radius.lg,
     borderWidth: 1,
-    gap: theme.spacing.xs,
     justifyContent: "center",
-    minHeight: theme.spacing.primaryTouchTarget,
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.md,
+  },
+  dropdownButtonContent: {
+    alignItems: "center",
+    flexDirection: "row",
+    gap: theme.spacing.md,
+    justifyContent: "space-between",
   },
   dropdownHint: {
     color: theme.colors.textSecondary,
@@ -122,8 +163,10 @@ const styles = StyleSheet.create({
   },
   dropdownText: {
     color: theme.colors.textPrimary,
-    fontSize: theme.typography.body,
-    fontWeight: "700",
+  },
+  dropdownTextGroup: {
+    flex: 1,
+    gap: theme.spacing.xs,
   },
   error: {
     color: theme.colors.error,
@@ -137,9 +180,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     color: theme.colors.textPrimary,
     fontSize: theme.typography.body,
-    minHeight: theme.spacing.touchTarget,
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.md,
+  },
+  compactInput: {
+    fontSize: theme.typography.caption,
+    lineHeight: 16,
   },
   label: {
     color: theme.colors.primary,
@@ -147,14 +191,12 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
   option: {
-    backgroundColor: theme.colors.dropdownSurface,
-    borderColor: theme.colors.dropdownBorder,
+    backgroundColor: theme.colors.primarySoft,
+    borderColor: theme.colors.secondary,
     borderRadius: theme.radius.sm,
     borderWidth: 1,
     gap: theme.spacing.xs,
     justifyContent: "center",
-    minHeight: theme.spacing.primaryTouchTarget,
-    padding: theme.spacing.md,
   },
   optionDetail: {
     color: theme.colors.textSecondary,
@@ -162,18 +204,27 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   options: {
-    gap: theme.spacing.sm,
+  },
+  compactOptionsPanel: {
+    backgroundColor: theme.colors.primarySoft,
+    borderColor: theme.colors.secondary,
+    borderRadius: theme.radius.sm,
+    borderWidth: 1,
+    overflow: "hidden",
+  },
+  compactOption: {
+    backgroundColor: "transparent",
+    borderRadius: 0,
+    borderWidth: 0,
   },
   optionText: {
     color: theme.colors.textPrimary,
-    fontSize: theme.typography.body,
-    fontWeight: "700",
   },
   selectedOption: {
-    backgroundColor: theme.colors.primarySoft,
-    borderColor: theme.colors.secondary,
+    backgroundColor: theme.colors.primary,
+    borderColor: theme.colors.primaryPressed,
   },
   selectedOptionText: {
-    color: theme.colors.primary,
+    color: theme.colors.onPrimary,
   },
 });

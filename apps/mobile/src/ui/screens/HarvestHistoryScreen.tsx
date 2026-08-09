@@ -47,8 +47,8 @@ export function HarvestHistoryScreen({
         title="Harvest history"
       />
       {params.saved === "1" ? <LocalSaveConfirmation message="Harvest saved on this device" /> : null}
-      <Card>
-        <SectionHeading title="Saved harvests" />
+      <Card rootLevelHeader>
+        <SectionHeading detail="Review local harvest records saved on this device, newest first." title="Saved harvests" />
         {isLoading ? (
           <Text style={styles.muted}>Loading local harvests...</Text>
         ) : records.length === 0 ? (

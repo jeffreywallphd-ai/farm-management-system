@@ -2,6 +2,7 @@ import type { Farm } from "../farm/Farm";
 import type { FarmLocation } from "../farm/FarmLocation";
 import type { Farmhand, FarmhandRecurringSchedule, FarmhandScheduleSettings, FarmhandWeeklyScheduleBlock } from "../farmhand/Farmhand";
 import type { FarmMapSettings, FarmPlaceGeometry } from "../gis/FarmMap";
+import type { InventoryItem } from "../inventory/Inventory";
 import type { TrackedItem } from "../farm/TrackedItem";
 import type { IsoDateTimeString } from "../records/OperationalRecord";
 import type { HarvestRecorded } from "../records/HarvestRecorded";
@@ -36,8 +37,8 @@ import type {
   PlanningTask,
 } from "../planning/Planning";
 
-export const MOBILE_PILOT_RECOVERY_COPY_EXPORT_VERSION = 20;
-export const MOBILE_PILOT_APP_DATA_SCHEMA_VERSION = 24;
+export const MOBILE_PILOT_RECOVERY_COPY_EXPORT_VERSION = 23;
+export const MOBILE_PILOT_APP_DATA_SCHEMA_VERSION = 27;
 
 export interface MobilePilotRecoveryCopy {
   exportVersion: typeof MOBILE_PILOT_RECOVERY_COPY_EXPORT_VERSION;
@@ -52,6 +53,7 @@ export interface MobilePilotRecoveryCopy {
   farmhandRecurringSchedules: FarmhandRecurringSchedule[];
   farmhandWeeklyScheduleBlocks: FarmhandWeeklyScheduleBlock[];
   trackedItems: TrackedItem[];
+  inventoryItems: InventoryItem[];
   harvestRecords: HarvestRecorded[];
   materialUseRecords: MaterialUseRecorded[];
   inventoryCountRecords: InventoryCountRecorded[];

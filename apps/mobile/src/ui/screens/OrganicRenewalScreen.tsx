@@ -65,13 +65,13 @@ export function OrganicRenewalScreen({
         title="Annual renewal"
       />
       <OrganicDashboardButton />
-      <Card>
-        <SectionHeading title="Renewal dates" />
+      <Card rootLevelHeader>
+        <SectionHeading detail="Review the saved annual update date and inspection window." title="Renewal dates" />
         <Text style={styles.body}>Annual update: {profile?.annualUpdateDueDate ?? "Not recorded"}</Text>
         <Text style={styles.body}>Inspection window: {profile?.inspectionDueWindow ?? "Not recorded"}</Text>
       </Card>
-      <Card>
-        <SectionHeading title="Evidence by renewal area" />
+      <Card rootLevelHeader>
+        <SectionHeading detail="Check whether linked evidence exists across renewal preparation areas." title="Evidence by renewal area" />
         {renewalCategories.map((category) => {
           const count = links.filter((view) => view.link.category === category).length;
           return (
@@ -82,8 +82,8 @@ export function OrganicRenewalScreen({
           );
         })}
       </Card>
-      <Card>
-        <SectionHeading title="Recent linked farm notes" />
+      <Card rootLevelHeader>
+        <SectionHeading detail="Review recent farm notes connected to organic certification evidence." title="Recent linked farm notes" />
         {links.length ? (
           links.slice(0, 8).map((view) => (
             <View key={view.link.id} style={styles.row}>

@@ -10,12 +10,13 @@ Do not share the build until every required item below is complete.
 
 - Farm setup works from a fresh install.
 - Farm places can be added and nested.
-- Crops, materials, and countable items can be added.
+- Crops can be added from Farm Setup, and farm inputs/materials plus equipment can be added from Inventory Management.
 - Voice notes can be recorded offline.
 - Photos can be attached offline.
 - Farm notes appear in the local timeline.
 - Farm-note detail plays audio and displays photos.
 - Manual harvest, material-use, and inventory-count records still work.
+- Material usage reporting opens from Inventory Management.
 - Manual JSON recovery copy can be created.
 - Media recovery ZIP package can be created and inspected.
 - App restart preserves setup, manual records, farm-note metadata, and retained media.
@@ -40,7 +41,7 @@ The app and onboarding materials must state clearly:
 
 ## Known Limitations To Tell Farmers
 
-- Voice notes are not transcribed.
+- Voice-note transcription requires the internal development build and local model; it remains draft text only.
 - Photos are not analyzed.
 - Recovery files must be saved manually.
 - Recovery import/restore is not available yet.

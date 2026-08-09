@@ -14,6 +14,7 @@ import {
 } from "../../domain/export/MobilePilotRecoveryCopy";
 import { serializeRecoveryCopy } from "../../infrastructure/export/JsonRecoveryCopyExporter";
 import { InMemoryFarmReferenceRepository } from "../../testing/fakes/InMemoryFarmReferenceRepository";
+import { InMemoryInventoryRepository } from "../../testing/fakes/InMemoryInventoryRepository";
 import { InMemoryLocalRecordRepository } from "../../testing/fakes/InMemoryLocalRecordRepository";
 
 async function seededManualPilot() {
@@ -32,6 +33,7 @@ async function seededManualPilot() {
     locations: [location],
     trackedItems: [crop, material],
   });
+  const inventoryRepository = new InMemoryInventoryRepository();
   const dependencies = {
     clock: {
       now: () => new Date(`2026-05-29T${String(nextHour++).padStart(2, "0")}:00:00.000Z`),
@@ -41,7 +43,7 @@ async function seededManualPilot() {
     localRecordRepository,
   };
 
-  return { ...dependencies, farm, location, crop, material };
+  return { ...dependencies, farm, location, crop, material, inventoryRepository };
 }
 
 test("material use creates a private confirmed local record", async () => {
@@ -160,6 +162,7 @@ test("expanded recovery copy includes all implemented manual records", async () 
   assert.equal(payload.harvestRecords.length, 1);
   assert.equal(payload.materialUseRecords.length, 1);
   assert.equal(payload.inventoryCountRecords.length, 1);
+  assert.deepEqual(payload.inventoryItems, []);
   assert.equal(payload.locations[0].kind, "field");
   assert.deepEqual(payload.farmWorkPackItemStates, []);
   assert.equal(payload.syncState, undefined);
@@ -183,6 +186,7 @@ test("expanded recovery copy rejects malformed manual record payloads", async ()
       farmhandRecurringSchedules: [],
       farmhandWeeklyScheduleBlocks: [],
       trackedItems: [deps.crop, deps.material],
+      inventoryItems: [],
       harvestRecords: [],
       organicCertificationScopes: [],
       organicPlaceProfiles: [],

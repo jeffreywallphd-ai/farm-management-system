@@ -103,7 +103,7 @@ export function OrganicAdvancedScopesScreen({
       <PageHeader eyebrow="Organic Certification" supportingText="Keep specialty-scope readiness notes local for certifier review." title="Organic advanced scopes" />
       <OrganicDashboardButton />
       <OrganicEvidencePanel category="advancedScope" farm={farm} farmEventRepository={farmEventRepository} repository={repository} />
-      <Card>
+      <Card rootLevelHeader>
         <SectionHeading detail="Use this for livestock, wild crops, mushrooms, producer groups, imports, and labeling notes. It does not replace specialty OSP sections or certifier instructions." title="Advanced scope record" />
         <OrganicFarmEventPrompt category="advancedScope" />
         {records.map((record) => (
@@ -152,8 +152,8 @@ export function OrganicAdvancedScopesScreen({
         ) : null}
         {error ? <Text style={styles.error}>{error}</Text> : null}
       </Card>
-      <Card>
-        <SectionHeading title="Advanced scope report" />
+      <Card rootLevelHeader>
+        <SectionHeading detail="Create a local report from specialty-scope readiness notes saved on this device." title="Advanced scope report" />
         <Button label="Create advanced scope report" onPress={handleReport} size="large" variant="secondary" />
         {report ? <Text style={styles.report}>{report}</Text> : null}
       </Card>

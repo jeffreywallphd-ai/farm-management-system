@@ -1,26 +1,43 @@
-import type { ReactNode } from "react";
+import { createContext, useContext, type ReactNode } from "react";
 import { ImageBackground, StyleSheet, View } from "react-native";
 
 import { theme } from "../theme/theme";
+import { useUiDensity } from "../theme/UiDensity";
 
 const cardTexture = require("../../../assets/images/farm-card-texture.png");
+const RootCardHeaderContext = createContext(false);
+
+export function useRootCardHeaderStyle() {
+  return useContext(RootCardHeaderContext);
+}
 
 export function Card({
   children,
+  rootLevelHeader = false,
   variant = "default",
 }: {
   children: ReactNode;
+  rootLevelHeader?: boolean;
   variant?: "default" | "primary" | "tinted" | "warm";
 }) {
+  const density = useUiDensity();
+  const densityStyle = { gap: density.cardGap, padding: density.cardPadding };
+
   if (variant === "primary") {
     return (
-      <ImageBackground imageStyle={styles.primaryTexture} source={cardTexture} style={[styles.card, styles.primaryCard]}>
-        {children}
-      </ImageBackground>
+      <RootCardHeaderContext.Provider value={rootLevelHeader}>
+        <ImageBackground imageStyle={styles.primaryTexture} source={cardTexture} style={[styles.card, densityStyle, styles.primaryCard]}>
+          {children}
+        </ImageBackground>
+      </RootCardHeaderContext.Provider>
     );
   }
 
-  return <View style={[styles.card, variant === "tinted" ? styles.tintedCard : null, variant === "warm" ? styles.warmCard : null]}>{children}</View>;
+  return (
+    <RootCardHeaderContext.Provider value={rootLevelHeader}>
+      <View style={[styles.card, densityStyle, variant === "tinted" ? styles.tintedCard : null, variant === "warm" ? styles.warmCard : null]}>{children}</View>
+    </RootCardHeaderContext.Provider>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -30,8 +47,6 @@ const styles = StyleSheet.create({
     borderRadius: theme.radius.lg,
     borderWidth: 1,
     elevation: 2,
-    gap: theme.spacing.md,
-    padding: theme.spacing.lg,
     shadowColor: "#3A2F1E",
     shadowOffset: { width: 0, height: 5 },
     shadowOpacity: 0.08,

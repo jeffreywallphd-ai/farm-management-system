@@ -5,6 +5,7 @@ import { theme } from "../theme/theme";
 
 export type ThemedIconName =
   | "archive"
+  | "arrowDown"
   | "arrowLeft"
   | "arrowRight"
   | "board"
@@ -131,8 +132,8 @@ function IconShape({
   name: ThemedIconName;
   scale: number;
 }) {
-  if (name === "arrowLeft" || name === "arrowRight") {
-    return <Chevron color={color} direction={name === "arrowRight" ? "right" : "left"} scale={scale} />;
+  if (name === "arrowDown" || name === "arrowLeft" || name === "arrowRight") {
+    return <Chevron color={color} direction={name === "arrowDown" ? "down" : name === "arrowRight" ? "right" : "left"} scale={scale} />;
   }
 
   if (name === "menu") {
@@ -494,7 +495,7 @@ function PlantIcon({
 }
 
 function shouldAddFarmAccent(name: ThemedIconName): boolean {
-  return !["arrowLeft", "arrowRight", "close", "leaf", "menu", "minus", "plus", "setup", "sprout"].includes(name);
+  return !["arrowDown", "arrowLeft", "arrowRight", "close", "leaf", "menu", "minus", "plus", "setup", "sprout"].includes(name);
 }
 
 function FarmAccentLeaf({ accent, scale }: { accent: string; scale: number }) {
@@ -574,7 +575,9 @@ function Triangle({ color, scale }: { color: string; scale: number }) {
   );
 }
 
-function Chevron({ color, direction, scale }: { color: string; direction: "left" | "right"; scale: number }) {
+function Chevron({ color, direction, scale }: { color: string; direction: "down" | "left" | "right"; scale: number }) {
+  const rotation = direction === "down" ? "135deg" : direction === "right" ? "45deg" : "-135deg";
+
   return (
     <View
       style={[
@@ -585,9 +588,9 @@ function Chevron({ color, direction, scale }: { color: string; direction: "left"
           borderRightWidth: 3 * scale,
           borderTopWidth: 3 * scale,
           height: 12 * scale,
-          left: direction === "right" ? 8 * scale : 9 * scale,
+          left: direction === "right" ? 8 * scale : direction === "left" ? 9 * scale : 8 * scale,
           top: 8 * scale,
-          transform: [{ rotate: direction === "right" ? "45deg" : "-135deg" }],
+          transform: [{ rotate: rotation }],
           width: 12 * scale,
         },
       ]}

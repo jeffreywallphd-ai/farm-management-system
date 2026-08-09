@@ -24,6 +24,7 @@ The mobile app now presents record locations as farmer-facing farm places. Farm 
 | Manual harvest | Mobile Pilot 1 included |
 | Manual material use | Mobile Pilot 1 included |
 | Manual inventory count | Mobile Pilot 1 included |
+| Inventory catalog, purchase notes, and material usage report | Mobile Pilot 1 included |
 | Planting/transplanting | Candidate later workflow |
 | Item movement | Candidate later workflow |
 | Equipment issue | Candidate later workflow |
@@ -113,6 +114,16 @@ And the worker does not need to re-enter the harvest because a server was unavai
 - Expected pilot outcome: the observation is saved locally, and discrepancy meaning is preserved where the pilot displays expected versus observed understanding.
 - Implementation note: Phase 3 implements inventory-count observations for crops and materials. A count is saved as its own record and does not overwrite earlier history.
 - Why it matters: an inventory count is evidence of current reality, not a reason to erase prior history.
+
+## Workflow 5A: Manage Farm Inputs and Equipment
+
+- Status: Mobile Pilot 1 included as local setup/reference and reporting support.
+- Actor: owner/operator or manager preparing work records, organic evidence, or purchasing decisions.
+- Physical/work context: farm office, barn, storage area, greenhouse, wash/pack area, or field edge.
+- Problem or trigger: the farmer needs one place to add inputs/materials, note where supplies are stored, keep basic supplier/reorder context, record pre-existing, purchased, donated, or self-produced inventory, record equipment that may matter for organic-contact risk, and preserve purchase context while unloading or storing items.
+- Desired user action: open Inventory Management; start adding a farm input or equipment item; choose a category and common item or `Other`; optionally enter a custom name; enter source type, amount on hand, unit, storage place, and supplier/source; optionally add organic review/evidence notes; record a material-purchase or equipment-purchase farm note from inside that add form; and take photos of the item, label or receipt, and storage place when useful.
+- Expected pilot outcome: catalog details and farmer-entered amount/source context are saved locally, purchase notes and photos are saved as private farm-event captures linked to the saved catalog item, material-use reports summarize confirmed material-use records, and recovery exports include inventory catalog details and farm-note media packages when generated.
+- Constraints: catalog source/amount fields and purchase notes do not create purchase orders, accounting records, inventory receipts, automatic stock adjustments, or reconciled authoritative stock totals. Equipment entries are catalog records, not equipment-use or maintenance records. Organic fields organize evidence for certifier review and do not verify approval or legal compliance.
 
 ## Workflow 6: Record an Equipment Issue
 

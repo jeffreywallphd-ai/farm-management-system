@@ -5,6 +5,7 @@ import { useRouter } from "expo-router";
 import { ThemedIcon } from "./ThemedIcon";
 import { pushRoute } from "../navigation";
 import { menuItems, type MenuRoute } from "../navigationMenu";
+import { useUiDensity } from "../theme/UiDensity";
 import { theme } from "../theme/theme";
 
 const appDisplayName = "Fazendio";
@@ -33,6 +34,7 @@ function HeaderMenuIcon({ isOpen }: { isOpen: boolean }) {
 
 export function AppHeader() {
   const router = useRouter();
+  const density = useUiDensity();
   const [isOpen, setIsOpen] = useState(false);
 
   function handleNavigate(route: MenuRoute) {
@@ -42,12 +44,20 @@ export function AppHeader() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.bar}>
+      <View
+        style={[
+          styles.bar,
+          {
+            minHeight: density.isUngloved ? 62 : theme.spacing.primaryTouchTarget,
+            paddingHorizontal: density.isUngloved ? theme.spacing.md : theme.spacing.lg,
+          },
+        ]}
+      >
         <Pressable
           accessibilityLabel="Go to Home"
           accessibilityRole="button"
           onPress={() => handleNavigate("/home")}
-          style={styles.titleButton}
+          style={[styles.titleButton, { minHeight: density.isUngloved ? 44 : theme.spacing.touchTarget }]}
         >
           <View style={styles.logoLockup}>
             <Image accessible={false} resizeMode="contain" source={logoVineOverlay} style={styles.logoVine} />
@@ -59,23 +69,36 @@ export function AppHeader() {
           accessibilityLabel={isOpen ? "Close menu" : "Open menu"}
           accessibilityRole="button"
           onPress={() => setIsOpen((current) => !current)}
-          style={styles.menuButton}
+          style={[
+            styles.menuButton,
+            {
+              minHeight: density.isUngloved ? 44 : theme.spacing.touchTarget,
+              minWidth: density.isUngloved ? 44 : theme.spacing.touchTarget,
+            },
+          ]}
         >
           <HeaderMenuIcon isOpen={isOpen} />
         </Pressable>
       </View>
       {isOpen ? (
-        <View style={styles.menu}>
+        <View style={[styles.menu, { padding: density.isUngloved ? theme.spacing.xs : theme.spacing.sm }]}>
           {menuItems.map((item) => (
             <Pressable
               accessibilityRole="button"
               key={item.route}
               onPress={() => handleNavigate(item.route)}
-              style={styles.menuItem}
+              style={[
+                styles.menuItem,
+                {
+                  gap: density.isUngloved ? theme.spacing.sm : theme.spacing.md,
+                  minHeight: density.isUngloved ? 48 : theme.spacing.primaryTouchTarget,
+                  paddingHorizontal: density.isUngloved ? theme.spacing.sm : theme.spacing.md,
+                },
+              ]}
             >
-              <ThemedIcon accentColor={theme.colors.secondary} color={theme.colors.primary} name={item.icon} size={24} />
-              <Text style={styles.menuItemText}>{item.label}</Text>
-              <ThemedIcon color={theme.colors.primary} name="arrowRight" size={22} />
+              <ThemedIcon accentColor={theme.colors.secondary} color={theme.colors.primary} name={item.icon} size={density.isUngloved ? 20 : 24} />
+              <Text style={[styles.menuItemText, density.isUngloved ? styles.compactMenuItemText : null]}>{item.label}</Text>
+              <ThemedIcon color={theme.colors.primary} name="arrowRight" size={density.isUngloved ? 18 : 22} />
             </Pressable>
           ))}
         </View>
@@ -95,8 +118,6 @@ const styles = StyleSheet.create({
     elevation: 4,
     flexDirection: "row",
     justifyContent: "space-between",
-    minHeight: theme.spacing.primaryTouchTarget,
-    paddingHorizontal: theme.spacing.lg,
     shadowColor: "#0A1E15",
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.18,
@@ -146,8 +167,6 @@ const styles = StyleSheet.create({
   menuButton: {
     alignItems: "center",
     justifyContent: "center",
-    minHeight: theme.spacing.touchTarget,
-    minWidth: theme.spacing.touchTarget,
   },
   menuIconCloseLineOne: {
     left: 6,
@@ -177,16 +196,18 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: theme.radius.sm,
     flexDirection: "row",
-    gap: theme.spacing.md,
     justifyContent: "space-between",
-    minHeight: theme.spacing.primaryTouchTarget,
-    paddingHorizontal: theme.spacing.md,
   },
   menuItemText: {
     color: theme.colors.textPrimary,
     flex: 1,
     fontSize: theme.typography.body,
     fontWeight: "700",
+  },
+  compactMenuItemText: {
+    fontSize: theme.typography.small,
+    fontWeight: "600",
+    lineHeight: 18,
   },
   title: {
     color: theme.colors.onPrimary,
@@ -197,7 +218,6 @@ const styles = StyleSheet.create({
   },
   titleButton: {
     justifyContent: "center",
-    minHeight: theme.spacing.touchTarget,
     paddingRight: theme.spacing.md,
   },
 });

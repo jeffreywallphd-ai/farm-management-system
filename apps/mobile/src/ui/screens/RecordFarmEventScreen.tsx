@@ -43,6 +43,7 @@ import { Screen } from "../components/Screen";
 import { SearchableSelectField } from "../components/SearchableSelectField";
 import { SelectField } from "../components/SelectField";
 import { SectionHeading } from "../components/SectionHeading";
+import { useUiDensity } from "../theme/UiDensity";
 import { buildFarmPlaceOptions } from "../farmPlaceDisplay";
 import { theme } from "../theme/theme";
 
@@ -66,6 +67,7 @@ interface RecordFarmEventScreenProps {
   farm: Farm;
   farmEventRepository: FarmEventRepository;
   farmReferenceRepository: FarmReferenceRepository;
+  initialEventType?: FarmEventType;
   initialPlanningTaskId?: string;
   initialOrganicCategory?: string;
   locations: FarmLocation[];
@@ -76,6 +78,8 @@ interface RecordFarmEventScreenProps {
 
 interface RecordFarmEventFormProps extends RecordFarmEventScreenProps {
   onSaved?: (eventId: string) => void | Promise<void>;
+  saveButtonLabel?: string;
+  savedMessageText?: string;
   showCertificationRequirementField?: boolean;
   showPlaceField?: boolean;
   showTaskField?: boolean;
@@ -89,7 +93,7 @@ export function RecordFarmEventScreen(props: RecordFarmEventScreenProps) {
         supportingText="Record a quick voice memo while the work is fresh. Add photos when a picture helps."
         title="Quick record farm events"
       />
-      <Card>
+      <Card rootLevelHeader>
         <RecordFarmEventForm {...props} />
       </Card>
     </Screen>
@@ -100,6 +104,7 @@ export function RecordFarmEventForm({
   farm,
   farmEventRepository,
   farmReferenceRepository,
+  initialEventType = "general",
   initialPlanningTaskId,
   initialOrganicCategory,
   locations,
@@ -107,13 +112,16 @@ export function RecordFarmEventForm({
   organicCertificationRepository,
   planningRepository,
   planningTasks,
+  saveButtonLabel = "Save farm event",
+  savedMessageText = "Farm event saved on this device.",
   showCertificationRequirementField = true,
   showPlaceField = true,
   showTaskField = true,
 }: RecordFarmEventFormProps) {
+  const density = useUiDensity();
   const recorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
   const recorderState = useAudioRecorderState(recorder);
-  const [eventType, setEventType] = useState<FarmEventType>("general");
+  const [eventType, setEventType] = useState<FarmEventType>(initialEventType);
   const [placeId, setPlaceId] = useState("");
   const [planningTaskId, setPlanningTaskId] = useState(initialPlanningTaskId ?? "");
   const [organicCategory, setOrganicCategory] = useState<OrganicEvidenceCategory | "">(
@@ -154,6 +162,10 @@ export function RecordFarmEventForm({
   useEffect(() => {
     setPlanningTaskId(initialPlanningTaskId ?? "");
   }, [initialPlanningTaskId]);
+
+  useEffect(() => {
+    setEventType(initialEventType);
+  }, [initialEventType]);
 
   useEffect(() => {
     if (isOrganicEvidenceCategory(initialOrganicCategory)) {
@@ -376,14 +388,14 @@ export function RecordFarmEventForm({
       setPlaceId("");
       setPlanningTaskId("");
       setOrganicCategory("");
-      setEventType("general");
+      setEventType(initialEventType);
       setNeedsOrganicReview(false);
       setSavedMessage(
         taskLinkFailed || organicLinkFailed
           ? "Farm event saved on this device. One selected connection could not be saved."
           : taskLinkSaved || organicLinkSaved
             ? "Farm event saved on this device and connected to your selected context."
-            : "Farm event saved on this device.",
+            : savedMessageText,
       );
       savedEventId = result.event.id;
     } catch (caughtError) {
@@ -477,13 +489,21 @@ export function RecordFarmEventForm({
         <Pressable
           accessibilityRole="button"
           onPress={() => setNeedsOrganicReview((current) => !current)}
-          style={[styles.reviewToggle, needsOrganicReview ? styles.reviewToggleSelected : null]}
+          style={[
+            styles.reviewToggle,
+            {
+              minHeight: density.buttonMinHeight,
+              paddingHorizontal: density.isUngloved ? theme.spacing.sm : theme.spacing.md,
+              paddingVertical: density.isUngloved ? theme.spacing.xs : theme.spacing.sm,
+            },
+            needsOrganicReview ? styles.reviewToggleSelected : null,
+          ]}
         >
-          <Text style={[styles.reviewToggleText, needsOrganicReview ? styles.reviewToggleTextSelected : null]}>
+          <Text style={[styles.reviewToggleText, density.isUngloved ? styles.compactActionText : null, needsOrganicReview ? styles.reviewToggleTextSelected : null]}>
             {needsOrganicReview ? "Marked for organic review" : "Mark for organic review"}
           </Text>
         </Pressable>
-        <SectionHeading detail="Optional photos stay local with this farm event." title="Photos" />
+        <SectionHeading detail={photoHelpTextForEventType(eventType)} rootCardHeader={false} title="Photos" />
         <View style={styles.photoActions}>
           <Button label="Take photo" onPress={handleTakePhoto} variant="secondary" />
           <Button label="Choose photos" onPress={handleChoosePhotos} variant="secondary" />
@@ -509,13 +529,25 @@ export function RecordFarmEventForm({
         {errors.attachments ? <Text style={styles.error}>{errors.attachments}</Text> : null}
         {errors.form ? <Text style={styles.error}>{errors.form}</Text> : null}
         {savedMessage ? <Text style={styles.success}>{savedMessage}</Text> : null}
-        <Button disabled={isSaving || recorderState.isRecording} label={isSaving ? "Saving..." : "Save farm event"} onPress={handleSave} />
+        <Button disabled={isSaving || recorderState.isRecording} label={isSaving ? "Saving..." : saveButtonLabel} onPress={handleSave} />
     </>
   );
 }
 
 function isOrganicEvidenceCategory(value: unknown): value is OrganicEvidenceCategory {
   return typeof value === "string" && ORGANIC_EVIDENCE_CATEGORIES.includes(value as OrganicEvidenceCategory);
+}
+
+function photoHelpTextForEventType(eventType: FarmEventType): string {
+  if (eventType === "materialPurchase") {
+    return "Optional photos stay local. Add photos of the material, label, receipt, and storage place when useful.";
+  }
+
+  if (eventType === "equipmentPurchase") {
+    return "Optional photos stay local. Add photos of the equipment, serial or label details, receipt, and storage place when useful.";
+  }
+
+  return "Optional photos stay local with this farm event.";
 }
 
 function mapZodErrors(error: z.ZodError): FormErrors {
@@ -560,8 +592,6 @@ const styles = StyleSheet.create({
     borderRadius: theme.radius.sm,
     borderWidth: 1,
     justifyContent: "center",
-    minHeight: theme.spacing.primaryTouchTarget,
-    paddingHorizontal: theme.spacing.md,
   },
   reviewToggleSelected: {
     backgroundColor: theme.colors.accent,
@@ -574,6 +604,10 @@ const styles = StyleSheet.create({
   },
   reviewToggleTextSelected: {
     color: theme.colors.onAccent,
+  },
+  compactActionText: {
+    fontSize: theme.typography.small,
+    lineHeight: 18,
   },
   error: {
     color: theme.colors.error,

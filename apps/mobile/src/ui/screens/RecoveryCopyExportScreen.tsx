@@ -9,6 +9,7 @@ import type { FarmhandRepository } from "../../application/ports/FarmhandReposit
 import type { FarmMapRepository } from "../../application/ports/FarmMapRepository";
 import type { FarmNoteTranscriptRepository } from "../../application/ports/FarmNoteTranscriptRepository";
 import type { FarmReferenceRepository } from "../../application/ports/FarmReferenceRepository";
+import type { InventoryRepository } from "../../application/ports/InventoryRepository";
 import type { LocalRecordRepository } from "../../application/ports/LocalRecordRepository";
 import type { OrganicCertificationRepository } from "../../application/ports/OrganicCertificationRepository";
 import type { PlanningRepository } from "../../application/ports/PlanningRepository";
@@ -32,6 +33,7 @@ export function RecoveryCopyExportScreen({
   farmMapRepository,
   farmNoteTranscriptRepository,
   farmReferenceRepository,
+  inventoryRepository,
   localRecordRepository,
   organicCertificationRepository,
   planningRepository,
@@ -43,6 +45,7 @@ export function RecoveryCopyExportScreen({
   farmMapRepository?: FarmMapRepository;
   farmNoteTranscriptRepository: FarmNoteTranscriptRepository;
   farmReferenceRepository: FarmReferenceRepository;
+  inventoryRepository?: InventoryRepository;
   localRecordRepository: LocalRecordRepository;
   organicCertificationRepository?: OrganicCertificationRepository;
   planningRepository?: PlanningRepository;
@@ -60,7 +63,7 @@ export function RecoveryCopyExportScreen({
     try {
       const nextFile = await createMobilePilotRecoveryCopy(
         { farmId: farm.id },
-        { clock: systemClock, exportRepository, farmhandRepository, farmMapRepository, farmReferenceRepository, localRecordRepository, organicCertificationRepository, planningRepository },
+        { clock: systemClock, exportRepository, farmhandRepository, farmMapRepository, farmReferenceRepository, inventoryRepository, localRecordRepository, organicCertificationRepository, planningRepository },
       );
       setFile(nextFile);
     } catch {
@@ -86,6 +89,7 @@ export function RecoveryCopyExportScreen({
           farmMapRepository,
           farmNoteTranscriptRepository,
           farmReferenceRepository,
+          inventoryRepository,
           localRecordRepository,
           planningRepository,
         },
@@ -105,9 +109,9 @@ export function RecoveryCopyExportScreen({
         supportingText="Save or share a copy of data stored on this device."
         title="Create recovery copy"
       />
-      <Card>
+      <Card rootLevelHeader>
         <SectionHeading
-          detail="This includes farm setup, locations, map settings, farm geometry, tracked items, harvests, material use, and inventory counts. Restore/import is not available yet."
+          detail="This includes farm setup, locations, map settings, farm geometry, tracked items, inventory catalog details, harvests, material use, and inventory counts. Restore/import is not available yet."
           title="Manual record JSON"
         />
         <Text style={styles.body}>
@@ -117,7 +121,7 @@ export function RecoveryCopyExportScreen({
         {error ? <Text style={styles.error}>{error}</Text> : null}
         <Button disabled={isExporting} label={isExporting ? "Creating..." : "Create recovery copy"} onPress={handleExport} />
       </Card>
-      <Card>
+      <Card rootLevelHeader>
         <SectionHeading
           detail="This ZIP includes the manual JSON data, map settings, farm geometry, plus saved farm-note metadata, voice memos, photos, and transcript drafts when present. Restore/import is not available yet."
           title="Farm-note media package"

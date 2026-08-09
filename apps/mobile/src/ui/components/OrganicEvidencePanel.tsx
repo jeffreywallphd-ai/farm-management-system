@@ -34,7 +34,7 @@ export function OrganicEvidencePanel({
   }, [category, farm.id, farmEventRepository, repository]);
 
   return (
-    <Card>
+    <Card rootLevelHeader>
       <SectionHeading
         detail="Quick record a voice/photo farm event when this area needs support. Saved events appear here as local evidence links."
         title={`${ORGANIC_EVIDENCE_CATEGORY_LABELS[category]} evidence`}

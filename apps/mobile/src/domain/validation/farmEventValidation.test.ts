@@ -7,6 +7,8 @@ import { farmEventInputSchema, farmEventTypeSchema, MAX_FARM_EVENT_NOTE_LENGTH }
 test("farm event types are constrained to the capture pilot vocabulary", () => {
   assert.equal(farmEventTypeSchema.parse("general"), "general");
   assert.equal(farmEventTypeSchema.parse("harvest"), "harvest");
+  assert.equal(farmEventTypeSchema.parse("materialPurchase"), "materialPurchase");
+  assert.equal(farmEventTypeSchema.parse("equipmentPurchase"), "equipmentPurchase");
   assert.throws(() => farmEventTypeSchema.parse("serverSync"));
 });
 
@@ -63,4 +65,3 @@ test("farm event note length is limited", () => {
     }),
   );
 });
-

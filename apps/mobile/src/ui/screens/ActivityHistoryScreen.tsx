@@ -54,8 +54,8 @@ export function ActivityHistoryScreen({
       {params.saved && savedMessages[params.saved] ? (
         <LocalSaveConfirmation message={savedMessages[params.saved]} />
       ) : null}
-      <Card>
-        <SectionHeading title="Saved activity" />
+      <Card rootLevelHeader>
+        <SectionHeading detail="Review the local records saved on this device, newest first." title="Saved activity" />
         {isLoading ? (
           <Text style={styles.muted}>Loading local activity...</Text>
         ) : records.length === 0 ? (

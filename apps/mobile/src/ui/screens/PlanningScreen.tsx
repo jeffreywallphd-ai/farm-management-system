@@ -65,6 +65,7 @@ import {
   filterPlanningForOrganicCertificationPursuit,
   isOrganicCertificationPursuitActive,
 } from "../organicCertificationPlanningVisibility";
+import { useUiDensity } from "../theme/UiDensity";
 import { theme } from "../theme/theme";
 import { pushRoute } from "../navigation";
 import {
@@ -450,7 +451,7 @@ export function PlanningScreen({
 
       {mode === "createGoal" ? (
         <>
-          <Card>
+          <Card rootLevelHeader>
             <SectionHeading detail="Build one goal tree at a time. The hierarchy below is the preview." title="Goals and subgoals" />
             {focusedRootGoal ? (
               <GoalBlock
@@ -486,7 +487,7 @@ export function PlanningScreen({
               </>
             ) : null}
           </Card>
-          <Card>
+          <Card rootLevelHeader>
             <SectionHeading detail="Tasks here can only attach to this goal and its subgoals." title="Tasks" />
             {focusedRootGoal ? (
               <>
@@ -529,7 +530,7 @@ export function PlanningScreen({
       ) : null}
 
       {mode === "singleTask" ? (
-        <Card>
+        <Card rootLevelHeader>
           <SectionHeading detail="Create work that does not belong to a goal yet." title="Single task" />
           <FormField label="Task title" onChangeText={setTaskTitle} placeholder="Call certifier, repair gate, seed carrots" value={taskTitle} />
           <FormField label="Notes" multiline onChangeText={setTaskNotes} placeholder="What needs doing?" value={taskNotes} />
@@ -569,12 +570,12 @@ export function PlanningScreen({
 
       {mode === "review" ? (
         <>
-          <Card>
+          <Card rootLevelHeader>
             <SectionHeading detail="See planned work by status and record farm events from task cards." title="Work boards" />
             <Button label="Open farm work boards" onPress={() => pushRoute(router, "/planning/boards")} size="large" />
           </Card>
-          <Card>
-            <SectionHeading title="Goals" />
+          <Card rootLevelHeader>
+            <SectionHeading detail="Review highest-level goals and open edits for their goal trees." title="Goals" />
             {rootGoals.length ? rootGoals.map((goal) => {
               const isFocusedGoalTree = focusedRootGoalId === goal.id && Boolean(editingGoalId || editingTaskId);
               const isEditingRootGoal = editingGoalId === goal.id;
@@ -611,8 +612,8 @@ export function PlanningScreen({
               );
             }) : <EmptyState text="No goals yet." />}
           </Card>
-          <Card>
-            <SectionHeading title="Non-goal tasks" />
+          <Card rootLevelHeader>
+            <SectionHeading detail="Review standalone tasks that are not attached to a goal." title="Non-goal tasks" />
             {nonGoalTasks.length ? nonGoalTasks.map((task) => {
               const isEditingThisTask = editingTaskId === task.id;
               return (
@@ -790,7 +791,11 @@ function TaskInstructionMediaFields({
 
   return (
     <View style={styles.mediaBlock}>
-      <SectionHeading detail="Optional voice or photo instructions stay on this device and appear on the task board." title="Task instructions" />
+      <SectionHeading
+        detail="Optional voice or photo instructions stay on this device and appear on the task board."
+        rootCardHeader={false}
+        title="Task instructions"
+      />
       {recorderState.isRecording ? (
         <Button label="Stop recording instructions" onPress={handleStopRecording} size="large" />
       ) : (
@@ -1030,8 +1035,20 @@ function ReviewRow({
   rowRef?: (node: View | null) => void;
   title: string;
 }) {
+  const density = useUiDensity();
+
   return (
-    <View collapsable={false} ref={rowRef} style={styles.reviewRow}>
+    <View
+      collapsable={false}
+      ref={rowRef}
+      style={[
+        styles.reviewRow,
+        {
+          minHeight: density.isUngloved ? density.inputMinHeight : theme.spacing.primaryTouchTarget,
+          padding: density.isUngloved ? theme.spacing.sm : theme.spacing.md,
+        },
+      ]}
+    >
       <Text style={styles.body}>{title}</Text>
       <Text style={styles.detail}>{detail}</Text>
       <Button label={editLabel} onPress={onEdit} size="large" variant="secondary" />
@@ -1207,8 +1224,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     gap: theme.spacing.xs,
     justifyContent: "center",
-    minHeight: theme.spacing.primaryTouchTarget,
-    padding: theme.spacing.md,
   },
   reviewEditScope: {
     gap: theme.spacing.sm,

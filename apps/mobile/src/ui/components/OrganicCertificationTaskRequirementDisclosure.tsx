@@ -7,10 +7,12 @@ import {
   isOrganicCertificationTask,
   type OrganicRequirementReference,
 } from "../screens/OrganicCertificationTaskRequirementModel";
+import { useUiDensity } from "../theme/UiDensity";
 import { theme } from "../theme/theme";
 
 export function OrganicCertificationTaskRequirementDisclosure({ task }: { task: PlanningTask }) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const density = useUiDensity();
 
   if (!isOrganicCertificationTask(task)) {
     return null;
@@ -26,7 +28,7 @@ export function OrganicCertificationTaskRequirementDisclosure({ task }: { task: 
       <Pressable
         accessibilityRole="button"
         onPress={() => setIsExpanded((current) => !current)}
-        style={styles.requirementToggle}
+        style={[styles.requirementToggle, { minHeight: density.isUngloved ? 36 : theme.spacing.touchTarget }]}
       >
         <Text style={styles.requirementIndicator}>{isExpanded ? "Hide" : "Open"}</Text>
       </Pressable>
@@ -39,7 +41,14 @@ export function OrganicCertificationTaskRequirementDisclosure({ task }: { task: 
               accessibilityRole="link"
               key={reference.key}
               onPress={() => confirmOpenRequirement(reference)}
-              style={styles.requirementLink}
+              style={[
+                styles.requirementLink,
+                {
+                  minHeight: density.inputMinHeight,
+                  paddingHorizontal: density.inputPaddingHorizontal,
+                  paddingVertical: density.isUngloved ? theme.spacing.xs : theme.spacing.sm,
+                },
+              ]}
             >
               <Text style={styles.requirementLinkText}>{reference.label}</Text>
             </Pressable>
@@ -100,7 +109,6 @@ const styles = StyleSheet.create({
   requirementToggle: {
     alignItems: "flex-start",
     justifyContent: "center",
-    minHeight: theme.spacing.touchTarget,
   },
   requirementIndicator: {
     color: theme.colors.primary,
@@ -117,9 +125,6 @@ const styles = StyleSheet.create({
     borderRadius: theme.radius.sm,
     borderWidth: 1,
     justifyContent: "center",
-    minHeight: theme.spacing.touchTarget,
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.sm,
   },
   requirementLinkText: {
     color: theme.colors.primary,

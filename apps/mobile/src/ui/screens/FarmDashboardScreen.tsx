@@ -3,7 +3,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import type { Farm } from "../../domain/farm/Farm";
 import type { FarmLocation } from "../../domain/farm/FarmLocation";
-import type { TrackedItem, TrackedItemKind } from "../../domain/farm/TrackedItem";
+import type { TrackedItem } from "../../domain/farm/TrackedItem";
 import {
   FARM_PLACE_GEOMETRY_ROLES,
   type FarmMapSettings,
@@ -60,6 +60,7 @@ import { SelectField } from "../components/SelectField";
 import { useDatePreferences } from "../datePreferences";
 import { buildFarmPlaceOptions } from "../farmPlaceDisplay";
 import { isOrganicCertificationPursuitActive } from "../organicCertificationPlanningVisibility";
+import { useUiDensity } from "../theme/UiDensity";
 import { theme } from "../theme/theme";
 import {
   isStarterPackHierarchyChecked,
@@ -69,7 +70,7 @@ import {
 } from "./FarmWorkPackSetupModel";
 
 type ReferenceSection = {
-  type: TrackedItemKind;
+  type: "crop";
   title: string;
   addLabel: string;
   placeholder: string;
@@ -83,14 +84,12 @@ export type SetupSectionId =
   | "farmWorkPacks"
   | "scheduleWeek"
   | "farmPlaces"
-  | "crops"
-  | "materials";
+  | "crops";
 
 export function FarmDashboardScreen({
   farm,
   locations,
   crops,
-  materials,
   farmMapRepository,
   organicCertificationRepository,
   planningRepository,
@@ -101,7 +100,6 @@ export function FarmDashboardScreen({
   farm: Farm;
   locations: FarmLocation[];
   crops: TrackedItem[];
-  materials: TrackedItem[];
   farmMapRepository: FarmMapRepository;
   organicCertificationRepository: OrganicCertificationRepository;
   planningRepository: PlanningRepository;
@@ -119,7 +117,6 @@ export function FarmDashboardScreen({
   const datePreferences = useDatePreferences();
   const sections: ReferenceSection[] = [
     { type: "crop", title: "Crops", addLabel: "Add crop", placeholder: "Kale", items: crops },
-    { type: "material", title: "Materials", addLabel: "Add material", placeholder: "Compost", items: materials },
   ];
 
   function toggle(section: SetupSectionId) {
@@ -174,6 +171,7 @@ export function FarmDashboardScreen({
         detail="Rename this local farm setup."
         isExpanded={expandedSection === "farmProfile"}
         onToggle={() => toggle("farmProfile")}
+        rootLevelHeader
         title="Farm name"
       >
         <View style={styles.actionStack}>
@@ -192,6 +190,7 @@ export function FarmDashboardScreen({
         detail={farmCenter ? "Saved farm center geometry is local on this device." : "Save an address or coordinates for the farm map."}
         isExpanded={expandedSection === "farmMapLocation"}
         onToggle={() => toggle("farmMapLocation")}
+        rootLevelHeader
         title="Farm map location"
       >
         <FarmMapLocationEditor
@@ -206,6 +205,7 @@ export function FarmDashboardScreen({
         detail="Choose starter goals and tasks for the work this farm actually does."
         isExpanded={expandedSection === "farmWorkPacks"}
         onToggle={() => toggle("farmWorkPacks")}
+        rootLevelHeader
         title="Starter work packs"
       >
         <FarmWorkPackSetup farmId={farm.id} planningRepository={planningRepository} />
@@ -214,6 +214,7 @@ export function FarmDashboardScreen({
         detail="Show or hide organic certification planning and boards for this farm."
         isExpanded={expandedSection === "organicCertification"}
         onToggle={() => toggle("organicCertification")}
+        rootLevelHeader
         title="Organic certification"
       >
         <OrganicCertificationSetup
@@ -226,6 +227,7 @@ export function FarmDashboardScreen({
         detail={`${locations.length} saved place${locations.length === 1 ? "" : "s"}`}
         isExpanded={expandedSection === "farmPlaces"}
         onToggle={() => toggle("farmPlaces")}
+        rootLevelHeader
         title="Farm places"
       >
         <FarmPlacesEditor
@@ -253,6 +255,7 @@ export function FarmDashboardScreen({
           isExpanded={expandedSection === sectionIdForType(section.type)}
           key={section.type}
           onToggle={() => toggle(sectionIdForType(section.type))}
+          rootLevelHeader
           title={section.title}
         >
           <TrackedItemsEditor
@@ -271,6 +274,7 @@ export function FarmDashboardScreen({
         detail="Controls calendar pickers, day order, and farmhand Week Of dates across the app."
         isExpanded={expandedSection === "scheduleWeek"}
         onToggle={() => toggle("scheduleWeek")}
+        rootLevelHeader
         title="Schedule week setup"
       >
         <SelectField
@@ -290,8 +294,8 @@ export function FarmDashboardScreen({
   );
 }
 
-function sectionIdForType(type: TrackedItemKind): SetupSectionId {
-  return type === "crop" ? "crops" : "materials";
+function sectionIdForType(_type: ReferenceSection["type"]): SetupSectionId {
+  return "crops";
 }
 
 export function FarmWorkPackSetup({
@@ -633,14 +637,23 @@ function PackItemToggle({
   label: string;
   onPress: () => void;
 }) {
+  const density = useUiDensity();
+
   return (
     <Pressable
       accessibilityRole="button"
       disabled={disabled}
       onPress={onPress}
-      style={[styles.packItemToggle, disabled ? styles.packCheckRowDisabled : null]}
+      style={[
+        styles.packItemToggle,
+        {
+          paddingHorizontal: density.isUngloved ? theme.spacing.sm : theme.spacing.md,
+          paddingVertical: density.isUngloved ? theme.spacing.xs : theme.spacing.sm,
+        },
+        disabled ? styles.packCheckRowDisabled : null,
+      ]}
     >
-      <Text style={styles.packItemToggleText}>{label}</Text>
+      <Text style={[styles.packItemToggleText, density.isUngloved ? styles.compactPackItemToggleText : null]}>{label}</Text>
     </Pressable>
   );
 }
@@ -668,8 +681,18 @@ function PackCheckRow({
   onPress: () => void;
   title?: boolean;
 }) {
+  const density = useUiDensity();
+
   return (
-    <View style={styles.packCheckRow}>
+    <View
+      style={[
+        styles.packCheckRow,
+        {
+          minHeight: density.isUngloved ? density.inputMinHeight : theme.spacing.primaryTouchTarget,
+          paddingHorizontal: density.isUngloved ? theme.spacing.xs : theme.spacing.sm,
+        },
+      ]}
+    >
       <Pressable
         accessibilityRole="checkbox"
         accessibilityState={{ checked: isChecked, disabled }}
@@ -937,8 +960,6 @@ const styles = StyleSheet.create({
     borderRadius: theme.radius.sm,
     borderWidth: 1,
     gap: theme.spacing.xs,
-    minHeight: theme.spacing.primaryTouchTarget,
-    paddingHorizontal: theme.spacing.sm,
     paddingVertical: theme.spacing.xs,
   },
   packCheckMain: {
@@ -997,6 +1018,10 @@ const styles = StyleSheet.create({
     color: theme.colors.primary,
     fontSize: theme.typography.small,
     fontWeight: "800",
+  },
+  compactPackItemToggleText: {
+    fontSize: theme.typography.caption,
+    lineHeight: 16,
   },
   mapPreview: {
     backgroundColor: theme.colors.surfaceMuted,

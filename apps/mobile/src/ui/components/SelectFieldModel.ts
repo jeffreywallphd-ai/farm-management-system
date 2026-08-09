@@ -1,6 +1,12 @@
 export type SelectSelectionMode = "single" | "multiple";
 export type SelectOptionLayout = "grid" | "list";
 
+interface SelectLayoutOption {
+  label: string;
+}
+
+const maxGridOptionLabelLength = 18;
+
 const exactDynamicOptionLabels = new Set([
   "assigned farmhand",
   "board",
@@ -16,8 +22,10 @@ const exactDynamicOptionLabels = new Set([
   "observation",
   "organic input",
   "parent place",
+  "parent goal",
   "previous crop",
   "seed lot",
+  "show tasks from",
   "show work for",
 ]);
 
@@ -36,20 +44,41 @@ export function getSelectDropdownHint(isOpen: boolean, selectionMode: SelectSele
   return selectionMode === "multiple" ? "Change options" : "Change option";
 }
 
-export function getSelectOptionLayout(label: string): SelectOptionLayout {
+export function getSelectOptionLayout(
+  label: string,
+  options: readonly SelectLayoutOption[] = [],
+  requestedLayout?: SelectOptionLayout,
+): SelectOptionLayout {
   const normalizedLabel = label.trim().toLowerCase();
   const isDynamicOptionSet =
     exactDynamicOptionLabels.has(normalizedLabel) || dynamicOptionLabelTerms.some((term) => normalizedLabel.includes(term));
 
-  return isDynamicOptionSet ? "list" : "grid";
+  if (requestedLayout === "list" || isDynamicOptionSet || hasLongOptionLabel(options)) {
+    return "list";
+  }
+
+  return requestedLayout ?? "grid";
 }
 
 export function formatGridOptionLabel(label: string): string {
-  const words = label.trim().split(/\s+/);
+  const trimmedLabel = label.trim();
+  const words = trimmedLabel.split(/\s+/);
 
-  if (words.length < 2 || label.length <= 13) {
+  if (words.length === 1 && trimmedLabel.includes("-")) {
+    return trimmedLabel.replace("-", "-\n");
+  }
+
+  if (words.length < 2 || trimmedLabel.length <= 13) {
     return label;
   }
 
   return words.join("\n");
+}
+
+function hasLongOptionLabel(options: readonly SelectLayoutOption[]): boolean {
+  return options.some((option) => {
+    const words = option.label.trim().split(/\s+/).filter(Boolean);
+
+    return option.label.trim().length > maxGridOptionLabelLength || words.length > 2;
+  });
 }

@@ -160,7 +160,7 @@ export function OrganicSystemPlanScreen({
       <OrganicDashboardButton />
       <OrganicEvidencePanel category="ospPractices" farm={farm} farmEventRepository={farmEventRepository} repository={repository} />
       <OrganicEvidencePanel category="ospRecordkeeping" farm={farm} farmEventRepository={farmEventRepository} repository={repository} />
-      <Card>
+      <Card rootLevelHeader>
         <SectionHeading detail="Use your certifier's forms for formal submission. These local notes help gather the pieces." title="OSP section" />
         <OrganicFarmEventPrompt category="ospPractices" />
         {sections.map((section) => (
@@ -207,7 +207,7 @@ export function OrganicSystemPlanScreen({
         ) : null}
         {error ? <Text style={styles.error}>{error}</Text> : null}
       </Card>
-      <Card>
+      <Card rootLevelHeader>
         <SectionHeading
           detail="Certification tasks use the shared planning foundation, but stay here in the certification workflow."
           title="Certification task"
@@ -222,8 +222,8 @@ export function OrganicSystemPlanScreen({
         <FormField label="Notes" multiline onChangeText={setTaskNotes} placeholder="Documents to find, questions for certifier, missing records" value={taskNotes} />
         <Button label="Save certification task" onPress={handleSaveCertificationTask} size="large" variant="secondary" />
       </Card>
-      <Card>
-        <SectionHeading title="OSP and inspection reports" />
+      <Card rootLevelHeader>
+        <SectionHeading detail="Create local OSP and inspection-preparation reports from saved notes and tasks." title="OSP and inspection reports" />
         <View style={styles.buttons}>
           <Button label="OSP Draft Summary" onPress={() => handleReport("ospDraft")} size="large" variant="secondary" />
           <Button label="Inspection Prep Report" onPress={() => handleReport("inspectionReadiness")} size="large" variant="secondary" />

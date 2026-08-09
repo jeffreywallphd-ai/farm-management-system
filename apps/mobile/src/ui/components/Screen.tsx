@@ -3,11 +3,11 @@ import { Image, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } f
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { AppHeader } from "./AppHeader";
+import { useUiDensity } from "../theme/UiDensity";
 import { theme } from "../theme/theme";
 
 const footerHills = require("../../../assets/images/farm-footer-hills.png");
 const headerSky = require("../../../assets/images/farm-header-sky.png");
-const headerToContentSpacing = Math.round(theme.spacing.xl * 0.6);
 
 export function Screen({
   children,
@@ -19,7 +19,8 @@ export function Screen({
   scrollViewRef?: RefObject<ScrollView | null>;
 }) {
   const insets = useSafeAreaInsets();
-  const headerImageHeight = insets.top + theme.spacing.primaryTouchTarget;
+  const density = useUiDensity();
+  const headerImageHeight = insets.top + (density.isUngloved ? 56 : theme.spacing.primaryTouchTarget);
 
   return (
     <KeyboardAvoidingView
@@ -35,12 +36,19 @@ export function Screen({
           <Image accessible={false} resizeMode="stretch" source={footerHills} style={styles.footerImage} />
         </View>
         <ScrollView
-          contentContainerStyle={styles.content}
+          contentContainerStyle={[
+            styles.content,
+            {
+              paddingBottom: density.isUngloved ? theme.spacing.xl + 28 : theme.spacing.xl + 42,
+              paddingHorizontal: density.contentPaddingHorizontal,
+              paddingTop: density.contentPaddingTop,
+            },
+          ]}
           keyboardShouldPersistTaps="handled"
           ref={scrollViewRef}
           style={styles.scrollView}
         >
-          <View collapsable={false} ref={contentRef} style={styles.inner}>{children}</View>
+          <View collapsable={false} ref={contentRef} style={[styles.inner, { gap: density.contentGap }]}>{children}</View>
         </ScrollView>
       </SafeAreaView>
     </KeyboardAvoidingView>
@@ -83,12 +91,8 @@ const styles = StyleSheet.create({
   },
   content: {
     flexGrow: 1,
-    paddingHorizontal: theme.spacing.lg,
-    paddingTop: headerToContentSpacing,
-    paddingBottom: theme.spacing.xl + 42,
   },
   inner: {
     width: "100%",
-    gap: theme.spacing.lg,
   },
 });

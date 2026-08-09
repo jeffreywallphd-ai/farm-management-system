@@ -9,14 +9,18 @@ import { Card } from "../components/Card";
 import { PageHeader } from "../components/PageHeader";
 import { Screen } from "../components/Screen";
 import { ThemedIcon, type ThemedIconName } from "../components/ThemedIcon";
+import { useDatePreferences } from "../datePreferences";
 import { pushRoute } from "../navigation";
+import { useUiDensity } from "../theme/UiDensity";
 import { theme } from "../theme/theme";
 import { summarizeHomeTaskCounts } from "./HomeScreenModel";
 
 export function HomeScreen({ farm }: { farm: Farm }) {
   const database = useDatabase();
+  const density = useUiDensity();
+  const { weekStartsOn } = useDatePreferences();
   const router = useRouter();
-  const [taskCounts, setTaskCounts] = useState({ blockedTasks: 0, workableTasks: 0 });
+  const [taskCounts, setTaskCounts] = useState({ blockedTasks: 0, workableTasks: 0, workableThisWeekTasks: 0 });
 
   useFocusEffect(
     useCallback(() => {
@@ -29,20 +33,20 @@ export function HomeScreen({ farm }: { farm: Farm }) {
 
         const tasks = await database.planningRepository.listTasks(farm.id);
         if (isActive) {
-          setTaskCounts(summarizeHomeTaskCounts(tasks));
+          setTaskCounts(summarizeHomeTaskCounts(tasks, { weekStartsOn }));
         }
       }
 
       loadTaskCounts().catch(() => {
         if (isActive) {
-          setTaskCounts({ blockedTasks: 0, workableTasks: 0 });
+          setTaskCounts({ blockedTasks: 0, workableTasks: 0, workableThisWeekTasks: 0 });
         }
       });
 
       return () => {
         isActive = false;
       };
-    }, [database, farm.id]),
+    }, [database, farm.id, weekStartsOn]),
   );
 
   return (
@@ -77,6 +81,7 @@ export function HomeScreen({ farm }: { farm: Farm }) {
           <Text style={styles.description}>Move planned work through task boards and record farm events from task cards.</Text>
           <View style={styles.taskIndicatorGrid}>
             <TaskIndicator label="Workable" value={taskCounts.workableTasks} />
+            {density.isUngloved ? <TaskIndicator label="This week" value={taskCounts.workableThisWeekTasks} /> : null}
             <TaskIndicator label="Blocked" value={taskCounts.blockedTasks} />
           </View>
           <Button icon="board" label="Track Work" onPress={() => pushRoute(router, "/planning/boards")} size="hero" />
@@ -121,10 +126,12 @@ export function HomeScreen({ farm }: { farm: Farm }) {
 }
 
 function TaskIndicator({ label, value }: { label: string; value: number }) {
+  const density = useUiDensity();
+
   return (
     <View style={styles.taskIndicator}>
-      <Text style={styles.taskIndicatorValue}>{value}</Text>
-      <Text style={styles.taskIndicatorLabel}>{label}</Text>
+      <Text style={[styles.taskIndicatorValue, density.isUngloved ? styles.compactTaskIndicatorValue : null]}>{value}</Text>
+      <Text style={[styles.taskIndicatorLabel, density.isUngloved ? styles.compactTaskIndicatorLabel : null]}>{label}</Text>
     </View>
   );
 }
@@ -206,8 +213,9 @@ const styles = StyleSheet.create({
   },
   taskIndicatorLabel: {
     color: theme.colors.textSecondary,
-    fontSize: theme.typography.small,
+    fontSize: theme.typography.caption,
     fontWeight: "700",
+    lineHeight: 16,
     letterSpacing: 0,
     textAlign: "center",
     textTransform: "uppercase",
@@ -215,9 +223,17 @@ const styles = StyleSheet.create({
   taskIndicatorValue: {
     color: theme.colors.primary,
     fontFamily: theme.typography.headingFontFamily,
-    fontSize: theme.typography.title,
+    fontSize: theme.typography.heading,
     fontWeight: theme.typography.headingFontWeight,
-    lineHeight: 36,
+    lineHeight: 28,
+  },
+  compactTaskIndicatorLabel: {
+    fontSize: 11,
+    lineHeight: 14,
+  },
+  compactTaskIndicatorValue: {
+    fontSize: theme.typography.section,
+    lineHeight: 24,
   },
   iconBadge: {
     alignItems: "center",

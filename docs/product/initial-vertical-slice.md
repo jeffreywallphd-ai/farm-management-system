@@ -53,7 +53,7 @@ The pilot includes:
 - A single-farm device-local operating context.
 - Minimal local farm setup.
 - Basic farm locations such as field, bed, greenhouse, tunnel, barn, storage area, or wash/pack area.
-- Basic tracked items sufficient for scoped workflows: selected crops, materials, equipment, or countable items.
+- Basic tracked items sufficient for scoped workflows: selected crops, farm inputs/materials, and equipment catalog details.
 
 This slice does not design account systems, multi-device membership, or final identity architecture.
 

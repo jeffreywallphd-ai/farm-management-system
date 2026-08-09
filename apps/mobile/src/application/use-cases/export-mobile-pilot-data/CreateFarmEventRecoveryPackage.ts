@@ -11,6 +11,7 @@ import type { ExportRepository, MobilePilotExportFile, RecoveryPackageMediaFile 
 import type { FarmhandRepository } from "../../ports/FarmhandRepository";
 import type { FarmMapRepository } from "../../ports/FarmMapRepository";
 import type { FarmReferenceRepository } from "../../ports/FarmReferenceRepository";
+import type { InventoryRepository } from "../../ports/InventoryRepository";
 import type { LocalRecordRepository } from "../../ports/LocalRecordRepository";
 import type { PlanningRepository } from "../../ports/PlanningRepository";
 import { serializeFarmEventRecoveryPackageManifest } from "../../../infrastructure/export/FarmEventRecoveryPackageExporter";
@@ -26,6 +27,7 @@ export async function createFarmEventRecoveryPackage(
     farmhandRepository?: FarmhandRepository;
     farmMapRepository?: FarmMapRepository;
     farmReferenceRepository: FarmReferenceRepository;
+    inventoryRepository?: InventoryRepository;
     localRecordRepository: LocalRecordRepository;
     planningRepository?: PlanningRepository;
   },

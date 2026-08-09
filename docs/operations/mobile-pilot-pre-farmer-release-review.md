@@ -9,7 +9,7 @@ The app is ready for owner-run physical-device release checks after local valida
 ## What Must Be Verified On Device
 
 1. Fresh install opens without Expo Router route warnings.
-2. Farm setup, farm places, crops, materials, and countable items persist after relaunch.
+2. Farm setup, farm places, crops, inventory materials, and equipment catalog entries persist after relaunch.
 3. Voice memo recording works in airplane mode.
 4. Photo capture and photo picker work with clear permission prompts.
 5. Farm notes save locally and appear in the farm-note timeline.
@@ -18,7 +18,7 @@ The app is ready for owner-run physical-device release checks after local valida
 8. Manual JSON recovery copy opens the native share/save flow.
 9. Media recovery ZIP package opens the native share/save flow and contains metadata plus retained media files.
 10. Cancelling share/save does not delete local records or media.
-11. No UI claims transcription, AI interpretation, upload, synchronization, accounts, cloud backup, analytics, listings, or messaging.
+11. No UI claims structured AI interpretation, upload, synchronization, accounts, cloud backup, analytics, listings, or messaging.
 
 ## Known Non-Goals For This Gate
 

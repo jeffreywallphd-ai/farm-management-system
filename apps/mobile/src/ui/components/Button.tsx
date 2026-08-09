@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { getThemedIconForText, ThemedIcon, type ThemedIconName } from "./ThemedIcon";
+import { useUiDensity } from "../theme/UiDensity";
 import { theme } from "../theme/theme";
 
 export function Button({
@@ -20,8 +21,9 @@ export function Button({
   size?: "standard" | "large" | "hero";
   disabled?: boolean;
 }) {
+  const density = useUiDensity();
   const iconColor = variant === "secondary" ? theme.colors.primary : theme.colors.onPrimary;
-  const iconSize = size === "hero" ? 32 : size === "large" ? 26 : 22;
+  const iconSize = density.isUngloved ? (size === "hero" ? 28 : size === "large" ? 23 : 20) : size === "hero" ? 32 : size === "large" ? 26 : 22;
   const resolvedIcon = icon ?? getThemedIconForText(label, "leaf");
   const resolvedTrailingIcon = trailingIcon ?? "arrowRight";
 
@@ -32,14 +34,17 @@ export function Button({
       onPress={onPress}
       style={({ pressed }) => [
         styles.button,
-        size === "large" ? styles.largeButton : null,
-        size === "hero" ? styles.heroButton : null,
+        {
+          minHeight: size === "hero" ? (density.isUngloved ? 68 : 86) : size === "large" ? density.buttonMinHeight : density.buttonMinHeight,
+          paddingHorizontal: density.isUngloved ? theme.spacing.md : size === "hero" ? theme.spacing.xl : theme.spacing.lg,
+          paddingVertical: density.isUngloved ? theme.spacing.sm : size === "large" || size === "hero" ? theme.spacing.lg : theme.spacing.md,
+        },
         variant === "secondary" ? styles.secondary : styles.primary,
         pressed && !disabled && (variant === "secondary" ? styles.secondaryPressed : styles.primaryPressed),
         disabled && styles.disabled,
       ]}
     >
-      <View style={styles.content}>
+      <View style={[styles.content, { gap: density.isUngloved ? theme.spacing.sm : theme.spacing.md }]}>
         <ThemedIcon color={iconColor} name={resolvedIcon} size={iconSize} />
         <Text
           numberOfLines={2}
@@ -48,6 +53,7 @@ export function Button({
             size === "standard" ? styles.standardLabel : null,
             size === "large" ? styles.largeLabel : null,
             size === "hero" ? styles.heroLabel : null,
+            density.isUngloved ? styles.compactLabel : null,
             variant === "secondary" ? styles.secondaryLabel : styles.primaryLabel,
           ]}
         >
@@ -63,19 +69,7 @@ const styles = StyleSheet.create({
   button: {
     alignItems: "center",
     borderRadius: theme.radius.lg,
-    minHeight: theme.spacing.primaryTouchTarget,
     justifyContent: "center",
-    paddingHorizontal: theme.spacing.lg,
-    paddingVertical: theme.spacing.md,
-  },
-  largeButton: {
-    minHeight: theme.spacing.primaryTouchTarget,
-    paddingVertical: theme.spacing.lg,
-  },
-  heroButton: {
-    minHeight: 86,
-    paddingHorizontal: theme.spacing.xl,
-    paddingVertical: theme.spacing.lg,
   },
   primary: {
     backgroundColor: theme.colors.primary,
@@ -104,7 +98,6 @@ const styles = StyleSheet.create({
   content: {
     alignItems: "center",
     flexDirection: "row",
-    gap: theme.spacing.md,
     justifyContent: "center",
     width: "100%",
   },
@@ -114,6 +107,10 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.body,
     fontWeight: "700",
     textAlign: "left",
+  },
+  compactLabel: {
+    fontSize: theme.typography.small,
+    lineHeight: 18,
   },
   standardLabel: {
     lineHeight: 20,

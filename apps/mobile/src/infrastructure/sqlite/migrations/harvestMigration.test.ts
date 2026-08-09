@@ -33,6 +33,10 @@ import { addFarmWorkTemplatePlanningSource } from "./0031_add_farm_work_template
 import { createFarmWorkPackStates } from "./0032_create_farm_work_pack_states";
 import { addStarterWorkPacksSetupState } from "./0033_add_starter_work_packs_setup_state";
 import { createFarmWorkPackItemStates } from "./0034_create_farm_work_pack_item_states";
+import { createInventoryManagement } from "./0035_create_inventory_management";
+import { addPurchaseFarmEventTypes } from "./0036_add_purchase_farm_event_types";
+import { addInventoryPurchaseNoteLinks } from "./0037_add_inventory_purchase_note_links";
+import { addInventoryCatalogQuantityAndSource } from "./0038_add_inventory_catalog_quantity_and_source";
 import { runMigrations } from "./migrationRunner";
 
 test("harvest migration creates only harvest record storage", () => {
@@ -545,4 +549,75 @@ test("farm place geometry map-view migration adds local view settings only", () 
   assert.doesNotMatch(sql, /upload/i);
   assert.doesNotMatch(sql, /analytics/i);
   assert.doesNotMatch(sql, /auth/i);
+});
+
+test("inventory management migration creates local catalog details without server behavior", () => {
+  const sql = createInventoryManagement.statements.join("\n");
+
+  assert.equal(createInventoryManagement.version, 35);
+  assert.match(sql, /CREATE TABLE IF NOT EXISTS inventory_items/);
+  assert.match(sql, /kind TEXT NOT NULL CHECK \(kind IN \('material', 'equipment'\)\)/);
+  assert.match(sql, /category TEXT/);
+  assert.match(sql, /common_item_key TEXT/);
+  assert.match(sql, /acquisition_source TEXT NOT NULL DEFAULT 'alreadyOwned'/);
+  assert.match(sql, /current_amount REAL/);
+  assert.match(sql, /current_unit TEXT/);
+  assert.match(sql, /organic_relevance TEXT NOT NULL/);
+  assert.match(sql, /organic_approval_status TEXT NOT NULL/);
+  assert.match(sql, /purchase_note_farm_event_id TEXT/);
+  assert.match(sql, /cleaning_required INTEGER NOT NULL/);
+  assert.doesNotMatch(sql, /server/i);
+  assert.doesNotMatch(sql, /sync/i);
+  assert.doesNotMatch(sql, /upload/i);
+  assert.doesNotMatch(sql, /analytics/i);
+  assert.doesNotMatch(sql, /auth/i);
+});
+
+test("inventory catalog quantity and source migration stores local catalog stock context only", () => {
+  const sql = addInventoryCatalogQuantityAndSource.statements.join("\n");
+
+  assert.equal(addInventoryCatalogQuantityAndSource.version, 38);
+  assert.match(sql, /ALTER TABLE inventory_items ADD COLUMN category TEXT/);
+  assert.match(sql, /ALTER TABLE inventory_items ADD COLUMN common_item_key TEXT/);
+  assert.match(sql, /ALTER TABLE inventory_items ADD COLUMN acquisition_source TEXT NOT NULL DEFAULT 'alreadyOwned'/);
+  assert.match(sql, /ALTER TABLE inventory_items ADD COLUMN current_amount REAL/);
+  assert.match(sql, /ALTER TABLE inventory_items ADD COLUMN current_unit TEXT/);
+  assert.match(sql, /idx_inventory_items_category/);
+  assert.doesNotMatch(sql, /purchase_order/i);
+  assert.doesNotMatch(sql, /accounting/i);
+  assert.doesNotMatch(sql, /ledger/i);
+  assert.doesNotMatch(sql, /server/i);
+  assert.doesNotMatch(sql, /sync/i);
+  assert.doesNotMatch(sql, /publication/i);
+});
+
+test("purchase farm event type migration expands local farm notes without purchase ledger behavior", () => {
+  const sql = addPurchaseFarmEventTypes.statements.join("\n");
+
+  assert.equal(addPurchaseFarmEventTypes.version, 36);
+  assert.match(sql, /CREATE TABLE farm_events_event_type_rebuilt/);
+  assert.match(sql, /'materialPurchase'/);
+  assert.match(sql, /'equipmentPurchase'/);
+  assert.match(sql, /needs_organic_review INTEGER NOT NULL DEFAULT 0/);
+  assert.doesNotMatch(sql, /purchase_order/i);
+  assert.doesNotMatch(sql, /accounting/i);
+  assert.doesNotMatch(sql, /stock_total/i);
+  assert.doesNotMatch(sql, /server/i);
+  assert.doesNotMatch(sql, /sync/i);
+  assert.doesNotMatch(sql, /publication/i);
+});
+
+test("inventory purchase note link migration associates catalog items with local farm notes only", () => {
+  const sql = addInventoryPurchaseNoteLinks.statements.join("\n");
+
+  assert.equal(addInventoryPurchaseNoteLinks.version, 37);
+  assert.match(sql, /ALTER TABLE inventory_items ADD COLUMN purchase_note_farm_event_id/);
+  assert.match(sql, /REFERENCES farm_events\(id\)/);
+  assert.match(sql, /idx_inventory_items_purchase_note/);
+  assert.doesNotMatch(sql, /purchase_order/i);
+  assert.doesNotMatch(sql, /accounting/i);
+  assert.doesNotMatch(sql, /stock_total/i);
+  assert.doesNotMatch(sql, /server/i);
+  assert.doesNotMatch(sql, /sync/i);
+  assert.doesNotMatch(sql, /publication/i);
 });

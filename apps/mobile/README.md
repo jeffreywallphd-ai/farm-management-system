@@ -2,7 +2,7 @@
 
 Mobile Pilot 1 is the standalone offline-first mobile app for farmer testing. It validates manual device-local recording, local activity history, clear saved-state communication, and user-controlled export/recovery copy before server-connected features exist.
 
-Phase 1 implements minimal local farm setup and reference data. A farmer can create one device-local farm profile, add farmer-facing farm places, crops, materials, and countable items, and reopen the app to see that setup data retained locally.
+Phase 1 implements minimal local farm setup and reference data. A farmer can create one device-local farm profile, add farmer-facing farm places and crops, add materials through Inventory Management, and reopen the app to see that setup data retained locally.
 
 Phase 2 implements the first complete operational workflow: manual harvest recording, harvest history, read-only harvest detail, and a local versioned JSON recovery-copy export for farm setup/reference data and saved harvest records.
 
@@ -42,20 +42,23 @@ Canonical record meaning lives in [Mobile Pilot 1 Operational Records](../../doc
 
 - Minimal local farm setup with a farm name.
 - Guided farm-place setup with place types and optional parent/child hierarchy.
-- Local tracked crops, materials, and countable items.
+- Local tracked crops and materials, with materials managed through Inventory Management.
 - SQLite-backed local persistence through the repository boundary.
 - Manual `HarvestRecorded` creation using an existing crop and location.
 - Manual `MaterialUseRecorded` creation using an existing material and optional location.
-- Manual `InventoryCountRecorded` creation using an existing material or countable item and optional location.
+- Manual `InventoryCountRecorded` creation using an existing crop or material and optional location.
+- Local Inventory Management page for adding farm inputs/materials and equipment through category and common-item pickers with an `Other` option, storing source type, amount on hand, unit, supplier/storage/reorder notes, recording linked private material-purchase and equipment-purchase farm notes from inside the add forms with voice and optional photos, storing organic review/evidence fields when relevant, and summarizing confirmed material-use records by material and unit.
 - Unified local activity history and read-only detail views for all three implemented manual records.
 - Local JSON recovery-copy file generation and device-native share/save flow for implemented manual records and required reference data, including farm-place type and parent relationships.
 - Farm-event capture metadata and local attachment-reference persistence foundation for ADR-0012 voice/photo work.
 - Local voice memo recording, microphone permission request, playback, optional photo attachment, and farm-note save flow.
 - Photo attachments are copied from picker/camera cache into durable app-owned local storage before the farm note is saved; older notes whose temporary files are no longer present show a per-photo unavailable state instead of hiding the note.
+- Inventory purchase notes use the same farm-note capture flow so farmers can photograph materials, labels, receipts, equipment, and storage places, then link the saved note to the catalog item without creating accounting records or automatic stock adjustments.
 - Local farm-note timeline with type, place, and date filters plus read-only detail review with audio playback and photo previews.
 - Persistent `Farm Notes` header with a hamburger menu for local navigation between capture, timeline, setup, activity history, and recovery copy.
 - Saved farm-note detail includes a transcript-draft area, local model download controls, and a `Transcribe voice memo` action using the `whisper.rn` adapter. It downloads `ggml-tiny.en.bin` from the accepted `ggerganov/whisper.cpp` Hugging Face model source into app document storage under `transcription-models/`. If transcription fails, the app maps common local causes such as missing audio, model-open failure, unsupported audio format, or native-module unavailability to user-safe messages while preserving the original audio.
 - ZIP media recovery package export containing manual JSON data, farm-note metadata, voice memo files, photo files, and transcript drafts when present.
+- Recovery-copy export includes inventory catalog details when present.
 - Organic Certification Phase 1: local organic operation profile, certification scope selection, organic dashboard, Organic Profile Report, and recovery-copy inclusion. This organizes records for certifier review and does not certify the farm or provide legal determinations.
 - Organic Certification Phase 2: local organic place profiles, transition/boundary/buffer fields, boundary evidence records, place-level reports, and recovery-copy inclusion. Readable place paths are derived from the current farm-place hierarchy rather than snapshotted names.
 - Organic Certification Phase 3: local organic input records, approval evidence references, input application records, input reports, and recovery-copy inclusion. Approval status is farmer-entered and not automatically verified against OMRI, WSDA, USDA, or certifier systems.

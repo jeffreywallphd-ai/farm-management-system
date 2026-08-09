@@ -42,8 +42,8 @@ export function OrganicInspectionDayScreen({
         title="Inspection day"
       />
       <OrganicDashboardButton />
-      <Card>
-        <SectionHeading title="Evidence shortcuts" />
+      <Card rootLevelHeader>
+        <SectionHeading detail="Open the main evidence areas that help prepare for inspection review." title="Evidence shortcuts" />
         <View style={styles.shortcutGrid}>
           {ORGANIC_EVIDENCE_CATEGORIES.map((category) => {
             const count = links.filter((view) => view.link.category === category).length;
@@ -56,8 +56,8 @@ export function OrganicInspectionDayScreen({
           })}
         </View>
       </Card>
-      <Card>
-        <SectionHeading title="Linked note evidence" />
+      <Card rootLevelHeader>
+        <SectionHeading detail="Review recent farm notes linked as inspection evidence." title="Linked note evidence" />
         {links.length ? (
           links.map((view) => (
             <View key={view.link.id} style={styles.row}>

@@ -214,7 +214,7 @@ export function OrganicTraceabilityScreen({
       <OrganicDashboardButton />
       <OrganicEvidencePanel category="lotTraceability" farm={farm} farmEventRepository={farmEventRepository} repository={repository} />
       <OrganicEvidencePanel category="handlingMassBalance" farm={farm} farmEventRepository={farmEventRepository} repository={repository} />
-      <Card>
+      <Card rootLevelHeader>
         <SectionHeading detail="Lots are farmer-entered traceability records. Link an existing harvest record ID when useful." title="Harvest lot" />
         <OrganicFarmEventPrompt category="lotTraceability" />
         {lots.map((lot) => (
@@ -281,8 +281,8 @@ export function OrganicTraceabilityScreen({
         ) : null}
         {error ? <Text style={styles.error}>{error}</Text> : null}
       </Card>
-      <Card>
-        <SectionHeading title="Handling, storage, and sales" />
+      <Card rootLevelHeader>
+        <SectionHeading detail="Record lot movement through handling, storage, and sales for traceability review." title="Handling, storage, and sales" />
         <OrganicFarmEventPrompt category="handlingMassBalance" />
         {lots.length === 0 ? (
           <Text style={styles.lotDetail}>Save an organic lot before recording movement or sales.</Text>
@@ -314,8 +314,8 @@ export function OrganicTraceabilityScreen({
           </>
         )}
       </Card>
-      <Card>
-        <SectionHeading title="Organic traceability reports" />
+      <Card rootLevelHeader>
+        <SectionHeading detail="Create local reports for harvest lots, handling, storage, sales, and mass balance." title="Organic traceability reports" />
         <View style={styles.buttons}>
           <Button label="Lot Traceability" onPress={() => handleCreateReport("lots")} size="large" variant="secondary" />
           <Button label="Handling Report" onPress={() => handleCreateReport("handling")} size="large" variant="secondary" />

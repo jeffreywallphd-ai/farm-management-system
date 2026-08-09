@@ -34,6 +34,10 @@ import { addFarmWorkTemplatePlanningSource } from "./0031_add_farm_work_template
 import { createFarmWorkPackStates } from "./0032_create_farm_work_pack_states";
 import { addStarterWorkPacksSetupState } from "./0033_add_starter_work_packs_setup_state";
 import { createFarmWorkPackItemStates } from "./0034_create_farm_work_pack_item_states";
+import { createInventoryManagement } from "./0035_create_inventory_management";
+import { addPurchaseFarmEventTypes } from "./0036_add_purchase_farm_event_types";
+import { addInventoryPurchaseNoteLinks } from "./0037_add_inventory_purchase_note_links";
+import { addInventoryCatalogQuantityAndSource } from "./0038_add_inventory_catalog_quantity_and_source";
 
 export interface Migration {
   version: number;
@@ -76,6 +80,10 @@ const migrations: Migration[] = [
   createFarmWorkPackStates,
   addStarterWorkPacksSetupState,
   createFarmWorkPackItemStates,
+  createInventoryManagement,
+  addPurchaseFarmEventTypes,
+  addInventoryPurchaseNoteLinks,
+  addInventoryCatalogQuantityAndSource,
 ];
 
 export async function runMigrations(database: SQLiteDatabase): Promise<void> {

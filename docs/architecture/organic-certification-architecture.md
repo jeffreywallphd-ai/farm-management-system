@@ -62,10 +62,12 @@ Boundary evidence can store an optional local URI/reference. Media capture and d
 
 Phase 3 adds local SQLite storage for:
 
-- organic input records linked optionally to setup materials;
+- organic input records linked optionally to tracked materials from Inventory Management;
 - organic input application records linked to organic inputs and optionally to places, crops, evidence references, and farm notes.
 
 Organic input approval status is stored as user-entered app data. The repository does not call OMRI, WSDA, USDA, certifier, or National List services. Any later external lookup or certifier-specific workflow requires separate accepted scope and ADR review.
+
+Inventory Management also stores organic-aware catalog fields for farm inputs/materials and equipment. Those fields are local supporting evidence fields and may eventually become the preferred inventory-backed home for input/equipment readiness. They do not replace organic input/application records yet, do not make approval decisions, and do not introduce external lookups or certifier submission.
 
 ## Phase 4 Storage Boundary
 

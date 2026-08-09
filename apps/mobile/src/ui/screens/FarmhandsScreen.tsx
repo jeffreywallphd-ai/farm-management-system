@@ -380,7 +380,7 @@ export function FarmhandsScreen({
         title="Farmhands"
       />
 
-      <Card>
+      <Card rootLevelHeader>
         <SectionHeading detail="Phone numbers and notes stay local unless you export a recovery copy." title="Add farmhand" />
         {!editingFarmhandId ? (
           <FarmhandForm
@@ -401,7 +401,7 @@ export function FarmhandsScreen({
         )}
       </Card>
 
-      <Card>
+      <Card rootLevelHeader>
         <SectionHeading detail="Tap a farmhand to edit details or call from this phone." title="Farmhand directory" />
         {farmhands.length ? farmhands.map((farmhand) => {
           const farmhandRecurringSchedules = recurringSchedules.filter((schedule) => schedule.farmhandId === farmhand.id);
@@ -439,7 +439,11 @@ export function FarmhandsScreen({
               ) : null}
               {isScheduling ? (
                 <View style={styles.schedulePanel}>
-                  <SectionHeading detail="Keep one current schedule for this farmhand. Saving replaces older schedule rows for this farmhand." title="Schedule" />
+                  <SectionHeading
+                    detail="Keep one current schedule for this farmhand. Saving replaces older schedule rows for this farmhand."
+                    rootCardHeader={false}
+                    title="Schedule"
+                  />
                   {currentSchedule && !isEditingSchedule ? (
                     <CurrentScheduleCard
                       schedule={currentSchedule}

@@ -21,6 +21,7 @@ Helps agents implement USDA organic certification readiness features without ove
 - The module organizes evidence and reports for farmer/certifier preparation. It does not certify farms or make legal determinations.
 - Farm setup owns the pursuit/continuation toggle. Missing profiles and `notOrganic` profiles mean certification is off; show an off-state certification page and hide seeded certification goals/boards until pursuit is turned back on.
 - Voice/photo farm notes are the source capture layer for certification evidence. Use organic evidence links to relate notes to organic categories or records instead of creating a separate evidence inbox or copying media.
+- Inventory Management can store optional organic relevance, approval/review status, regulation notes, and evidence notes for farm inputs/materials and equipment. These fields organize evidence and do not verify approval or make compliance decisions.
 - Organic Certification uses the shared local planning foundation for certification goals, subgoals, and tasks while remaining a standalone certification feature.
 - Seeded certification planning uses two highest-level goals: certification administration work and certification farm work.
 - Certification planning templates should split broad regulatory areas into smaller subgoals when evidence differs, including input approval vs application, soil fertility vs compost vs manure intervals, lot traceability vs handling/mass balance, and OSP practices vs recordkeeping/prevention procedures.

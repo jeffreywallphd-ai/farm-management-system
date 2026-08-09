@@ -247,7 +247,7 @@ Phase 2 is complete when:
 
 ## Phase 3 Scope
 
-Phase 3 adds organic input and material readiness records tied to the app's existing setup materials.
+Phase 3 adds organic input and material readiness records tied to the app's existing tracked materials from Inventory Management.
 
 Included:
 

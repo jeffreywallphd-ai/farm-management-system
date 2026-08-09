@@ -17,7 +17,20 @@ describe("HomeScreenModel", () => {
     assert.deepEqual(summary, {
       blockedTasks: 1,
       workableTasks: 2,
+      workableThisWeekTasks: 0,
     });
+  });
+
+  it("counts workable tasks due during the current farm week", () => {
+    const summary = summarizeHomeTaskCounts([
+      makeTask({ id: "week-start", status: "notStarted", dueDate: "2026-06-01" }),
+      makeTask({ id: "week-end", status: "inProgress", dueDate: "2026-06-07" }),
+      makeTask({ id: "blocked-this-week", status: "blocked", dueDate: "2026-06-04" }),
+      makeTask({ id: "next-week", status: "notStarted", dueDate: "2026-06-08" }),
+      makeTask({ id: "no-date", status: "notStarted" }),
+    ], { today: "2026-06-04", weekStartsOn: 1 });
+
+    assert.equal(summary.workableThisWeekTasks, 2);
   });
 });
 

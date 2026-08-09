@@ -24,18 +24,15 @@ function SetupRouteContent({ farm, database }: { farm: Farm; database: ReadyData
   const params = useLocalSearchParams<{ section?: string }>();
   const [locations, setLocations] = useState<FarmLocation[]>([]);
   const [crops, setCrops] = useState<TrackedItem[]>([]);
-  const [materials, setMaterials] = useState<TrackedItem[]>([]);
 
   const loadReferences = useCallback(async () => {
-    const [nextLocations, nextCrops, nextMaterials] = await Promise.all([
+    const [nextLocations, nextCrops] = await Promise.all([
       listLocations(farm.id, database.farmReferenceRepository),
       listTrackedItems(farm.id, "crop", database.farmReferenceRepository),
-      listTrackedItems(farm.id, "material", database.farmReferenceRepository),
     ]);
 
     setLocations(nextLocations);
     setCrops(nextCrops);
-    setMaterials(nextMaterials);
   }, [database.farmReferenceRepository, farm.id]);
 
   useEffect(() => {
@@ -48,7 +45,6 @@ function SetupRouteContent({ farm, database }: { farm: Farm; database: ReadyData
       farm={farm}
       initialExpandedSection={parseSetupSection(params.section)}
       locations={locations}
-      materials={materials}
       farmMapRepository={database.farmMapRepository}
       organicCertificationRepository={database.organicCertificationRepository}
       onReferenceSaved={loadReferences}
@@ -68,8 +64,7 @@ function parseSetupSection(section?: string | string[]): SetupSectionId | undefi
     value === "organicCertification" ||
     value === "farmWorkPacks" ||
     value === "scheduleWeek" ||
-    value === "crops" ||
-    value === "materials"
+    value === "crops"
   ) {
     return value;
   }

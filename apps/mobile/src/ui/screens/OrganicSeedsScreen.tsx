@@ -183,7 +183,7 @@ export function OrganicSeedsScreen({
       <PageHeader eyebrow="Organic Certification" supportingText="Track seed lots, commercial availability searches, and planting events locally." title="Organic seeds" />
       <OrganicDashboardButton />
       <OrganicEvidencePanel category="seeds" farm={farm} farmEventRepository={farmEventRepository} repository={repository} />
-      <Card>
+      <Card rootLevelHeader>
         <SectionHeading detail="Nonorganic seed records are evidence prompts for certifier review, not automatic approval." title="Seed lot" />
         <OrganicFarmEventPrompt category="seeds" />
         {seedLots.map((seedLot) => (
@@ -256,8 +256,8 @@ export function OrganicSeedsScreen({
         ) : null}
         {error ? <Text style={styles.error}>{error}</Text> : null}
       </Card>
-      <Card>
-        <SectionHeading title="Commercial availability search" />
+      <Card rootLevelHeader>
+        <SectionHeading detail="Record searches used to document whether organic seed was commercially available." title="Commercial availability search" />
         <OrganicFarmEventPrompt category="seeds" />
         <SelectField label="Seed lot" onChange={setSelectedSeedLotId} options={seedLotOptions} value={selectedSeedLotId} />
         <FormField label="Supplier searched" onChangeText={setSearchSupplier} placeholder="Supplier name" value={searchSupplier} />
@@ -266,8 +266,8 @@ export function OrganicSeedsScreen({
         <FormField label="Notes" multiline onChangeText={setSearchNotes} placeholder="Variety, quantity, quality, timing details" value={searchNotes} />
         <Button label="Record search" onPress={handleRecordSearch} size="large" variant="secondary" />
       </Card>
-      <Card>
-        <SectionHeading title="Planting event" />
+      <Card rootLevelHeader>
+        <SectionHeading detail="Link seed lots to planting records for local certification review." title="Planting event" />
         <OrganicFarmEventPrompt category="seeds" />
         <SelectField label="Seed lot" onChange={setSelectedSeedLotId} options={seedLotOptions} value={selectedSeedLotId} />
         <SelectField label="Crop" onChange={setPlantCropId} options={cropOptions} value={plantCropId} />
@@ -277,8 +277,8 @@ export function OrganicSeedsScreen({
         <SelectField label="Method" onChange={(value) => setPlantingMethod(value as "transplant" | "directSeed" | "")} options={[{ label: "Not recorded", value: "" }, { label: "Transplant", value: "transplant" }, { label: "Direct seed", value: "directSeed" }]} value={plantingMethod} />
         <Button label="Record planting" onPress={handleRecordPlanting} size="large" variant="secondary" />
       </Card>
-      <Card>
-        <SectionHeading title="Organic seed reports" />
+      <Card rootLevelHeader>
+        <SectionHeading detail="Create local reports for seed lots, searches, and planting events." title="Organic seed reports" />
         <View style={styles.buttons}>
           <Button label="Seed and Planting Stock Report" onPress={() => handleCreateReport("seedLots")} size="large" variant="secondary" />
           <Button label="Commercial Availability Report" onPress={() => handleCreateReport("commercialAvailability")} size="large" variant="secondary" />

@@ -231,6 +231,58 @@ test("voice memo farm event can include copied local photo attachments", async (
   assert.deepEqual(photoAttachmentStorageRepository.deletedUris, []);
 });
 
+test("inventory purchase farm notes keep voice and item storage photos as private source captures", async () => {
+  const references = new InMemoryFarmReferenceRepository();
+  await references.createFarm(farm);
+  await references.addLocation(field);
+  const eventRepository = new InMemoryFarmEventRepository({ locations: [field] });
+  const voiceMemoStorageRepository = new FakeVoiceMemoStorageRepository();
+  const photoAttachmentStorageRepository = new FakePhotoAttachmentStorageRepository();
+
+  const result = await recordVoiceMemoFarmEvent(
+    {
+      farmId: farm.id,
+      eventType: "materialPurchase",
+      placeId: field.id,
+      note: "Bought two bags of potting mix and put them in dry storage.",
+      temporaryVoiceMemoUri: "file:///cache/temp-recording.m4a",
+      temporaryPhotoAttachments: [
+        {
+          temporaryUri: "file:///cache/material-label.jpg",
+          originalFileName: "material-label.jpg",
+          width: 1200,
+          height: 900,
+          mimeType: "image/jpeg",
+        },
+        {
+          temporaryUri: "file:///cache/storage-place.jpg",
+          originalFileName: "storage-place.jpg",
+          width: 1200,
+          height: 900,
+          mimeType: "image/jpeg",
+        },
+      ],
+    },
+    {
+      clock: { now: () => new Date("2026-05-30T12:00:00.000Z") },
+      farmEventRepository: eventRepository,
+      farmReferenceRepository: references,
+      idGenerator: new SequenceIds(["voice-file-1", "photo-file-1", "photo-file-2", "event-1", "attachment-1", "attachment-2", "attachment-3"]),
+      photoAttachmentStorageRepository,
+      voiceMemoStorageRepository,
+    },
+  );
+
+  assert.equal(result.event.eventType, "materialPurchase");
+  assert.equal(result.event.privacy, "privateToFarm");
+  assert.equal(result.event.placeId, field.id);
+  assert.equal(result.attachments.filter((attachment) => attachment.kind === "photo").length, 2);
+  assert.deepEqual(
+    photoAttachmentStorageRepository.persistedInputs.map((input) => input.originalFileName),
+    ["material-label.jpg", "storage-place.jpg"],
+  );
+});
+
 test("photo attachment storage receives source photo metadata and does not persist picker cache URI", async () => {
   const references = new InMemoryFarmReferenceRepository();
   await references.createFarm(farm);
@@ -364,8 +416,8 @@ test("farm event recovery package contains metadata plus voice and photo media r
   );
 
   const manifest = JSON.parse(exportRepository.contents);
-  assert.equal(manifest.packageVersion, 2);
-  assert.equal(manifest.packageSchemaVersion, 2);
+  assert.equal(manifest.packageVersion, 3);
+  assert.equal(manifest.packageSchemaVersion, 3);
   assert.equal(manifest.manualRecoveryCopy.farm.id, farm.id);
   assert.equal(manifest.farmEvents.length, 1);
   assert.equal(manifest.farmEvents[0].attachments.length, 2);

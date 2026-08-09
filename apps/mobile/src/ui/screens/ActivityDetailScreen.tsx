@@ -49,7 +49,7 @@ export function ActivityDetailScreen({
   return (
     <Screen>
       <PageHeader eyebrow={getActivityKindLabel(kind)} title="Activity details" />
-      <Card>
+      <Card rootLevelHeader>
         {isLoading ? (
           <Text style={styles.muted}>Loading activity...</Text>
         ) : detail ? (
@@ -68,7 +68,7 @@ function ActivityDetailContent({ detail }: { detail: LocalActivityRecordView }) 
     const harvest = detail as HarvestRecordView;
     return (
       <>
-        <SectionHeading title={harvest.crop.name} />
+        <SectionHeading detail="Review this confirmed local harvest record saved on this device." title={harvest.crop.name} />
         <DetailLine label="Record type" value="Harvest" />
         <DetailLine label="Amount" value={formatQuantity(harvest.record.quantity)} />
         <DetailLine label="Location" value={harvest.sourceLocation.name} />
@@ -83,7 +83,7 @@ function ActivityDetailContent({ detail }: { detail: LocalActivityRecordView }) 
     const materialUse = detail as MaterialUseRecordView;
     return (
       <>
-        <SectionHeading title={materialUse.material.name} />
+        <SectionHeading detail="Review this confirmed local material-use record saved on this device." title={materialUse.material.name} />
         <DetailLine label="Record type" value="Material use" />
         <DetailLine label="Amount" value={formatQuantity(materialUse.record.quantity)} />
         <DetailLine label="Location" value={materialUse.useLocation?.name ?? "No location"} />
@@ -97,7 +97,7 @@ function ActivityDetailContent({ detail }: { detail: LocalActivityRecordView }) 
   const inventoryCount = detail as InventoryCountRecordView;
   return (
     <>
-      <SectionHeading title={inventoryCount.trackedItem.name} />
+      <SectionHeading detail="Review this confirmed local inventory-count record saved on this device." title={inventoryCount.trackedItem.name} />
       <DetailLine label="Record type" value="Inventory count" />
       <DetailLine label="Observed count" value={formatQuantity(inventoryCount.record.observedQuantity)} />
       <DetailLine label="Location" value={inventoryCount.location?.name ?? "No location"} />

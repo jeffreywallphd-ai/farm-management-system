@@ -5,6 +5,7 @@ import { theme } from "../theme/theme";
 import { Button } from "./Button";
 import { PickerIconButton } from "./PickerIconButton";
 import { useDatePreferences } from "../datePreferences";
+import { useUiDensity } from "../theme/UiDensity";
 import { buildCalendarWeeks, monthTitle, parseDateInput, shiftMonth, weekdayLabels } from "./DateFieldModel";
 
 export function DateField({
@@ -20,6 +21,7 @@ export function DateField({
   error?: string;
   placeholder?: string;
 }) {
+  const density = useUiDensity();
   const { weekStartsOn } = useDatePreferences();
   const initialDate = parseDateInput(value) ?? new Date();
   const [isPickerOpen, setIsPickerOpen] = useState(false);
@@ -44,9 +46,9 @@ export function DateField({
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { gap: density.fieldGap }]}>
       <Text style={styles.label}>{label}</Text>
-      <View style={styles.inputRow}>
+      <View style={[styles.inputRow, { gap: density.fieldGap }]}>
         <TextInput
           accessibilityLabel={label}
           keyboardType="numbers-and-punctuation"
@@ -54,7 +56,16 @@ export function DateField({
           placeholder={placeholder}
           placeholderTextColor={theme.colors.textSecondary}
           returnKeyType="done"
-          style={[styles.input, error ? styles.inputError : null]}
+          style={[
+            styles.input,
+            density.isUngloved ? styles.compactInput : null,
+            {
+              minHeight: density.inputMinHeight,
+              paddingHorizontal: density.inputPaddingHorizontal,
+              paddingVertical: density.inputPaddingVertical,
+            },
+            error ? styles.inputError : null,
+          ]}
           value={value}
         />
         <PickerIconButton accessibilityLabel={`Pick ${label}`} icon="calendar" onPress={openPicker} />
@@ -62,7 +73,7 @@ export function DateField({
       {error ? <Text style={styles.error}>{error}</Text> : null}
       <Modal animationType="fade" onRequestClose={() => setIsPickerOpen(false)} transparent visible={isPickerOpen}>
         <View style={styles.modalBackdrop}>
-          <View style={styles.modalCard}>
+          <View style={[styles.modalCard, { gap: density.contentGap, padding: density.isUngloved ? theme.spacing.md : theme.spacing.lg }]}>
             <View style={styles.modalHeader}>
               <Button label="Previous" onPress={() => moveMonth(-1)} size="large" variant="secondary" />
               <Text style={styles.monthTitle}>{monthTitle(visibleMonth.year, visibleMonth.month)}</Text>
@@ -86,6 +97,7 @@ export function DateField({
                     onPress={() => chooseDate(day.date)}
                     style={({ pressed }) => [
                       styles.dayButton,
+                      { minHeight: density.isUngloved ? 38 : 48 },
                       !day.isCurrentMonth ? styles.outsideMonth : null,
                       day.isToday ? styles.today : null,
                       isSelected ? styles.selectedDay : null,
@@ -110,7 +122,6 @@ export function DateField({
 
 const styles = StyleSheet.create({
   container: {
-    gap: theme.spacing.sm,
   },
   label: {
     color: theme.colors.primary,
@@ -120,7 +131,6 @@ const styles = StyleSheet.create({
   inputRow: {
     alignItems: "center",
     flexDirection: "row",
-    gap: theme.spacing.sm,
   },
   input: {
     backgroundColor: theme.colors.surface,
@@ -130,9 +140,10 @@ const styles = StyleSheet.create({
     color: theme.colors.textPrimary,
     fontSize: theme.typography.body,
     flex: 1,
-    minHeight: theme.spacing.touchTarget,
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.md,
+  },
+  compactInput: {
+    fontSize: theme.typography.caption,
+    lineHeight: 16,
   },
   inputError: {
     borderColor: theme.colors.error,
@@ -153,8 +164,6 @@ const styles = StyleSheet.create({
     borderColor: theme.colors.border,
     borderRadius: theme.radius.lg,
     borderWidth: 1,
-    gap: theme.spacing.md,
-    padding: theme.spacing.lg,
   },
   modalHeader: {
     alignItems: "center",
@@ -185,7 +194,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: theme.radius.sm,
     justifyContent: "center",
-    minHeight: 48,
     width: `${100 / 7}%`,
   },
   outsideMonth: {

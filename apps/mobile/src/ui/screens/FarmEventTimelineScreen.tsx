@@ -60,7 +60,7 @@ export function FarmEventTimelineScreen({
         supportingText="Review voice and photo notes saved privately on this device."
         title="Farm note timeline"
       />
-      <Card>
+      <Card rootLevelHeader>
         <SectionHeading detail="Filter your saved notes without needing reception." title="Find notes" />
         <SelectField
           label="Type"
@@ -83,8 +83,8 @@ export function FarmEventTimelineScreen({
           value={dateFilter}
         />
       </Card>
-      <Card>
-        <SectionHeading title="Saved farm notes" />
+      <Card rootLevelHeader>
+        <SectionHeading detail="Open saved voice and photo notes kept locally on this device." title="Saved farm notes" />
         {isLoading ? (
           <Text style={styles.muted}>Loading saved farm notes...</Text>
         ) : filteredEvents.length === 0 ? (

@@ -54,7 +54,9 @@ This document defines the domain meaning of organic certification readiness reco
 ## Phase 3 Domain Rules
 
 - An organic input is the app's local certification-readiness record for a material, substance, or product that may be used in organic production or handling.
-- Organic inputs may link to an existing setup material but can also exist without that link when the farmer wants a certification record before setup cleanup.
+- Organic inputs may link to an existing tracked material from Inventory Management but can also exist without that link when the farmer wants a certification record before inventory cleanup.
+- Inventory catalog items may also store organic relevance, approval/review status, regulation notes, and evidence notes for farm inputs/materials and equipment. These fields are intended to make inventory usable as a long-term home for input and equipment evidence if the standalone certification module is reduced later.
+- When organic certification pursuit is off, organic inventory fields may remain optional supporting context. When a farmer marks an inventory item as organic-relevant, user-facing copy and validation should guide the farmer toward approval/evidence notes, but the app still must not decide acceptability.
 - Approval status is farmer-entered evidence organization. The app must not automatically verify OMRI, WSDA, National List, certifier approval, allowed status, restricted status, or prohibited status.
 - `needsReview`, `unknown`, `restricted`, and `prohibited` statuses should be surfaced in reports as attention items for farmer/certifier review, not as final compliance findings.
 - An organic input application records how a saved organic input was used, including optional place, crop, date, quantity, rate, reason, target problem, weather notes, applied-by, evidence references, and optional farm-note link.

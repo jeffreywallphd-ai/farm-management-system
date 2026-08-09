@@ -41,12 +41,12 @@ export function HarvestDetailScreen({
   return (
     <Screen>
       <PageHeader eyebrow="Harvest" title="Harvest details" />
-      <Card>
+      <Card rootLevelHeader>
         {isLoading ? (
           <Text style={styles.muted}>Loading harvest...</Text>
         ) : detail ? (
           <>
-            <SectionHeading title={detail.crop.name} />
+            <SectionHeading detail="Review this confirmed local harvest record saved on this device." title={detail.crop.name} />
             <DetailLine label="Amount" value={formatHarvestQuantity(detail)} />
             <DetailLine label="Location" value={detail.sourceLocation.name} />
             <DetailLine label="Date" value={formatRecordDate(detail.record.effectiveAt)} />

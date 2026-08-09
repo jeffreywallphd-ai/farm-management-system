@@ -80,13 +80,13 @@ export function RecordInventoryCountScreen({
     <Screen>
       <PageHeader eyebrow="Inventory count" supportingText="Record an observed crop or material count. It will not overwrite earlier history." title="Record crop or material count" />
       {items.length === 0 ? (
-        <Card>
-          <SectionHeading title="Finish setup first" />
+        <Card rootLevelHeader>
+          <SectionHeading detail="Add a crop, material, or countable item before recording an inventory count." title="Finish setup first" />
           <EmptyState text="Add a crop or material before recording a count." />
           <Button label="Back to farm setup" onPress={() => replaceRoute(router, "/setup")} variant="secondary" />
         </Card>
       ) : (
-        <Card>
+        <Card rootLevelHeader>
           <SectionHeading detail="A count is an observation, not a replacement for prior records." title="Count details" />
           <SelectField error={errors.trackedItemId} label="Item" onChange={setTrackedItemId} options={items.map((item) => ({ label: item.name, value: item.id }))} value={trackedItemId} />
           <FormField error={errors.quantityText} keyboardType="decimal-pad" label="Observed count" onChangeText={setQuantityText} placeholder="0" value={quantityText} />

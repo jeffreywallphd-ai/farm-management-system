@@ -33,9 +33,9 @@ export class WhisperRnVoiceMemoTranscriptionService implements VoiceMemoTranscri
       throw new TranscriptionAudioUnavailableError();
     }
 
-    let whisperModule: typeof import("whisper.rn");
+    let whisperModule: typeof import("whisper.rn/index");
     try {
-      whisperModule = await import("whisper.rn");
+      whisperModule = await import("whisper.rn/index");
     } catch {
       throw new TranscriptionModelUnavailableError("Install the internal development build to use local transcription.");
     }
